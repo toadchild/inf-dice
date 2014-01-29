@@ -32,7 +32,7 @@ enum ammo_t{
  */
 struct result{
     int value;          // Number that was rolled
-    int is_hit;         // If the die is a hit (false on a crit)
+    int is_hit;         // If the die is a hit (true on a crit)
     int is_crit;        // If the die is a crit
 };
 
@@ -160,7 +160,7 @@ static void print_tables(struct dice *d){
  *
  * Standard numerical function. Precalculated for efficiency.
  */
-static uint64_t factorial(int n){
+static int factorial(int n){
     switch(n){
         case 0:
         case 1:
@@ -308,22 +308,24 @@ static void count_player_results(struct player *us, struct player *them, int *hi
     *hits = 0;
     *crits = 0;
 
-    // Find highest roll of other player
-    them->best = 0;
-    for(i = 1; i < them->n; i++){
-        if(them->d[i].is_hit && 
-                (!them->d[them->best].is_hit || 
-                (them->d[i].value > them->d[them->best].value))){
+    // Find highest successful roll of other player
+    // Use the fact that the array is sorted
+    for(i = them->n - 1; i >= 0; i--){
+        if(them->d[i].is_hit){
             them->best = i;
+            break;
         }
     }
 
-    for(i = 0; i < us->n; i++){
+    for(i = us->n - 1; i >= 0; i--){
         if(us->d[i].is_hit){
             if(us->d[i].is_crit){
                 // crit, see if it was canceled
                 if(!(them->stat >= us->stat && them->d[them->best].is_crit)){
                     (*crits)++;
+                }else{
+                    // All lower dice will also be canceled
+                    break;
                 }
             }else{
                 // it was a regular hit, see if it was canceled
@@ -331,6 +333,9 @@ static void count_player_results(struct player *us, struct player *them, int *hi
                         (them->d[them->best].value < us->d[i].value ||
                         (them->d[them->best].value == us->d[i].value && them->stat < us->stat)))){
                     (*hits)++;
+                }else{
+                    // All lower dice will also be canceled
+                    break;
                 }
             }
         }
@@ -347,20 +352,25 @@ static void count_player_results(struct player *us, struct player *them, int *hi
  * the roller outputs the numbers in sorted order.
  */
 static int repeat_factor(struct player *p){
-    int seq_len = 1, seq_num = 0;
+    int seq_len = 1, seq_num;
     int i;
     int fact = 1;
 
-    for(i = 0; i < p->n; i++){
+    seq_num = p->d[0].value;
+    for(i = 1; i < p->n; i++){
         if(p->d[i].value != seq_num){
-            fact *= factorial(seq_len);
+            if(seq_len > 1){
+                fact *= factorial(seq_len);
+            }
             seq_num = p->d[i].value;
             seq_len = 1;
         }else{
             seq_len++;
         }
     }
-    fact *= factorial(seq_len);
+    if(seq_len > 1){
+        fact *= factorial(seq_len);
+    }
 
     return fact;
 }
