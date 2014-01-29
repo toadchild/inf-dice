@@ -108,10 +108,27 @@ static void print_tables(struct dice *d){
 }
 
 static uint64_t factorial(int n){
-    if(n == 0){
-        return 1;
+    switch(n){
+        case 0:
+        case 1:
+            return 1;
+            break;
+        case 2:
+            return 2;
+            break;
+        case 3:
+            return 6;
+            break;
+        case 4:
+            return 24;
+            break;
+        case 5:
+            return 120;
+            break;
+        default:
+            return n * factorial(n - 1);
+            break;
     }
-    return n * factorial(n - 1);
 }
 
 static uint64_t choose(int n, int k){
