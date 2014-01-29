@@ -46,9 +46,9 @@ struct dice{
     uint64_t num_rolls;
 };
 
-static int print_player_hits(struct player *p, int p_num, int num_rolls){
+static uint64_t print_player_hits(struct player *p, int p_num, int num_rolls){
     int hits, crits;
-    int n_rolls = 0;
+    uint64_t n_rolls = 0;
 
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
@@ -78,7 +78,7 @@ static void print_tables(struct dice *d){
 
     n_rolls += print_player_hits(&d->p2, 2, d->num_rolls);
 
-    printf("Tables contain %lld rolls.  Total should be %lld\n\n", n_rolls, d->num_rolls);
+    printf("Hit tables contain %llu rolls.  Total should be %llu\n\n", n_rolls, d->num_rolls);
 
     cumul_prob = 0.0;
     for(w = W_MAX; w > 0; w--){
