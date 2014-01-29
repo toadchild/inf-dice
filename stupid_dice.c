@@ -9,26 +9,46 @@
 #define SAVES_MAX  3
 #define W_MAX (B_MAX * SAVES_MAX)
 #define STAT_MAX 20
+#define ROLL_MAX 20
+#define DAM_MAX 20
 
-/*
- * This is a really dumb implementation of Infinity dice math that enumerates
- * every possible combination given the BS and B of both models and tabulates
- * the outcomes
- */
-
-struct result{
-    int value;
-    int is_hit;
-    int is_crit;
+enum ammo_t{
+    AMMO_NORMAL,
+    AMMO_DA,
+    AMMO_EXP,
+    AMMO_FIRE,
 };
 
+/*
+ * This is an implementation of Infinity dice math that enumerates every
+ * possible combination given the BS and B of both models and tabulates
+ * the outcomes.
+ *
+ * Created by Jonathan Polley.
+ */
+
+/*
+ * Structure for a single die result.
+ */
+struct result{
+    int value;          // Number that was rolled
+    int is_hit;         // If the die is a hit (false on a crit)
+    int is_crit;        // If the die is a crit
+};
+
+/*
+ * Data structure for each player.
+ *
+ * Includes both player attributes and their hit/wound tables.
+ */
 struct player{
-    int stat;
-    int n;
-    int dam;
-    int ammo;
-    struct result d[B_MAX];
-    int best;   // offset into d
+    int stat;                   // target number for rolls
+    int n;                      // number of dice
+    int dam;                    // damage value
+    enum ammo_t ammo;           // ammo type
+
+    struct result d[B_MAX];     // current set of dice being evaluated
+    int best;                   // offset into d - their best die
 
     // count of hit types
     // first index is number of regular hits
@@ -40,12 +60,24 @@ struct player{
     double w[W_MAX + 1];
 };
 
+/*
+ * Master data structure.
+ */
 struct dice{
     struct player p1, p2;
 
     uint64_t num_rolls;
 };
 
+
+
+
+/*
+ * print_player_hits()
+ *
+ * Helper for print_tables().  Prints likelyhood that player scored a
+ * certain number of hits/crits.
+ */
 static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_rolls){
     int hits, crits;
     uint64_t n_rolls = 0;
@@ -53,7 +85,7 @@ static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_roll
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
             if((hits > 0 || crits > 0) && p->hit[hits][crits] > 0){
-                printf("P%d Hits: %d Crits %d - %lld (%0.02f)%%\n", p_num, hits, crits, p->hit[hits][crits], 100.0 * p->hit[hits][crits] / num_rolls);
+                printf("P%d Hits: %d Crits %d: %6.2f%% (%lld)\n", p_num, hits, crits, 100.0 * p->hit[hits][crits] / num_rolls, p->hit[hits][crits]);
                 n_rolls += p->hit[hits][crits];
             }
         }
@@ -63,50 +95,71 @@ static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_roll
     return n_rolls;
 }
 
-static void print_tables(struct dice *d){
+/*
+ * print_player_wounds()
+ *
+ * Helper for print_tables().  Prints likelyhood that player scored a
+ * certain number of wounds.
+ */
+void print_player_wounds(struct player *p, int p_num, uint64_t num_rolls){
+    double cumul_prob;
     int w;
-    uint64_t n_rolls = 0, n;
-    double n2;
-    double cumul_prob;;
-
-    n_rolls += print_player_hits(&d->p1, 1, d->num_rolls);
-
-    n = d->p1.hit[0][0] + d->p2.hit[0][0];
-    n_rolls += n;
-    printf("No Hits - %lld (%0.02f)%%\n", n, 100.0 * n / d->num_rolls);
-    printf("\n");
-
-    n_rolls += print_player_hits(&d->p2, 2, d->num_rolls);
-
-    printf("Hit tables contain %llu rolls.  Total should be %llu\n\n", n_rolls, d->num_rolls);
 
     cumul_prob = 0.0;
     for(w = W_MAX; w > 0; w--){
-        if(d->p2.w[w] > 0){
-            double prob = 100.0 * d->p2.w[w] / d->num_rolls;
+        if(p->w[w] > 0){
+            double prob = 100.0 * p->w[w] / num_rolls;
             cumul_prob += prob;
-            if(prob >= 0.01){
-                printf("P2 Scores %d Wound(s): %0.02f%%     %d+ Wounds: %0.02f%%\n", w, prob, w, cumul_prob);
-            }
-        }
-    }
-    printf("\n");
-
-    n2 = d->p1.w[0] + d->p2.w[0];
-    printf("No Wounds: %0.02f%%\n", 100.0 * n2 / d->num_rolls);
-    printf("\n");
-
-    for(w = 1; w <= W_MAX; w++){
-        if(d->p1.w[w] > 0){
-            double prob = 100.0 * d->p1.w[w] / d->num_rolls;
-            if(prob >= 0.01){
-                printf("P1 Scores %d Wound(s): %0.2f%%\n", w, prob);
+            if(prob >= 0.005){
+                printf("P%d Scores %2d Wound(s): %6.2f%%     %2d+ Wounds: %6.2f%%\n", p_num, w, prob, w, cumul_prob);
             }
         }
     }
     printf("\n");
 }
 
+/*
+ * print_tables()
+ *
+ * Prints generated data in an orderly format.
+ *
+ * Prints both raw hit data and wound statistics.
+ */
+static void print_tables(struct dice *d){
+    uint64_t n_rolls = 0, n;
+    double n2;
+
+    printf("Total Hits: %lld\n", d->num_rolls);
+    printf("\n");
+
+    n_rolls += print_player_hits(&d->p1, 1, d->num_rolls);
+
+    n = d->p1.hit[0][0] + d->p2.hit[0][0];
+    n_rolls += n;
+    printf("No Hits: %6.2f%% %lld\n", 100.0 * n / d->num_rolls, n);
+    printf("\n");
+
+    n_rolls += print_player_hits(&d->p2, 2, d->num_rolls);
+    assert(n_rolls == d->num_rolls);
+
+    printf("\n");
+    printf("======================================================\n");
+    printf("\n");
+
+    print_player_wounds(&d->p1, 1, d->num_rolls);
+
+    n2 = d->p1.w[0] + d->p2.w[0];
+    printf("No Wounds: %6.2f%%\n", 100.0 * n2 / d->num_rolls);
+    printf("\n");
+
+    print_player_wounds(&d->p2, 2, d->num_rolls);
+}
+
+/*
+ * factorial()
+ *
+ * Standard numerical function. Precalculated for efficiency.
+ */
 static uint64_t factorial(int n){
     switch(n){
         case 0:
@@ -131,14 +184,31 @@ static uint64_t factorial(int n){
     }
 }
 
+/*
+ * choose()
+ *
+ * Standard probability/statistics function.
+ */
 static uint64_t choose(int n, int k){
     return factorial(n) / (factorial(k) * factorial(n - k));
 }
 
+/*
+ * hit_prob()
+ *
+ * Uses binomial theorem to calculate the likelyhood that a certain number
+ * of hits were successful.
+ */
 static double hit_prob(int successes, int trials, double probability){
     return choose(trials, successes) * pow(probability, successes) * pow(1 - probability, trials - successes);
 }
 
+/*
+ * fire_damage()
+ *
+ * Helper for calc_player_wounds(). Recursively calculates how many wounds
+ * Fire ammo could have inflicted.
+ */
 static void fire_damage(struct player *p, int hits, int total_hits, double prob, int depth){
     int w;
 
@@ -150,7 +220,7 @@ static void fire_damage(struct player *p, int hits, int total_hits, double prob,
     }
 
     for(w = 0; w <= hits; w++){
-        double new_prob = hit_prob(w, hits, ((double)p->dam) / 20);
+        double new_prob = hit_prob(w, hits, ((double)p->dam) / ROLL_MAX);
         int new_depth = depth - 1;
 
         if(w == 0){
@@ -162,6 +232,12 @@ static void fire_damage(struct player *p, int hits, int total_hits, double prob,
     }
 }
 
+/*
+ * calc_player_wounds()
+ *
+ * For a given player, traverses their hit/crit table and determines how
+ * likely they are to have inflicted wounds on their opponent.
+ */
 static void calc_player_wounds(struct player *p){
     int hits, crits, w;
 
@@ -175,35 +251,45 @@ static void calc_player_wounds(struct player *p){
                 // crits always hit, so they are an offset into the w array
                 // then we count up to the max number of hits.
                 int saves;
-                switch(p->ammo){
-                    case 'D':
-                        // DA - two saves per hit, plus the second die for crits
-                        saves = 2 * hits + crits;
-                        break;
-                    case 'E':
-                        // EXP - three saves per hit, plus the extra two for crits
-                        saves = 3 * hits + 2 * crits;
-                        break;
-                    default:
-                        // Normal - one save per regular hit
-                        saves = hits;
-                }
-
-                if(p->ammo != 'F'){
-                    for(w = 0; w <= saves; w++){
-                        assert(crits + w <= W_MAX);
-                        p->w[crits + w] += hit_prob(w, saves, ((double)p->dam) / 20) * p->hit[hits][crits];
-                    }
-                }else{
+                if(p->ammo == AMMO_FIRE){
                     // Fire ammo
                     // If you fail the save, you must roll again, ad infinitum.
                     fire_damage(p, hits + crits, crits, p->hit[hits][crits], SAVES_MAX - 1);
+                }else{
+                    switch(p->ammo){
+                        case AMMO_DA:
+                            // DA - two saves per hit, plus the second die for crits
+                            saves = 2 * hits + crits;
+                            break;
+                        case AMMO_EXP:
+                            // EXP - three saves per hit, plus the extra two for crits
+                            saves = 3 * hits + 2 * crits;
+                            break;
+                        case AMMO_NORMAL:
+                            // Normal - one save per regular hit
+                            saves = hits;
+                            break;
+                        default:
+                            fprintf(stderr, "ERROR: Unknown ammo type: %d\n", p->ammo);
+                            exit(1);
+                            break;
+                    }
+
+                    for(w = 0; w <= saves; w++){
+                        assert(crits + w <= W_MAX);
+                        p->w[crits + w] += hit_prob(w, saves, ((double)p->dam) / ROLL_MAX) * p->hit[hits][crits];
+                    }
                 }
             }
         }
     }
 }
 
+/*
+ * calc_wounds()
+ *
+ * Causes the wound tables to be calculated for each player.
+ */
 static void calc_wounds(struct dice *d){
     int hits, crits, i, w;
 
@@ -211,8 +297,13 @@ static void calc_wounds(struct dice *d){
     calc_player_wounds(&d->p2);
 }
 
+/*
+ * count_player_results()
+ *
+ * Compares each die for a given player to the best roll for the other
+ * player. Then counts how many uncanceled hits/crits this player scored.
+ */
 static void count_player_results(struct player *us, struct player *them, int *hits, int *crits){
-    // This is also a stupid algortithm
     int i;
     *hits = 0;
     *crits = 0;
@@ -231,13 +322,11 @@ static void count_player_results(struct player *us, struct player *them, int *hi
         if(us->d[i].is_hit){
             if(us->d[i].is_crit){
                 // crit, see if it was canceled
-
                 if(!(them->stat >= us->stat && them->d[them->best].is_crit)){
                     (*crits)++;
                 }
             }else{
                 // it was a regular hit, see if it was canceled
-
                 if(!them->d[them->best].is_hit || (!them->d[them->best].is_crit &&
                         (them->d[them->best].value < us->d[i].value ||
                         (them->d[them->best].value == us->d[i].value && them->stat < us->stat)))){
@@ -248,30 +337,20 @@ static void count_player_results(struct player *us, struct player *them, int *hi
     }
 }
 
-void print_dice(struct dice *d, int multiplier){
-    int i;
-
-    for(i = 0; i < d->p1.n; i++){
-        printf("%d ", d->p1.d[i].value);
-    }
-
-    printf("| ");
-
-    for(i = 0; i < d->p2.n; i++){
-        printf("%d ", d->p2.d[i].value);
-    }
-
-    printf("* %d\n", multiplier);
-}
-
+/*
+ * repeat_factor()
+ *
+ * Helper for count_roll_results()
+ *
+ * Counts the lengths of sequences in the die rolls in order to find the
+ * factorial denominator for the data multiplier. This is easy to do since
+ * the roller outputs the numbers in sorted order.
+ */
 static int repeat_factor(struct player *p){
     int seq_len = 1, seq_num = 0;
     int i;
     int fact = 1;
 
-    // need to calculate the number of permutations for the compacted dice tables
-    // It is based on the number and length of sequences
-    // They are easy to find since everything is sorted.
     for(i = 0; i < p->n; i++){
         if(p->d[i].value != seq_num){
             fact *= factorial(seq_len);
@@ -286,44 +365,32 @@ static int repeat_factor(struct player *p){
     return fact;
 }
 
-static void _count_results(struct dice *d){
+/*
+ * count_roll_results()
+ *
+ * For a given configuration of dice, calculates who won the FtF roll,
+ * and how many hits/crits they scored.  Adds these to a running tally.
+ *
+ * Uses factorials to calculate a multiplicative factor to un-stack the
+ * duplicate die rolls that the matrix symmetry optimization cut out.
+ */
+static void count_roll_results(struct dice *d){
     int hits1, crits1;
     int hits2, crits2;
     int fact1, fact2;
     int multiplier;
 
+    // Hits are counted as 'multiplier' since we are using matrix symmetries
     fact1 = repeat_factor(&d->p1);
     fact2 = repeat_factor(&d->p2);
     multiplier = factorial(d->p1.n) / fact1 * factorial(d->p2.n) / fact2;
-    //print_dice(d, multiplier);
 
     count_player_results(&d->p1, &d->p2, &hits1, &crits1);
     count_player_results(&d->p2, &d->p1, &hits2, &crits2);
 
-    if((crits1 + hits1 > 0) && (crits2 + hits2 > 0)){
-        int i;
-        printf("ERROR, both sides scored hits!!!!\n");
-        /*
-        printf("stat1: %d\nn1: %d\n", d->stat1, d->n1);
-        for(i = 0; i < d->n1; i++){
-            printf("d1[%d]: %d\n", i, d->d1[i]);
-        }
-        printf("\n");
-
-        printf("stat2: %d\nn2: %d\n", d->stat2, d->n2);
-        for(i = 0; i < d->n2; i++){
-            printf("d2[%d]: %d\n", i, d->d2[i]);
-        }
-        printf("\n");
-
-        printf("hits1: %d\ncrits1: %d\n", hits1, crits1);
-        printf("hits2: %d\ncrits2: %d\n", hits2, crits2);
-        */
-        exit(1);
-    }
+    assert((crits1 + hits1 == 0) || (crits2 + hits2 == 0));
 
     // Need to ensure we only count totally whiffed rolls once
-    // Hits are counted as 'n' since we are using matrix symmetries
     if(crits1 + hits1){
         d->p1.hit[hits1][crits1] += multiplier;
     }else{
@@ -333,6 +400,15 @@ static void _count_results(struct dice *d){
     d->num_rolls += multiplier;
 }
 
+/*
+ * annotate_roll()
+ *
+ * This is a helper for roll_dice() that marks whether a given die is a
+ * hit or a crit.
+ *
+ * XXX This should be extended to support stats over 20 with extended
+ * crititcal ranges.
+ */
 static void annotate_roll(struct player *p, int n){
     if(p->d[n].value == p->stat){
         p->d[n].is_crit = 1;
@@ -347,33 +423,55 @@ static void annotate_roll(struct player *p, int n){
     }
 }
 
-static void _gen_table(int b1, int b2, int start1, int start2, struct dice *d){
+/*
+ * roll_dice()
+ *
+ * Recursive die roller.  Generates all possible permutations of dice,
+ * calls into count_roll_results() as each row is completed.
+ *
+ * Uses matrix symmetries to cut down on the number of identical
+ * evaluations.
+ */
+static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d){
     int i;
 
     if(b1 > 0){
         // roll next die for P1
-        for(i = start1; i <= STAT_MAX; i++){
+        for(i = start1; i <= ROLL_MAX; i++){
             d->p1.d[d->p1.n - b1].value = i;
 
             annotate_roll(&d->p1, d->p1.n - b1);
 
-            _gen_table(b1 - 1, b2, i, start2, d);
+            roll_dice(b1 - 1, b2, i, start2, d);
         }
     }else if(b2 > 0){
         // roll next die for P2
-        for(i = start2; i <= STAT_MAX; i++){
+        for(i = start2; i <= ROLL_MAX; i++){
             d->p2.d[d->p2.n - b2].value = i;
 
             annotate_roll(&d->p2, d->p2.n - b2);
 
-            _gen_table(b1, b2 - 1, start1, i, d);
+            roll_dice(b1, b2 - 1, start1, i, d);
         }
     }else{
         // all dice are rolled; count results
-        _count_results(d);
+        count_roll_results(d);
     }
 }
 
+/*
+ * tabulate()
+ *
+ * This function generates and then prints two tables.
+ *
+ * First is the total number of hits/crits possible for each player.
+ * This is calculated using roll_dice().
+ *
+ * Second is the number of wounds that each of these hit outcomes could
+ * cause. These are calculated by calc_wounds().
+ *
+ * Finally, both datasets are printed using print_tables().
+ */
 static void tabulate(struct player *p1, struct player *p2){
     struct dice d;
     memset(&d, 0, sizeof(d));
@@ -387,9 +485,8 @@ static void tabulate(struct player *p1, struct player *p2){
     d.p1.ammo = p1->ammo;
     d.p2.ammo = p2->ammo;
 
-    // recursive roller
-    _gen_table(d.p1.n, d.p2.n, 1, 1, &d);
-    printf("Generated %lld rolls. Should be %.0f\n\n", d.num_rolls, pow(STAT_MAX, d.p1.n + d.p2.n));
+    roll_dice(d.p1.n, d.p2.n, 1, 1, &d);
+    assert(d.num_rolls == pow(ROLL_MAX, d.p1.n + d.p2.n));
     
     calc_wounds(&d);
 
@@ -398,6 +495,7 @@ static void tabulate(struct player *p1, struct player *p2){
 
 int main(int argc, char *argv[]){
     struct player p1, p2;
+    char ammo1, ammo2;
     int i;
 
     if(argc != 9){
@@ -409,11 +507,11 @@ int main(int argc, char *argv[]){
     p1.stat = strtol(argv[i++], NULL, 10);
     p1.n = strtol(argv[i++], NULL, 10);
     p1.dam = strtol(argv[i++], NULL, 10);
-    p1.ammo = argv[i++][0];
+    ammo1 = argv[i++][0];
     p2.stat = strtol(argv[i++], NULL, 10);
     p2.n = strtol(argv[i++], NULL, 10);
     p2.dam = strtol(argv[i++], NULL, 10);
-    p2.ammo = argv[i++][0];
+    ammo2 = argv[i++][0];
 
     if(p1.n < 1 || p1.n > B_MAX){
         printf("B 1 must be in the range of 1 to %d\n", B_MAX);
@@ -435,24 +533,52 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    if(p1.dam < 1 || p1.dam > STAT_MAX){
-        printf("DAM 1 must be in the range of 1 to %d\n", STAT_MAX);
+    if(p1.dam < 1 || p1.dam > DAM_MAX){
+        printf("DAM 1 must be in the range of 1 to %d\n", DAM_MAX);
         return 1;
     }
 
-    if(p2.dam < 1 || p2.dam > STAT_MAX){
-        printf("DAM 2 must be in the range of 1 to %d\n", STAT_MAX);
+    if(p2.dam < 1 || p2.dam > DAM_MAX){
+        printf("DAM 2 must be in the range of 1 to %d\n", DAM_MAX);
         return 1;
     }
 
-    if(p1.ammo != 'N' && p1.ammo != 'D' && p1.ammo != 'E' && p1.ammo != 'F'){
-        printf("AMMO 1 must be one of N, D, E, F\n");
-        return 1;
+    switch(ammo1){
+        case 'N':
+            p1.ammo = AMMO_NORMAL;
+            break;
+        case 'D':
+            p1.ammo = AMMO_DA;
+            break;
+        case 'E':
+            p1.ammo = AMMO_EXP;
+            break;
+        case 'F':
+            p1.ammo = AMMO_FIRE;
+            break;
+        default:
+            fprintf(stderr, "ERROR: AMMO 1 type %c unknown.  Must be one of N, D, E, F\n", ammo1);
+            exit(1);
+            break;
     }
 
-    if(p2.ammo != 'N' && p2.ammo != 'D' && p2.ammo != 'E' && p2.ammo != 'F'){
-        printf("AMMO 2 must be one of N, D, E, F\n");
-        return 1;
+    switch(ammo2){
+        case 'N':
+            p2.ammo = AMMO_NORMAL;
+            break;
+        case 'D':
+            p2.ammo = AMMO_DA;
+            break;
+        case 'E':
+            p2.ammo = AMMO_EXP;
+            break;
+        case 'F':
+            p2.ammo = AMMO_FIRE;
+            break;
+        default:
+            fprintf(stderr, "ERROR: AMMO 2 type %c unknown.  Must be one of N, D, E, F\n", ammo2);
+            exit(1);
+            break;
     }
 
     tabulate(&p1, &p2);
