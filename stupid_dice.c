@@ -5,10 +5,10 @@
 #include <math.h>
 #include <assert.h>
 
-const int B_MAX = 5;
-const int SAVES_MAX = 3;
-const int W_MAX = B_MAX * SAVES_MAX;
-const int STAT_MAX = 20;
+#define B_MAX  5
+#define SAVES_MAX  3
+#define W_MAX (B_MAX * SAVES_MAX)
+#define STAT_MAX 20
 
 /*
  * This is a really dumb implementation of Infinity dice math that enumerates
