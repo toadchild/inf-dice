@@ -46,7 +46,7 @@ struct dice{
     uint64_t num_rolls;
 };
 
-static uint64_t print_player_hits(struct player *p, int p_num, int num_rolls){
+static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_rolls){
     int hits, crits;
     uint64_t n_rolls = 0;
 
