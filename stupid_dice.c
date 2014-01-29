@@ -46,7 +46,7 @@ struct dice{
     uint64_t num_rolls;
 };
 
-int print_player_hits(struct player *p, int p_num, int num_rolls){
+static int print_player_hits(struct player *p, int p_num, int num_rolls){
     int hits, crits;
     int n_rolls = 0;
 
@@ -63,7 +63,7 @@ int print_player_hits(struct player *p, int p_num, int num_rolls){
     return n_rolls;
 }
 
-void print_tables(struct dice *d){
+static void print_tables(struct dice *d){
     int w;
     uint64_t n_rolls = 0, n;
     double n2;
@@ -107,28 +107,26 @@ void print_tables(struct dice *d){
     printf("\n");
 }
 
-uint64_t factorial(int n){
+static uint64_t factorial(int n){
     if(n == 0){
         return 1;
     }
     return n * factorial(n - 1);
 }
 
-uint64_t choose(int n, int k){
+static uint64_t choose(int n, int k){
     return factorial(n) / (factorial(k) * factorial(n - k));
 }
 
-double hit_prob(int successes, int trials, double probability){
+static double hit_prob(int successes, int trials, double probability){
     return choose(trials, successes) * pow(probability, successes) * pow(1 - probability, trials - successes);
 }
 
-void fire_damage(struct player *p, int hits, int total_hits, double prob, int depth){
+static void fire_damage(struct player *p, int hits, int total_hits, double prob, int depth){
     int w;
 
     if(depth == 0){
         // record damage at bottom of stack
-        printf("W %d\n", total_hits);
-
         assert(total_hits <= W_MAX);
         p->w[total_hits] += prob;
         return;
@@ -147,7 +145,7 @@ void fire_damage(struct player *p, int hits, int total_hits, double prob, int de
     }
 }
 
-void calc_player_wounds(struct player *p){
+static void calc_player_wounds(struct player *p){
     int hits, crits, w;
 
     for(hits = 0; hits <= B_MAX; hits++){
@@ -189,16 +187,18 @@ void calc_player_wounds(struct player *p){
     }
 }
 
-void calc_wounds(struct dice *d){
+static void calc_wounds(struct dice *d){
     int hits, crits, i, w;
 
     calc_player_wounds(&d->p1);
     calc_player_wounds(&d->p2);
 }
 
-void count_player_results(struct player *us, struct player *them, int *hits, int *crits){
+static void count_player_results(struct player *us, struct player *them, int *hits, int *crits){
     // This is also a stupid algortithm
     int i;
+    *hits = 0;
+    *crits = 0;
 
     // Find highest roll of other player
     them->best = 0;
@@ -231,9 +231,54 @@ void count_player_results(struct player *us, struct player *them, int *hits, int
     }
 }
 
-void _count_results(struct dice *d){
-    int hits1 = 0, crits1 = 0;
-    int hits2 = 0, crits2 = 0;
+void print_dice(struct dice *d, int multiplier){
+    int i;
+
+    for(i = 0; i < d->p1.n; i++){
+        printf("%d ", d->p1.d[i].value);
+    }
+
+    printf("| ");
+
+    for(i = 0; i < d->p2.n; i++){
+        printf("%d ", d->p2.d[i].value);
+    }
+
+    printf("* %d\n", multiplier);
+}
+
+static int repeat_factor(struct player *p){
+    int seq_len = 1, seq_num = 0;
+    int i;
+    int fact = 1;
+
+    // need to calculate the number of permutations for the compacted dice tables
+    // It is based on the number and length of sequences
+    // They are easy to find since everything is sorted.
+    for(i = 0; i < p->n; i++){
+        if(p->d[i].value != seq_num){
+            fact *= factorial(seq_len);
+            seq_num = p->d[i].value;
+            seq_len = 1;
+        }else{
+            seq_len++;
+        }
+    }
+    fact *= factorial(seq_len);
+
+    return fact;
+}
+
+static void _count_results(struct dice *d){
+    int hits1, crits1;
+    int hits2, crits2;
+    int fact1, fact2;
+    int multiplier;
+
+    fact1 = repeat_factor(&d->p1);
+    fact2 = repeat_factor(&d->p2);
+    multiplier = factorial(d->p1.n) / fact1 * factorial(d->p2.n) / fact2;
+    //print_dice(d, multiplier);
 
     count_player_results(&d->p1, &d->p2, &hits1, &crits1);
     count_player_results(&d->p2, &d->p1, &hits2, &crits2);
@@ -261,16 +306,17 @@ void _count_results(struct dice *d){
     }
 
     // Need to ensure we only count totally whiffed rolls once
+    // Hits are counted as 'n' since we are using matrix symmetries
     if(crits1 + hits1){
-        d->p1.hit[hits1][crits1]++;
+        d->p1.hit[hits1][crits1] += multiplier;
     }else{
-        d->p2.hit[hits2][crits2]++;
+        d->p2.hit[hits2][crits2] += multiplier;
     }
 
-    d->num_rolls++;
+    d->num_rolls += multiplier;
 }
 
-void annotate_roll(struct player *p, int n){
+static void annotate_roll(struct player *p, int n){
     if(p->d[n].value == p->stat){
         p->d[n].is_crit = 1;
     }else{
@@ -284,24 +330,26 @@ void annotate_roll(struct player *p, int n){
     }
 }
 
-void _gen_table(int b1, int b2, struct dice *d){
+static void _gen_table(int b1, int b2, int start1, int start2, struct dice *d){
     int i;
 
     if(b1 > 0){
         // roll next die for P1
-        for(i = 1; i <= STAT_MAX; i++){
+        for(i = start1; i <= STAT_MAX; i++){
             d->p1.d[d->p1.n - b1].value = i;
 
             annotate_roll(&d->p1, d->p1.n - b1);
-            _gen_table(b1 - 1, b2, d);
+
+            _gen_table(b1 - 1, b2, i, start2, d);
         }
     }else if(b2 > 0){
         // roll next die for P2
-        for(i = 1; i <= STAT_MAX; i++){
+        for(i = start2; i <= STAT_MAX; i++){
             d->p2.d[d->p2.n - b2].value = i;
 
             annotate_roll(&d->p2, d->p2.n - b2);
-            _gen_table(b1, b2 - 1, d);
+
+            _gen_table(b1, b2 - 1, start1, i, d);
         }
     }else{
         // all dice are rolled; count results
@@ -309,7 +357,7 @@ void _gen_table(int b1, int b2, struct dice *d){
     }
 }
 
-void tabulate(struct player *p1, struct player *p2){
+static void tabulate(struct player *p1, struct player *p2){
     struct dice d;
     memset(&d, 0, sizeof(d));
 
@@ -323,7 +371,8 @@ void tabulate(struct player *p1, struct player *p2){
     d.p2.ammo = p2->ammo;
 
     // recursive roller
-    _gen_table(d.p1.n, d.p2.n, &d);
+    _gen_table(d.p1.n, d.p2.n, 1, 1, &d);
+    printf("Generated %lld rolls. Should be %.0f\n\n", d.num_rolls, pow(STAT_MAX, d.p1.n + d.p2.n));
     
     calc_wounds(&d);
 
