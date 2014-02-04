@@ -1,5 +1,6 @@
 CFLAGS=-O2
-LDFLAGS=-lm
+LDFLAGS=
+LDLIBS=-lm
 
 all: stupid_dice
 
