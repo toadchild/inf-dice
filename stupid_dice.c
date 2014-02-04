@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <math.h>
 #include <assert.h>
+#include <pthread.h>
+ 
+#define NUM_THREADS 20
 
 #define B_MAX  5
 #define SAVES_MAX  3
@@ -64,6 +67,7 @@ struct player{
  * Master data structure.
  */
 struct dice{
+    int thread_num;
     struct player p1, p2;
 
     uint64_t num_rolls;
@@ -442,17 +446,26 @@ static void annotate_roll(struct player *p, int n){
  * Uses matrix symmetries to cut down on the number of identical
  * evaluations.
  */
-static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d){
+static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, int thread_num){
     int i;
+    int step;
+ 
+    // step is used for outermost loop to divide up data between threads
+    if(thread_num >= 0){
+        step = NUM_THREADS;
+        start1 = thread_num + 1;
+    }else{
+        step = 1;
+    }
 
     if(b1 > 0){
         // roll next die for P1
-        for(i = start1; i <= ROLL_MAX; i++){
+        for(i = start1; i <= ROLL_MAX; i += step){
             d->p1.d[d->p1.n - b1].value = i;
 
             annotate_roll(&d->p1, d->p1.n - b1);
 
-            roll_dice(b1 - 1, b2, i, start2, d);
+            roll_dice(b1 - 1, b2, i, 1, d, -1);
         }
     }else if(b2 > 0){
         // roll next die for P2
@@ -461,13 +474,26 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d){
 
             annotate_roll(&d->p2, d->p2.n - b2);
 
-            roll_dice(b1, b2 - 1, start1, i, d);
+            roll_dice(0, b2 - 1, 21, i, d, -1);
         }
     }else{
         // all dice are rolled; count results
         count_roll_results(d);
     }
 }
+
+
+/*
+ * rolling_thread()
+ */
+void *rolling_thread(void *data){
+    struct dice *d = data;
+
+    roll_dice(d->p1.n, d->p2.n, 1, 1, d, d->thread_num);
+
+    return NULL;
+}
+
 
 /*
  * tabulate()
@@ -483,24 +509,50 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d){
  * Finally, both datasets are printed using print_tables().
  */
 static void tabulate(struct player *p1, struct player *p2){
-    struct dice d;
-    memset(&d, 0, sizeof(d));
+    struct dice d[NUM_THREADS];
+    pthread_t threads[NUM_THREADS];
+    int t, h, c;
+    int rval;
 
-    d.p1.n = p1->n;
-    d.p2.n = p2->n;
-    d.p1.stat = p1->stat;
-    d.p2.stat = p2->stat;
-    d.p1.dam = p1->dam;
-    d.p2.dam = p2->dam;
-    d.p1.ammo = p1->ammo;
-    d.p2.ammo = p2->ammo;
+    for(t = 0; t < NUM_THREADS; t++){
+        memset(&d[t], 0, sizeof(d[t]));
 
-    roll_dice(d.p1.n, d.p2.n, 1, 1, &d);
-    assert(d.num_rolls == pow(ROLL_MAX, d.p1.n + d.p2.n));
+        d[t].thread_num = t;
+        d[t].p1.n = p1->n;
+        d[t].p2.n = p2->n;
+        d[t].p1.stat = p1->stat;
+        d[t].p2.stat = p2->stat;
+        d[t].p1.dam = p1->dam;
+        d[t].p2.dam = p2->dam;
+        d[t].p1.ammo = p1->ammo;
+        d[t].p2.ammo = p2->ammo;
+
+        rval = (pthread_create(&threads[t], NULL, rolling_thread, &d[t]));
+        if(rval){
+            fprintf(stderr, "ERROR: failed to create thread %d of %d\n", t, NUM_THREADS);
+            exit(1);
+        }
+    }
+
+    // Wait for all threads and sum the results
+    pthread_join(threads[0], NULL);
+    for(t = 1; t < NUM_THREADS; t++){
+        pthread_join(threads[t], NULL);
+        d[0].num_rolls += d[t].num_rolls;
+
+        // copy hit and crit data
+        for(h = 0; h <= B_MAX; h++){
+            for(c = 0; c <= B_MAX; c++){
+                d[0].p1.hit[h][c] += d[t].p1.hit[h][c];
+                d[0].p2.hit[h][c] += d[t].p2.hit[h][c];
+            }
+        }
+    }
+    assert(d[0].num_rolls == pow(ROLL_MAX, d[0].p1.n + d[0].p2.n));
     
-    calc_wounds(&d);
+    calc_wounds(d);
 
-    print_tables(&d);
+    print_tables(d);
 }   
 
 int main(int argc, char *argv[]){

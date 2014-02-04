@@ -1,6 +1,6 @@
 CFLAGS=-O2
 LDFLAGS=
-LDLIBS=-lm
+LDLIBS=-lm -lpthread
 
 all: stupid_dice
 
