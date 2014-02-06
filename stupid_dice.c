@@ -315,6 +315,7 @@ static void count_player_results(struct player *us, struct player *them, int *hi
 
     // Find highest successful roll of other player
     // Use the fact that the array is sorted
+    them->best = 0;
     for(i = them->n - 1; i >= 0; i--){
         if(them->d[i].is_hit){
             them->best = i;
