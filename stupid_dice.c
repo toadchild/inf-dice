@@ -5,8 +5,6 @@
 #include <math.h>
 #include <assert.h>
 #include <pthread.h>
- 
-#define NUM_THREADS 20
 
 #define B_MAX  5
 #define SAVES_MAX  3
@@ -14,6 +12,9 @@
 #define STAT_MAX 20
 #define ROLL_MAX 20
 #define DAM_MAX 20
+
+// Other assumptions require that NUM_THREADS equals ROLL_MAX
+#define NUM_THREADS ROLL_MAX
 
 enum ammo_t{
     AMMO_NORMAL,
@@ -362,6 +363,7 @@ static int repeat_factor(struct player *p){
 
     seq_num = p->d[0].value;
     for(i = 1; i < p->n; i++){
+        // misses are counted differently, not using sequences
         if(p->d[i].value != seq_num){
             if(seq_len > 1){
                 fact *= factorial(seq_len);
@@ -379,6 +381,33 @@ static int repeat_factor(struct player *p){
     return fact;
 }
 
+/*
+ * miss_factor()
+ *
+ * Helper for count_roll_results()
+ *
+ * Counts how many die rolls we didn't bother rolling because we know
+ * they were going to miss.
+ */
+static int miss_factor(struct player *p, int start){
+    int i;
+    int fact = 1;
+
+    for(i = start; i < p->n; i++){
+        if(p->d[i].is_hit){
+            continue;
+        }
+        fact *= ROLL_MAX - p->d[i].value + 1;
+    }
+
+    return fact;
+}
+
+/*
+ * print_roll
+ *
+ * Test function that prints roll values and their multiplier.
+ */
 void print_roll(struct dice *d, int64_t multiplier){
     int i;
     for(i = 0; i < d->p1.n; i++){
@@ -400,15 +429,21 @@ void print_roll(struct dice *d, int64_t multiplier){
  * Uses factorials to calculate a multiplicative factor to un-stack the
  * duplicate die rolls that the matrix symmetry optimization cut out.
  */
-static void count_roll_results(struct dice *d, int64_t multiplier){
+static void count_roll_results(struct dice *d){
     int hits1, crits1;
     int hits2, crits2;
     int fact1, fact2;
+    int64_t multiplier;
 
     // Hits are counted as 'multiplier' since we are using matrix symmetries
     fact1 = repeat_factor(&d->p1);
     fact2 = repeat_factor(&d->p2);
-    multiplier *= factorial(d->p1.n) / fact1 * factorial(d->p2.n) / fact2;
+    multiplier = factorial(d->p1.n) / fact1 * factorial(d->p2.n) / fact2;
+
+    // more multipliers for rolling up all misses
+    multiplier *= miss_factor(&d->p1, 0);
+    multiplier *= miss_factor(&d->p2, 0);
+
     //print_roll(d, multiplier);
 
     count_player_results(&d->p1, &d->p2, &hits1, &crits1);
@@ -458,13 +493,14 @@ static void annotate_roll(struct player *p, int n){
  * Uses matrix symmetries to cut down on the number of identical
  * evaluations.
  */
-static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, int thread_num, int64_t multiplier){
+static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, int thread_num){
     int i, n;
     int step;
  
     // step is used for outermost loop to divide up data between threads
+    // Each thread does a single digit of first die roll
     if(thread_num >= 0){
-        step = NUM_THREADS;
+        step = ROLL_MAX;
         start1 = thread_num + 1;
     }else{
         step = 1;
@@ -483,13 +519,10 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
             // Send in a multiplier and exit this loop early.
             // Don't do it on the first index, since that is our thread slicer
             // Don't do it on the start value, as that has a different multiplier on the back-end
-            if(b1 == 1 && i > start1 && !d->p1.d[n].is_hit){
-                //printf("Die is %d; increase multiplier from %lld to %lld\n", i, multiplier, multiplier * (ROLL_MAX - i + 1));
-                multiplier *= ROLL_MAX - i + 1;
-                roll_dice(b1 - 1, b2, i, 1, d, -1, multiplier);
+            roll_dice(b1 - 1, b2, i, 1, d, -1);
+
+            if(!d->p1.d[n].is_hit){
                 break;
-            }else{
-                roll_dice(b1 - 1, b2, i, 1, d, -1, multiplier);
             }
         }
     }else if(b2 > 0){
@@ -501,17 +534,15 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
 
             annotate_roll(&d->p2, n);
 
-            if(b2 == 1 && i > start2 && !d->p2.d[n].is_hit){
-                multiplier *= ROLL_MAX - i + 1;
-                roll_dice(0, b2 - 1, 21, i, d, -1, multiplier);
+            roll_dice(0, b2 - 1, 21, i, d, -1);
+
+            if(!d->p2.d[n].is_hit){
                 break;
-            }else{
-                roll_dice(0, b2 - 1, 21, i, d, -1, multiplier);
             }
         }
     }else{
         // all dice are rolled; count results
-        count_roll_results(d, multiplier);
+        count_roll_results(d);
     }
 }
 
@@ -522,7 +553,9 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
 void *rolling_thread(void *data){
     struct dice *d = data;
 
-    roll_dice(d->p1.n, d->p2.n, 1, 1, d, d->thread_num, 1);
+    if(d->thread_num <= d->p1.stat){
+        roll_dice(d->p1.n, d->p2.n, 1, 1, d, d->thread_num);
+    }
 
     return NULL;
 }
@@ -584,7 +617,7 @@ static void tabulate(struct player *p1, struct player *p2){
             }
         }
     }
-    printf("total rolls %lld should be %.0f\n", d[0].num_rolls, pow(ROLL_MAX, d[0].p1.n + d[0].p2.n));
+    //printf("total rolls %lld should be %.0f\n", d[0].num_rolls, pow(ROLL_MAX, d[0].p1.n + d[0].p2.n));
     assert(d[0].num_rolls == pow(ROLL_MAX, d[0].p1.n + d[0].p2.n));
     
     calc_wounds(d);
