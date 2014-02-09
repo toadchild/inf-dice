@@ -364,7 +364,6 @@ static int repeat_factor(struct player *p){
 
     seq_num = p->d[0].value;
     for(i = 1; i < p->n; i++){
-        // misses are counted differently, not using sequences
         if(p->d[i].value != seq_num){
             if(seq_len > 1){
                 fact *= factorial(seq_len);
