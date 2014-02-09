@@ -604,7 +604,7 @@ static void tabulate(struct player *p1, struct player *p2){
 
     // Wait for all threads and sum the results
     pthread_join(threads[0], NULL);
-    printf("thread %d num_rolls %lld\n", 0, d[0].num_rolls);
+    //printf("thread %d num_rolls %lld\n", 0, d[0].num_rolls);
     for(t = 1; t < NUM_THREADS; t++){
         pthread_join(threads[t], NULL);
         //printf("thread %d num_rolls %lld\n", t, d[t].num_rolls);
