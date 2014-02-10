@@ -32,3 +32,8 @@
     border: 1px solid black;
     margin: 1em;
 }
+
+#time {
+    font-size: 75%;
+    color: grey;
+}

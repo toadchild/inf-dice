@@ -11,7 +11,7 @@
 #define W_MAX (B_MAX * SAVES_MAX)
 #define STAT_MAX 20
 #define ROLL_MAX 20
-#define DAM_MAX 20
+#define DAM_MAX 15
 
 // Other assumptions require that NUM_THREADS equals ROLL_MAX
 #define NUM_THREADS ROLL_MAX
@@ -21,6 +21,13 @@ enum ammo_t{
     AMMO_DA,
     AMMO_EXP,
     AMMO_FIRE,
+};
+
+static const char *ammo_labels[] = {
+    "Normal",
+    "DA",
+    "EXP",
+    "Fire",
 };
 
 /*
@@ -625,6 +632,10 @@ static void tabulate(struct player *p1, struct player *p2){
     print_tables(d);
 }   
 
+static void print_player(const struct player *p, int p_num){
+    printf("P%d BS %2d B %d DAM %2d AMMO %s\n", p_num, p->stat, p->n, p->dam, ammo_labels[p->ammo]);
+}
+
 int main(int argc, char *argv[]){
     struct player p1, p2;
     char ammo1, ammo2;
@@ -655,23 +666,23 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    if(p1.stat < 1 || p1.stat > STAT_MAX){
-        printf("BS 1 must be in the range of 1 to %d\n", STAT_MAX);
+    if(p1.stat < 0 || p1.stat > STAT_MAX){
+        printf("BS 1 must be in the range of 0 to %d\n", STAT_MAX);
         return 1;
     }
 
-    if(p2.stat < 1 || p2.stat > STAT_MAX){
-        printf("BS 2 must be in the range of 1 to %d\n", STAT_MAX);
+    if(p2.stat < 0 || p2.stat > STAT_MAX){
+        printf("BS 2 must be in the range of 0 to %d\n", STAT_MAX);
         return 1;
     }
 
-    if(p1.dam < 1 || p1.dam > DAM_MAX){
-        printf("DAM 1 must be in the range of 1 to %d\n", DAM_MAX);
+    if(p1.dam < 0 || p1.dam > DAM_MAX){
+        printf("DAM 1 must be in the range of 0 to %d\n", DAM_MAX);
         return 1;
     }
 
-    if(p2.dam < 1 || p2.dam > DAM_MAX){
-        printf("DAM 2 must be in the range of 1 to %d\n", DAM_MAX);
+    if(p2.dam < 0 || p2.dam > DAM_MAX){
+        printf("DAM 2 must be in the range of 0 to %d\n", DAM_MAX);
         return 1;
     }
 
@@ -712,6 +723,10 @@ int main(int argc, char *argv[]){
             exit(1);
             break;
     }
+
+    print_player(&p1, 1);
+    print_player(&p2, 2);
+    printf("\n");
 
     tabulate(&p1, &p2);
 
