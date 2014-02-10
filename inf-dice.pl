@@ -4,7 +4,9 @@ use strict;
 use warnings;
 use Time::HiRes qw(time);
 use CGI qw/:standard/;
-$CGI::POST_MAX=1024 * 100;  # max 100K posts
+use Data::Dumper;
+
+$CGI::POST_MAX=1024;  # max 1K posts
 $XGI::DISABLE_UPLOADS = 1;  # no uploads
 
 
@@ -18,6 +20,7 @@ Content-Type: text/html; charset=utf-8
         <meta charset="UTF-8">
         <title>Infinity Dice Calculator</title>
         <link href="inf-dice.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="inf-dice.js"></script>
     </head>
     <body>
 EOF
@@ -25,7 +28,9 @@ EOF
 
 my $action = ['shoot'];
 my $action_labels = {shoot => 'Shoot'};
+
 my $burst = [1, 2, 3, 4, 5];
+
 my $ammo = ['N', 'D', 'E', 'F'];
 my $ammo_lables = {
     N => 'Normal', 
@@ -33,14 +38,35 @@ my $ammo_lables = {
     E => 'EXP',
     F => 'Fire',
 };
+
 my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
     0 => 'None',
-    -3 => 'Mimetism/Camo',
-    -6 => 'TO Camo/ODD/ODF',
+    -3 => 'Mimetism/Camo (-3 BS)',
+    -6 => 'TO Camo/ODD/ODF (-6 BS)',
 };
-my $range = ['+3', '0', '-3', '-6'];
+
+my $range = ['3', '0', '-3', '-6'];
+my $range_labels = {
+    3 => '+3 BS',
+    0 => '+0 BS',
+    -3 => '-3 BS',
+    -6 => '-6 BS',
+};
+
 my $viz = ['0', '-3', '-6'];
+my $viz_labels = {
+    0 => '+0 BS',
+    -3 => '-3 BS',
+    -6 => '-6 BS',
+};
+
+my $link = [0, 3, 5];
+my $link_labels = {
+    0 => 'None',
+    3 => '3 (+1 B)',
+    5 => '5 (+1 B, +3 BS)',
+};
 
 sub print_input_section{
     my ($player) = @_;
@@ -81,21 +107,25 @@ sub print_input_section{
            </div>\n";
 
     print "<div class='modifiers'>
+           <h2>Modifiers</h2>
            <label>Range",
-           popup_menu("$player.mod_range", $range, param("$player.mod_range") // ''),
+           popup_menu("$player.range", $range, param("$player.range") // '', $range_labels),
+           "</label><br>",
+
+           "<label>Link Team",
+           popup_menu("$player.link", $link, param("$player.link") // '', $link_labels),
+           "</label><br>",
+
+           "<label>Visibility Penalty",
+           popup_menu("$player.viz", $viz, param("$player.viz") // '', $viz_labels),
            "</label>",
 
            "<h2>Defensive Abilities</h2>
            <label>Camo",
-           popup_menu("$player.mod_ch", $ch, param("$player.mod_ch") // '', $ch_labels),
-           "</label>",
+           popup_menu("$player.ch", $ch, param("$player.ch") // '', $ch_labels),
+           "</label><br>",
 
-           checkbox("$player.mod_cover", defined(param("$player.mod_cover")), 3, 'Cover'),
-
-           "<h2>Other Penalties</h2>
-           <label>Visibility",
-           popup_menu("$player.mod_viz", $viz, param("$player.mod_viz") // ''),
-           "</label>",
+           checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
 
            "</div>\n";
 
@@ -128,13 +158,32 @@ sub print_input{
 
 sub print_output{
     my ($output) = @_;
-    print <<EOF
-        <div id="output">
+
+    print "<div id='output'>\n";
+
+    print "<p>\n";
+    for my $w (sort keys $output->{1}{hits}){
+        printf "P1 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{1}{hits}{$w}, $w, $output->{1}{cumul_hits}{$w};
+    }
+    print "</p>\n";
+
+    printf "<p>No wounds: %.2f%%</p>\n", $output->{0};
+
+    print "<p>\n";
+    for my $w (sort keys $output->{2}{hits}){
+        printf "P2 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{2}{hits}{$w}, $w, $output->{2}{cumul_hits}{$w};
+    }
+    print "</p>\n";
+
+    print "<button onclick='toggle_display(\"raw_output\")'>
+        Toggle raw output
+        </button>
+        <div id='raw_output' style='display: none;'>
         <pre>
-$output
+$output->{raw}
         </pre>
         </div>
-EOF
+        </div>\n";
 }
 
 sub print_tail{
@@ -154,15 +203,24 @@ sub max{
 
 sub gen_args{
     my ($us, $them) = @_;
+    my ($link_bs, $link_b) = (0, 0);
 
-    max(param("$us.bs") + param("$them.mod_ch") - param("$them.mod_cover") + param("$us.mod_range") + param("$us.mod_viz"), 0),
-    param("$us.b"),
-    max(param("$us.dam") - param("$them.arm") - param("$them.mod_cover"), 0),
+    if(param("$us.link") >= 3){
+        $link_b = 1;
+    }
+
+    if(param("$us.link") >= 5){
+        $link_bs = 3;
+    }
+
+    max(param("$us.bs") + param("$them.ch") - param("$them.cover") + param("$us.range") + param("$us.viz") + $link_bs, 0),
+    param("$us.b") + $link_b,
+    max(param("$us.dam") - param("$them.arm") - param("$them.cover"), 0),
     param("$us.ammo"),
 }
 
 sub generate_output{
-    my $output='';
+    my $output={};
     my @args;
 
     if(param('p1.type') eq 'shoot' && param('p2.type') eq 'shoot'){
@@ -172,8 +230,15 @@ sub generate_output{
 
     if(@args){
         open DICE, '-|', 'inf-dice', @args;
+        $output->{raw} = '';
         while(<DICE>){
-            $output .= $_;
+            $output->{raw} .= $_;
+            if(m/^P(.) Scores +(\d+) W[^0-9]*([0-9.]+)%.*(\d+)\+ W[^0-9]*([0-9.]+)%/){
+                $output->{$1}{hits}{$2} = $3;
+                $output->{$1}{cumul_hits}{$4} = $5;
+            }elsif(m/^No Wounds: +([0-9.]+)/){
+                $output->{0} = $1;
+            }
         }
     }
 

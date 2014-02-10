@@ -15,5 +15,5 @@ inf-dice: inf-dice.o
 inf-dice.o: inf-dice.c
 
 install: inf-dice
-	cp inf-dice.css inf-dice.pl ${WWWDIR}
+	cp inf-dice.js inf-dice.css inf-dice.pl ${WWWDIR}
 	cp inf-dice ${BINDIR}
