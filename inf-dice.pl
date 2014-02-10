@@ -5,9 +5,10 @@ use warnings;
 use Time::HiRes qw(time);
 use CGI qw/:standard/;
 use Data::Dumper;
+use POSIX;
 
 $CGI::POST_MAX=1024;  # max 1K posts
-$XGI::DISABLE_UPLOADS = 1;  # no uploads
+$CGI::DISABLE_UPLOADS = 1;  # no uploads
 
 
 sub print_head{
@@ -22,7 +23,7 @@ Content-Type: text/html; charset=utf-8
         <link href="inf-dice.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="inf-dice.js"></script>
     </head>
-    <body>
+    <body onload="set_ARM_BTS()">
 EOF
 }
 
@@ -31,19 +32,25 @@ my $action_labels = {shoot => 'Shoot'};
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['N', 'D', 'E', 'F'];
-my $ammo_lables = {
-    N => 'Normal', 
-    D => 'DA',
-    E => 'EXP',
-    F => 'Fire',
+my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'E/M', 'E/M2'];
+my $ammo_codes = {
+    Normal => {code => 'N', arm => 1},
+    AP => {code => 'N', arm => 0.5},
+    'AP+DA' => {code => 'D', arm => 0.5},
+    'AP+EXP' => {code => 'E', arm => 0.5},
+    DA => {code => 'D', arm => 1},
+    EXP => {code => 'E', arm => 1},
+    Fire => {code => 'F', arm => 1},
+    Viral => {code => 'D', arm => 1},
+    'E/M' => {code => 'N', arm => 1},
+    'E/M2' => {code => 'D', arm => 1},
 };
 
 my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
     0 => 'None',
-    -3 => 'Mimetism/Camo (-3 BS)',
-    -6 => 'TO Camo/ODD/ODF (-6 BS)',
+    -3 => 'Mimetism/Camo (-3 Opponent BS)',
+    -6 => 'TO Camo/ODD/ODF (-6 Opponent BS)',
 };
 
 my $range = ['3', '0', '-3', '-6'];
@@ -56,7 +63,7 @@ my $range_labels = {
 
 my $viz = ['0', '-3', '-6'];
 my $viz_labels = {
-    0 => '+0 BS',
+    0 => 'None',
     -3 => '-3 BS',
     -6 => '-6 BS',
 };
@@ -91,7 +98,11 @@ sub print_input_section{
           "</label>
 
            <label>Ammo",
-           popup_menu("$player.ammo", $ammo, param("$player.ammo") // '', $ammo_lables),
+           popup_menu(-name => "$player.ammo", 
+               -values => $ammo, 
+               -default => param("$player.ammo") // '',
+               -onchange => "set_ARM_BTS()",
+           ),
            "</label>
 
            <br>
@@ -100,7 +111,10 @@ sub print_input_section{
            textfield("$player.dam", param("$player.dam")),
            "</label>
 
-           <label>ARM/BTS (positive)",
+           <label>
+           <span id='$player.arm.label_arm'>ARM</span>
+           <span id='$player.arm.label_bts'>BTS</span>
+           ",
            textfield("$player.arm", param("$player.arm")),
            "</label>
 
@@ -161,29 +175,32 @@ sub print_output{
 
     print "<div id='output'>\n";
 
-    print "<p>\n";
-    for my $w (sort keys $output->{1}{hits}){
-        printf "P1 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{1}{hits}{$w}, $w, $output->{1}{cumul_hits}{$w};
+    if($output){
+        print "<p>\n";
+        for my $w (sort keys %{$output->{1}{hits}}){
+            printf "P1 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{1}{hits}{$w}, $w, $output->{1}{cumul_hits}{$w};
+        }
+        print "</p>\n";
+
+        printf "<p>No wounds: %.2f%%</p>\n", $output->{0};
+
+        print "<p>\n";
+        for my $w (sort keys %{$output->{2}{hits}}){
+            printf "P2 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{2}{hits}{$w}, $w, $output->{2}{cumul_hits}{$w};
+        }
+        print "</p>\n";
+
+        print "<button onclick='toggle_display(\"raw_output\")'>
+            Toggle raw output
+            </button>
+            <div id='raw_output' style='display: none;'>
+            <pre>
+    $output->{raw}
+            </pre>
+            </div>\n";
     }
-    print "</p>\n";
 
-    printf "<p>No wounds: %.2f%%</p>\n", $output->{0};
-
-    print "<p>\n";
-    for my $w (sort keys $output->{2}{hits}){
-        printf "P2 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{2}{hits}{$w}, $w, $output->{2}{cumul_hits}{$w};
-    }
-    print "</p>\n";
-
-    print "<button onclick='toggle_display(\"raw_output\")'>
-        Toggle raw output
-        </button>
-        <div id='raw_output' style='display: none;'>
-        <pre>
-$output->{raw}
-        </pre>
-        </div>
-        </div>\n";
+    print "</div>\n";
 }
 
 sub print_tail{
@@ -204,6 +221,7 @@ sub max{
 sub gen_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
+    my ($arm, $ammo);
 
     if(param("$us.link") >= 3){
         $link_b = 1;
@@ -213,14 +231,18 @@ sub gen_args{
         $link_bs = 3;
     }
 
+    # Lookup number of saves, invert BTS sign if needed
+    $arm = ceil(abs(param("$them.arm")) * $ammo_codes->{param("$us.ammo")}{arm});
+    $ammo = $ammo_codes->{param("$us.ammo")}{code};
+
     max(param("$us.bs") + param("$them.ch") - param("$them.cover") + param("$us.range") + param("$us.viz") + $link_bs, 0),
     param("$us.b") + $link_b,
-    max(param("$us.dam") - param("$them.arm") - param("$them.cover"), 0),
-    param("$us.ammo"),
+    max(param("$us.dam") - $arm - param("$them.cover"), 0),
+    $ammo,
 }
 
 sub generate_output{
-    my $output={};
+    my $output;
     my @args;
 
     if(param('p1.type') eq 'shoot' && param('p2.type') eq 'shoot'){
