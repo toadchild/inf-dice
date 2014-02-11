@@ -67,7 +67,7 @@ struct player{
     // first index is number of regular hits
     // second index is number of crits
     // value is number of times this happened
-    uint64_t hit[B_MAX + 1][B_MAX + 1];
+    int64_t hit[B_MAX + 1][B_MAX + 1];
 
     // Number of times N successes was inflicted
     double success[SUCCESS_MAX + 1];
@@ -80,7 +80,7 @@ struct dice{
     int thread_num;
     struct player p1, p2;
 
-    uint64_t num_rolls;
+    int64_t num_rolls;
 };
 
 
@@ -92,9 +92,9 @@ struct dice{
  * Helper for print_tables().  Prints likelyhood that player scored a
  * certain number of hits/crits.
  */
-static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_rolls){
+static int64_t print_player_hits(struct player *p, int p_num, int64_t num_rolls){
     int hits, crits;
-    uint64_t n_rolls = 0;
+    int64_t n_rolls = 0;
 
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
@@ -115,7 +115,7 @@ static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_roll
  * Helper for print_tables().  Prints likelyhood that player scored a
  * certain number of successes.
  */
-double print_player_successes(struct player *p, int p_num, uint64_t num_rolls){
+double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
     double cumul_prob;
     int success;
     double n_success = 0;
@@ -145,7 +145,7 @@ double print_player_successes(struct player *p, int p_num, uint64_t num_rolls){
  * Prints both raw hit data and success statistics.
  */
 static void print_tables(struct dice *d){
-    uint64_t n_rolls = 0, n;
+    int64_t n_rolls = 0, n;
     double n_success = 0;
     double n2;
 
@@ -174,7 +174,7 @@ static void print_tables(struct dice *d){
     printf("\n");
 
     n_success += print_player_successes(&d->p2, 2, d->num_rolls);
-    assert(n_success == d->num_rolls);
+    assert(round(n_success) == d->num_rolls);
 }
 
 /*
@@ -182,7 +182,7 @@ static void print_tables(struct dice *d){
  *
  * Standard numerical function. Precalculated for efficiency.
  */
-static int factorial(int n){
+static int64_t factorial(int n){
     switch(n){
         case 0:
         case 1:
@@ -211,7 +211,7 @@ static int factorial(int n){
  *
  * Standard probability/statistics function.
  */
-static uint64_t choose(int n, int k){
+static int64_t choose(int n, int k){
     return factorial(n) / (factorial(k) * factorial(n - k));
 }
 
