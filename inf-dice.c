@@ -670,32 +670,32 @@ int main(int argc, char *argv[]){
     ammo2 = argv[i++][0];
 
     if(p1.n < 1 || p1.n > B_MAX){
-        printf("B 1 must be in the range of 1 to %d\n", B_MAX);
+        printf("ERROR: B 1 must be in the range of 1 to %d\n", B_MAX);
         return 1;
     }
 
     if(p2.n < 1 || p2.n > B_MAX){
-        printf("B 2 must be in the range of 1 to %d\n", B_MAX);
+        printf("ERROR: B 2 must be in the range of 1 to %d\n", B_MAX);
         return 1;
     }
 
     if(p1.stat < 0 || p1.stat > STAT_MAX){
-        printf("BS 1 must be in the range of 0 to %d\n", STAT_MAX);
+        printf("ERROR: BS 1 must be in the range of 0 to %d\n", STAT_MAX);
         return 1;
     }
 
     if(p2.stat < 0 || p2.stat > STAT_MAX){
-        printf("BS 2 must be in the range of 0 to %d\n", STAT_MAX);
+        printf("ERROR: BS 2 must be in the range of 0 to %d\n", STAT_MAX);
         return 1;
     }
 
     if(p1.dam < 0 || p1.dam > DAM_MAX){
-        printf("DAM 1 must be in the range of 0 to %d\n", DAM_MAX);
+        printf("ERROR: DAM 1 must be in the range of 0 to %d\n", DAM_MAX);
         return 1;
     }
 
     if(p2.dam < 0 || p2.dam > DAM_MAX){
-        printf("DAM 2 must be in the range of 0 to %d\n", DAM_MAX);
+        printf("ERROR: DAM 2 must be in the range of 0 to %d\n", DAM_MAX);
         return 1;
     }
 

@@ -214,21 +214,27 @@ sub print_output{
 
     print "<div id='output'>\n";
 
-    if($output){
+    if($output->{error}){
+        print "<div class='output_error'>$output->{error}</div>\n";
+    }
+
+    if($output->{hits}){
         print "<p>\n";
-        for my $h (sort keys %{$output->{1}{hits}}){
-            printf "P1 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{1}{hits}{$h}, $h, $output->{1}{cumul_hits}{$h};
+        for my $h (sort keys %{$output->{hits}{1}}){
+            printf "P1 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h}, $h, $output->{cumul_hits}{1}{$h};
         }
         print "</p>\n";
 
-        printf "<p>No successes: %.2f%%</p>\n", $output->{0};
+        printf "<p>No successes: %.2f%%</p>\n", $output->{hits}{0};
 
         print "<p>\n";
-        for my $h (sort keys %{$output->{2}{hits}}){
-            printf "P2 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{2}{hits}{$h}, $h, $output->{2}{cumul_hits}{$h};
+        for my $h (sort keys %{$output->{hits}{2}}){
+            printf "P2 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h}, $h, $output->{cumul_hits}{2}{$h};
         }
         print "</p>\n";
+    }
 
+    if($output->{raw}){
         print "<button onclick='toggle_display(\"raw_output\")'>
             Toggle raw output
             </button>
@@ -328,10 +334,12 @@ sub generate_output{
         while(<DICE>){
             $output->{raw} .= $_;
             if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%.*(\d+)\+ S[^0-9]*([0-9.]+)%/){
-                $output->{$1}{hits}{$2} = $3;
-                $output->{$1}{cumul_hits}{$4} = $5;
+                $output->{hits}{$1}{$2} = $3;
+                $output->{cumul_hits}{$1}{$4} = $5;
             }elsif(m/^No Successes: +([0-9.]+)/){
-                $output->{0} = $1;
+                $output->{hits}{0} = $1;
+            }elsif(m/^ERROR/){
+                $output->{error} = $_;
             }
         }
     }
