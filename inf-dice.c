@@ -7,8 +7,8 @@
 #include <pthread.h>
 
 #define B_MAX  5
-#define SAVES_MAX  3
-#define W_MAX (B_MAX * SAVES_MAX)
+#define SAVESUCCESS_MAX  3
+#define SUCCESS_MAX (B_MAX * SAVESUCCESS_MAX)
 #define STAT_MAX 20
 #define ROLL_MAX 20
 #define DAM_MAX 15
@@ -21,6 +21,7 @@ enum ammo_t{
     AMMO_DA,
     AMMO_EXP,
     AMMO_FIRE,
+    AMMO_NONE,
 };
 
 static const char *ammo_labels[] = {
@@ -28,6 +29,7 @@ static const char *ammo_labels[] = {
     "DA",
     "EXP",
     "Fire",
+    "None",
 };
 
 /*
@@ -50,7 +52,7 @@ struct result{
 /*
  * Data structure for each player.
  *
- * Includes both player attributes and their hit/wound tables.
+ * Includes both player attributes and their hit/success tables.
  */
 struct player{
     int stat;                   // target number for rolls
@@ -67,8 +69,8 @@ struct player{
     // value is number of times this happened
     uint64_t hit[B_MAX + 1][B_MAX + 1];
 
-    // Number of times N wounds was inflicted
-    double w[W_MAX + 1];
+    // Number of times N successes was inflicted
+    double success[SUCCESS_MAX + 1];
 };
 
 /*
@@ -108,26 +110,31 @@ static uint64_t print_player_hits(struct player *p, int p_num, uint64_t num_roll
 }
 
 /*
- * print_player_wounds()
+ * print_player_successes()
  *
  * Helper for print_tables().  Prints likelyhood that player scored a
- * certain number of wounds.
+ * certain number of successes.
  */
-void print_player_wounds(struct player *p, int p_num, uint64_t num_rolls){
+double print_player_successes(struct player *p, int p_num, uint64_t num_rolls){
     double cumul_prob;
-    int w;
+    int success;
+    double n_success = 0;
 
     cumul_prob = 0.0;
-    for(w = W_MAX; w > 0; w--){
-        if(p->w[w] > 0){
-            double prob = 100.0 * p->w[w] / num_rolls;
+    for(success = SUCCESS_MAX; success > 0; success--){
+        if(p->success[success] > 0){
+            double prob = 100.0 * p->success[success] / num_rolls;
             cumul_prob += prob;
             if(prob >= 0.005){
-                printf("P%d Scores %2d Wound(s): %6.2f%%     %2d+ Wounds: %6.2f%%\n", p_num, w, prob, w, cumul_prob);
+                printf("P%d Scores %2d Success(es): %6.2f%%     %2d+ Successes: %6.2f%%\n", p_num, success, prob, success, cumul_prob);
             }
+
+            n_success += p->success[success];
         }
     }
     printf("\n");
+
+    return n_success;
 }
 
 /*
@@ -135,10 +142,11 @@ void print_player_wounds(struct player *p, int p_num, uint64_t num_rolls){
  *
  * Prints generated data in an orderly format.
  *
- * Prints both raw hit data and wound statistics.
+ * Prints both raw hit data and success statistics.
  */
 static void print_tables(struct dice *d){
     uint64_t n_rolls = 0, n;
+    double n_success = 0;
     double n2;
 
     printf("Total Hits: %lld\n", d->num_rolls);
@@ -158,13 +166,15 @@ static void print_tables(struct dice *d){
     printf("======================================================\n");
     printf("\n");
 
-    print_player_wounds(&d->p1, 1, d->num_rolls);
+    n_success += print_player_successes(&d->p1, 1, d->num_rolls);
 
-    n2 = d->p1.w[0] + d->p2.w[0];
-    printf("No Wounds: %6.2f%%\n", 100.0 * n2 / d->num_rolls);
+    n2 = d->p1.success[0] + d->p2.success[0];
+    n_success += n2;
+    printf("No Successes: %6.2f%%\n", 100.0 * n2 / d->num_rolls);
     printf("\n");
 
-    print_player_wounds(&d->p2, 2, d->num_rolls);
+    n_success += print_player_successes(&d->p2, 2, d->num_rolls);
+    assert(n_success == d->num_rolls);
 }
 
 /*
@@ -218,55 +228,60 @@ static double hit_prob(int successes, int trials, double probability){
 /*
  * fire_damage()
  *
- * Helper for calc_player_wounds(). Recursively calculates how many wounds
+ * Helper for calc_player_successes(). Recursively calculates how many successes
  * Fire ammo could have inflicted.
  */
 static void fire_damage(struct player *p, int hits, int total_hits, double prob, int depth){
-    int w;
+    int success;
 
     if(depth == 0){
         // record damage at bottom of stack
-        assert(total_hits <= W_MAX);
-        p->w[total_hits] += prob;
+        assert(total_hits <= SUCCESS_MAX);
+        p->success[total_hits] += prob;
         return;
     }
 
-    for(w = 0; w <= hits; w++){
-        double new_prob = hit_prob(w, hits, ((double)p->dam) / ROLL_MAX);
+    for(success = 0; success <= hits; success++){
+        double new_prob = hit_prob(success, hits, ((double)p->dam) / ROLL_MAX);
         int new_depth = depth - 1;
 
-        if(w == 0){
+        if(success == 0){
             // record data if no additional hits were scored.
             new_depth = 0;
         }
 
-        fire_damage(p, w, total_hits + w, prob * new_prob, new_depth);
+        fire_damage(p, success, total_hits + success, prob * new_prob, new_depth);
     }
 }
 
 /*
- * calc_player_wounds()
+ * calc_player_successes()
  *
  * For a given player, traverses their hit/crit table and determines how
- * likely they are to have inflicted wounds on their opponent.
+ * likely they are to have inflicted successes on their opponent.
  */
-static void calc_player_wounds(struct player *p){
-    int hits, crits, w;
+static void calc_player_successes(struct player *p){
+    int hits, crits, success;
 
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
             if(p->hit[hits][crits] > 0){
                 // We scored this many hits and crits
-                // now we need to determine how likely it was we caused however many wounds
+                // now we need to determine how likely it was we caused however many successes
                 // Gotta binomialize!
 
-                // crits always hit, so they are an offset into the w array
+                // crits always hit, so they are an offset into the success array
                 // then we count up to the max number of hits.
                 int saves;
                 if(p->ammo == AMMO_FIRE){
                     // Fire ammo
                     // If you fail the save, you must roll again, ad infinitum.
-                    fire_damage(p, hits + crits, crits, p->hit[hits][crits], SAVES_MAX - 1);
+                    fire_damage(p, hits + crits, crits, p->hit[hits][crits], SAVESUCCESS_MAX - 1);
+                }else if(p->ammo == AMMO_NONE){
+                    // Non-lethal skill (Dodge, Smoke)
+                    // There is no saving throw. Number of successes still
+                    // matters for smoke.
+                    p->success[crits + hits] += p->hit[hits][crits];
                 }else{
                     switch(p->ammo){
                         case AMMO_DA:
@@ -287,9 +302,9 @@ static void calc_player_wounds(struct player *p){
                             break;
                     }
 
-                    for(w = 0; w <= saves; w++){
-                        assert(crits + w <= W_MAX);
-                        p->w[crits + w] += hit_prob(w, saves, ((double)p->dam) / ROLL_MAX) * p->hit[hits][crits];
+                    for(success = 0; success <= saves; success++){
+                        assert(crits + success <= SUCCESS_MAX);
+                        p->success[crits + success] += hit_prob(success, saves, ((double)p->dam) / ROLL_MAX) * p->hit[hits][crits];
                     }
                 }
             }
@@ -298,15 +313,13 @@ static void calc_player_wounds(struct player *p){
 }
 
 /*
- * calc_wounds()
+ * calc_successes()
  *
- * Causes the wound tables to be calculated for each player.
+ * Causes the success tables to be calculated for each player.
  */
-static void calc_wounds(struct dice *d){
-    int hits, crits, i, w;
-
-    calc_player_wounds(&d->p1);
-    calc_player_wounds(&d->p2);
+static void calc_successes(struct dice *d){
+    calc_player_successes(&d->p1);
+    calc_player_successes(&d->p2);
 }
 
 /*
@@ -576,8 +589,8 @@ void *rolling_thread(void *data){
  * First is the total number of hits/crits possible for each player.
  * This is calculated using roll_dice().
  *
- * Second is the number of wounds that each of these hit outcomes could
- * cause. These are calculated by calc_wounds().
+ * Second is the number of successes that each of these hit outcomes could
+ * cause. These are calculated by calc_successes().
  *
  * Finally, both datasets are printed using print_tables().
  */
@@ -627,7 +640,7 @@ static void tabulate(struct player *p1, struct player *p2){
     //printf("total rolls %lld should be %.0f\n", d[0].num_rolls, pow(ROLL_MAX, d[0].p1.n + d[0].p2.n));
     assert(d[0].num_rolls == pow(ROLL_MAX, d[0].p1.n + d[0].p2.n));
     
-    calc_wounds(d);
+    calc_successes(d);
 
     print_tables(d);
 }   
@@ -699,8 +712,11 @@ int main(int argc, char *argv[]){
         case 'F':
             p1.ammo = AMMO_FIRE;
             break;
+        case '-':
+            p1.ammo = AMMO_NONE;
+            break;
         default:
-            fprintf(stderr, "ERROR: AMMO 1 type %c unknown.  Must be one of N, D, E, F\n", ammo1);
+            fprintf(stderr, "ERROR: AMMO 1 type %c unknown.  Must be one of N, D, E, F, -\n", ammo1);
             exit(1);
             break;
     }
@@ -718,8 +734,11 @@ int main(int argc, char *argv[]){
         case 'F':
             p2.ammo = AMMO_FIRE;
             break;
+        case '-':
+            p2.ammo = AMMO_NONE;
+            break;
         default:
-            fprintf(stderr, "ERROR: AMMO 2 type %c unknown.  Must be one of N, D, E, F\n", ammo2);
+            fprintf(stderr, "ERROR: AMMO 2 type %c unknown.  Must be one of N, D, E, F, -\n", ammo2);
             exit(1);
             break;
     }

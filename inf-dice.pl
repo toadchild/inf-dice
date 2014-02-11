@@ -23,27 +23,31 @@ Content-Type: text/html; charset=utf-8
         <link href="inf-dice.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="inf-dice.js"></script>
     </head>
-    <body onload="set_ARM_BTS()">
+    <body onload="init_on_load()">
 EOF
 }
 
-my $action = ['shoot'];
-my $action_labels = {shoot => 'Shoot'};
+my $action = ['attack', 'dodge'];
+my $action_labels = {
+    attack => 'Attack',
+    dodge => 'Dodge',
+};
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'E/M', 'E/M2'];
+my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'E/M', 'E/M2', 'Smoke'];
 my $ammo_codes = {
-    Normal => {code => 'N', arm => 1},
+    Normal => {code => 'N'},
     AP => {code => 'N', arm => 0.5},
     'AP+DA' => {code => 'D', arm => 0.5},
     'AP+EXP' => {code => 'E', arm => 0.5},
-    DA => {code => 'D', arm => 1},
-    EXP => {code => 'E', arm => 1},
-    Fire => {code => 'F', arm => 1},
-    Viral => {code => 'D', arm => 1},
-    'E/M' => {code => 'N', arm => 1},
-    'E/M2' => {code => 'D', arm => 1},
+    DA => {code => 'D'},
+    EXP => {code => 'E'},
+    Fire => {code => 'F'},
+    Viral => {code => 'D'},
+    'E/M' => {code => 'N'},
+    'E/M2' => {code => 'D'},
+    'Smoke' => {code => '-', cover => 0},
 };
 
 my $ch = ['0', '-3', '-6'];
@@ -75,6 +79,12 @@ my $link_labels = {
     5 => '5 (+1 B, +3 BS)',
 };
 
+my $dodge_unit = [0, -6];
+my $dodge_unit_labels = {
+    0 => 'None',
+    -6 => 'REM/TAG/Motorcycle (-6 PH)',
+};
+
 sub print_input_section{
     my ($player) = @_;
 
@@ -83,45 +93,70 @@ sub print_input_section{
     print "<div class='action'>
           <label>Action",
     
-          popup_menu("$player.type", $action, param("$player.type") // '', $action_labels),
+          popup_menu(-name => "$player.action",
+              -values => $action,
+              -default => param("$player.action") // '',
+              -labels => $action_labels,
+              -onchange => "set_action('$player')",
+          ),
           "</label>
           </div>\n";
 
-    print "<div class='shoot'>
+    print_input_attack_section($player);
+
+    print "</div>\n";
+}
+
+sub print_input_attack_section{
+    my ($player) = @_;
+
+    print "<div class='attack'>
           <h2>Model Stats</h2>
-          <label>BS",
+          <label>
+          <span id='$player.bs.label_bs'>BS</span>
+          <span id='$player.bs.label_ph'>PH</span>
+          ",
           textfield("$player.bs", param("$player.bs")),
           "</label>
 
+          <span id='$player.b'>
           <label>B",
           popup_menu("$player.b", $burst, param("$player.b")),
           "</label>
+          </span>
 
-           <label>Ammo",
-           popup_menu(-name => "$player.ammo", 
-               -values => $ammo, 
-               -default => param("$player.ammo") // '',
-               -onchange => "set_ARM_BTS()",
-           ),
-           "</label>
+          <span id='$player.ammo'>
+          <label>Ammo",
+          popup_menu(-name => "$player.ammo", 
+              -values => $ammo, 
+              -default => param("$player.ammo") // '',
+              -onchange => "set_ammo('$player')",
+          ),
+          "</label>
+          </span>
 
-           <br>
+          <br>
 
-           <label>DAM",
-           textfield("$player.dam", param("$player.dam")),
-           "</label>
+          <span id='$player.dam'>
+          <label>DAM",
+          textfield("$player.dam", param("$player.dam")),
+          "</label>
+          </span>
 
-           <label>
-           <span id='$player.arm.label_arm'>ARM</span>
-           <span id='$player.arm.label_bts'>BTS</span>
-           ",
-           textfield("$player.arm", param("$player.arm")),
-           "</label>
+          <span id='$player.arm'>
+          <label>
+          <span id='$player.arm.label_arm'>ARM</span>
+          <span id='$player.arm.label_bts'>BTS</span>
+          ",
+          textfield("$player.arm", param("$player.arm")),
+          "</label>
+          </span>
 
-           </div>\n";
+          </div>\n";
 
     print "<div class='modifiers'>
            <h2>Modifiers</h2>
+           <span id='$player.mods.attack'>
            <label>Range",
            popup_menu("$player.range", $range, param("$player.range") // '', $range_labels),
            "</label><br>",
@@ -133,6 +168,12 @@ sub print_input_section{
            "<label>Visibility Penalty",
            popup_menu("$player.viz", $viz, param("$player.viz") // '', $viz_labels),
            "</label>",
+           "</span>
+           <span id='$player.mods.dodge'>
+           <label>Unit Type",
+           popup_menu("$player.dodge_unit", $dodge_unit, param("$player.dodge_unit") // '', $dodge_unit_labels),
+           "</label>",
+           "</span>",
 
            "<h2>Defensive Abilities</h2>
            <label>Camo",
@@ -142,8 +183,6 @@ sub print_input_section{
            checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
 
            "</div>\n";
-
-    print "</div>\n";
 }
 
 sub print_input_head{
@@ -177,16 +216,16 @@ sub print_output{
 
     if($output){
         print "<p>\n";
-        for my $w (sort keys %{$output->{1}{hits}}){
-            printf "P1 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{1}{hits}{$w}, $w, $output->{1}{cumul_hits}{$w};
+        for my $h (sort keys %{$output->{1}{hits}}){
+            printf "P1 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{1}{hits}{$h}, $h, $output->{1}{cumul_hits}{$h};
         }
         print "</p>\n";
 
-        printf "<p>No wounds: %.2f%%</p>\n", $output->{0};
+        printf "<p>No successes: %.2f%%</p>\n", $output->{0};
 
         print "<p>\n";
-        for my $w (sort keys %{$output->{2}{hits}}){
-            printf "P2 scores %d wounds %.2f%% %d+ wounds: %.2f%%<br>\n", $w, $output->{2}{hits}{$w}, $w, $output->{2}{cumul_hits}{$w};
+        for my $h (sort keys %{$output->{2}{hits}}){
+            printf "P2 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{2}{hits}{$h}, $h, $output->{2}{cumul_hits}{$h};
         }
         print "</p>\n";
 
@@ -195,7 +234,7 @@ sub print_output{
             </button>
             <div id='raw_output' style='display: none;'>
             <pre>
-    $output->{raw}
+$output->{raw}
             </pre>
             </div>\n";
     }
@@ -218,10 +257,10 @@ sub max{
     return $a > $b ? $a : $b;
 }
 
-sub gen_args{
+sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($arm, $ammo);
+    my ($arm, $ammo, $cover);
 
     if(param("$us.link") >= 3){
         $link_b = 1;
@@ -232,33 +271,66 @@ sub gen_args{
     }
 
     # Lookup number of saves, invert BTS sign if needed
-    $arm = ceil(abs(param("$them.arm")) * $ammo_codes->{param("$us.ammo")}{arm});
+    $arm = $ammo_codes->{param("$us.ammo")}{arm} // 1;
+    $arm = ceil(abs(param("$them.arm")) * $arm);
     $ammo = $ammo_codes->{param("$us.ammo")}{code};
+    $cover = $ammo_codes->{param("$us.ammo")}{cover} // 1;
+    $cover = param("$them.cover") * $cover;
 
-    max(param("$us.bs") + param("$them.ch") - param("$them.cover") + param("$us.range") + param("$us.viz") + $link_bs, 0),
-    param("$us.b") + $link_b,
-    max(param("$us.dam") - $arm - param("$them.cover"), 0),
-    $ammo,
+    return (
+        max(param("$us.bs") + param("$them.ch") - $cover + param("$us.range") + param("$us.viz") + $link_bs, 0),
+        param("$us.b") + $link_b,
+        max(param("$us.dam") - $arm - param("$them.cover"), 0),
+        $ammo,
+    );
+}
+
+sub gen_dodge_args{
+    my ($us, $them) = @_;
+
+    # TODO
+    # -6 if template
+    return (
+        max(param("$us.bs") + param("$us.dodge_unit"), 0),
+        1,
+        0,
+        '-',
+    );
 }
 
 sub generate_output{
     my $output;
-    my @args;
+    my (@args1, @args2);
 
-    if(param('p1.type') eq 'shoot' && param('p2.type') eq 'shoot'){
-        # FtF shootout
-        @args = (gen_args('p1', 'p2'), gen_args('p2', 'p1'));
+    if(!defined param('p1.action') || !defined param('p2.action')){
+        return;
     }
 
-    if(@args){
-        open DICE, '-|', 'inf-dice', @args;
+    if(param('p1.action') eq 'attack'){
+        @args1 = gen_attack_args('p1', 'p2')
+    }elsif(param('p1.action') eq 'dodge'){
+        @args1 = gen_dodge_args('p1', 'p2')
+    }else{
+        die "Unknown action";
+    }
+
+    if(param('p2.action') eq 'attack'){
+        @args2 = gen_attack_args('p2', 'p1')
+    }elsif(param('p2.action') eq 'dodge'){
+        @args2 = gen_dodge_args('p2', 'p1')
+    }else{
+        die "Unknown action";
+    }
+
+    if(@args1 && @args2){
+        open DICE, '-|', 'inf-dice', (@args1, @args2);
         $output->{raw} = '';
         while(<DICE>){
             $output->{raw} .= $_;
-            if(m/^P(.) Scores +(\d+) W[^0-9]*([0-9.]+)%.*(\d+)\+ W[^0-9]*([0-9.]+)%/){
+            if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%.*(\d+)\+ S[^0-9]*([0-9.]+)%/){
                 $output->{$1}{hits}{$2} = $3;
                 $output->{$1}{cumul_hits}{$4} = $5;
-            }elsif(m/^No Wounds: +([0-9.]+)/){
+            }elsif(m/^No Successes: +([0-9.]+)/){
                 $output->{0} = $1;
             }
         }
