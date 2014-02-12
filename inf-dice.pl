@@ -27,9 +27,10 @@ Content-Type: text/html; charset=utf-8
 EOF
 }
 
-my $action = ['attack', 'dodge'];
+my $action = ['bs', 'cc', 'dodge'];
 my $action_labels = {
-    attack => 'Attack',
+    bs => 'BS Attack',
+    cc => 'CC Attack',
     dodge => 'Dodge',
 };
 
@@ -44,9 +45,9 @@ my $ammo_codes = {
     DA => {code => 'D'},
     EXP => {code => 'E'},
     Fire => {code => 'F'},
-    Viral => {code => 'D'},
-    'E/M' => {code => 'N'},
-    'E/M2' => {code => 'D'},
+    Viral => {code => 'D', save => 'bts'},
+    'E/M' => {code => 'N', save => 'bts'},
+    'E/M2' => {code => 'D', save => 'bts'},
     'Smoke' => {code => '-', cover => 0},
 };
 
@@ -55,6 +56,14 @@ my $ch_labels = {
     0 => 'None',
     -3 => 'Mimetism/Camo (-3 Opponent BS)',
     -6 => 'TO Camo/ODD/ODF (-6 Opponent BS)',
+};
+
+my $ikohl = ['0', '-3', '-6', '-9'];
+my $ikohl_labels = {
+    0 => 'None',
+    -3 => 'L1 (-3 Opponent CC)',
+    -6 => 'L2 (-6 Opponent CC)',
+    -9 => 'L3 (-9 Opponent CC)',
 };
 
 my $range = ['3', '0', '-3', '-6'];
@@ -112,18 +121,20 @@ sub print_input_attack_section{
 
     print "<div class='attack'>
           <h2>Model Stats</h2>
-          <label>
-          <span id='$player.bs.label_bs'>BS</span>
-          <span id='$player.bs.label_ph'>PH</span>
+          <span id='$player.stat'>
+          <label>STAT
           ",
-          textfield("$player.bs", param("$player.bs")),
+          popup_menu("$player.stat", [8 .. 22], param("$player.stat")),
           "</label>
+          </span>
 
           <span id='$player.b'>
           <label>B",
           popup_menu("$player.b", $burst, param("$player.b")),
           "</label>
           </span>
+
+          <br>
 
           <span id='$player.ammo'>
           <label>Ammo",
@@ -135,20 +146,27 @@ sub print_input_attack_section{
           "</label>
           </span>
 
-          <br>
-
           <span id='$player.dam'>
           <label>DAM",
-          textfield("$player.dam", param("$player.dam")),
+          popup_menu("$player.dam", [6 .. 15], param("$player.dam")),
           "</label>
           </span>
 
+          <br>
+
           <span id='$player.arm'>
           <label>
-          <span id='$player.arm.label_arm'>ARM</span>
-          <span id='$player.arm.label_bts'>BTS</span>
+          ARM
           ",
-          textfield("$player.arm", param("$player.arm")),
+          popup_menu("$player.arm", [0 .. 10], param("$player.arm")),
+          "</label>
+          </span>
+
+          <span id='$player.bts'>
+          <label>
+          BTS
+          ",
+          popup_menu("$player.bts", [0, -3, -6, -9], param("$player.bts")),
           "</label>
           </span>
 
@@ -156,7 +174,6 @@ sub print_input_attack_section{
 
     print "<div class='modifiers'>
            <h2>Modifiers</h2>
-           <span id='$player.mods.attack'>
            <label>Range",
            popup_menu("$player.range", $range, param("$player.range") // '', $range_labels),
            "</label><br>",
@@ -167,20 +184,24 @@ sub print_input_attack_section{
 
            "<label>Visibility Penalty",
            popup_menu("$player.viz", $viz, param("$player.viz") // '', $viz_labels),
-           "</label>",
-           "</span>
-           <span id='$player.mods.dodge'>
-           <label>Unit Type",
-           popup_menu("$player.dodge_unit", $dodge_unit, param("$player.dodge_unit") // '', $dodge_unit_labels),
-           "</label>",
-           "</span>",
+           "</label><br>",
 
-           "<h2>Defensive Abilities</h2>
-           <label>Camo",
+           "<label>Unit Type",
+           popup_menu("$player.dodge_unit", $dodge_unit, param("$player.dodge_unit") // '', $dodge_unit_labels),
+           "</label><br>",
+
+           "<h2>Defensive Abilities</h2>",
+
+           checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
+           "<br>\n",
+
+           "<label>Camo",
            popup_menu("$player.ch", $ch, param("$player.ch") // '', $ch_labels),
            "</label><br>",
 
-           checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
+           "<label>i-Kohl",
+           popup_menu("$player.ikohl", $ikohl, param("$player.ikohl") // '', $ikohl_labels),
+           "</label><br>",
 
            "</div>\n";
 }
@@ -257,7 +278,7 @@ sub print_output{
     }
 
     if($output->{raw}){
-        print "<button onclick='toggle_display(\"raw_output\")'>
+        print "<button onclick='raw_output()'>
             Toggle raw output
             </button>
             <div id='raw_output' style='display: none;'>
@@ -288,7 +309,8 @@ sub max{
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($arm, $ammo, $cover);
+    my ($arm, $ammo, $cover, $save);
+    my $mods;
 
     if(param("$us.link") >= 3){
         $link_b = 1;
@@ -300,13 +322,22 @@ sub gen_attack_args{
 
     # Lookup number of saves, invert BTS sign if needed
     $arm = $ammo_codes->{param("$us.ammo")}{arm} // 1;
-    $arm = ceil(abs(param("$them.arm")) * $arm);
+    $save = $ammo_codes->{param("$us.ammo")}{save} // 'arm';
+    $arm = ceil(abs(param("$them.$save")) * $arm);
     $ammo = $ammo_codes->{param("$us.ammo")}{code};
     $cover = $ammo_codes->{param("$us.ammo")}{cover} // 1;
     $cover = param("$them.cover") * $cover;
 
+    if(param("$us.action") == 'bs'){
+        # BS mods
+        $mods = param("$them.ch") - $cover + param("$us.range") + param("$us.viz") + $link_bs;
+    }elsif(param("$us.action") == 'cc'){
+        # CC mods
+        $mods = param("$them.ikohl") + $link_bs;
+    }
+
     return (
-        max(param("$us.bs") + param("$them.ch") - $cover + param("$us.range") + param("$us.viz") + $link_bs, 0),
+        max(param("$us.stat") + $mods, 0),
         param("$us.b") + $link_b,
         max(param("$us.dam") - $arm - param("$them.cover"), 0),
         $ammo,
@@ -319,11 +350,23 @@ sub gen_dodge_args{
     # TODO
     # -6 if template
     return (
-        max(param("$us.bs") + param("$us.dodge_unit"), 0),
+        max(param("$us.stat") + param("$us.dodge_unit"), 0),
         1,
         0,
         '-',
     );
+}
+
+sub gen_args{
+    my ($us, $them) = @_;
+
+    if(param("$us.action") eq 'cc' || param("$us.action") eq 'bs'){
+        return gen_attack_args($us, $them);
+    }elsif(param("$us.action") eq 'dodge'){
+        return gen_dodge_args($us, $them);
+    }
+
+    return ();
 }
 
 sub generate_output{
@@ -334,21 +377,8 @@ sub generate_output{
         return;
     }
 
-    if(param('p1.action') eq 'attack'){
-        @args1 = gen_attack_args('p1', 'p2')
-    }elsif(param('p1.action') eq 'dodge'){
-        @args1 = gen_dodge_args('p1', 'p2')
-    }else{
-        die "Unknown action";
-    }
-
-    if(param('p2.action') eq 'attack'){
-        @args2 = gen_attack_args('p2', 'p1')
-    }elsif(param('p2.action') eq 'dodge'){
-        @args2 = gen_dodge_args('p2', 'p1')
-    }else{
-        die "Unknown action";
-    }
+    @args1 = gen_args('p1', 'p2');
+    @args2 = gen_args('p2', 'p1');
 
     if(@args1 && @args2){
         open DICE, '-|', 'inf-dice', (@args1, @args2);
@@ -384,5 +414,10 @@ sub print_page{
 
     print_tail($end - $start);
 }
+
+#my $IN;
+#open $IN, "test.in" or die;
+#restore_parameters($IN);
+#close $IN;
 
 print_page();

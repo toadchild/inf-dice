@@ -29,6 +29,8 @@ function other_player(player){
 }
 
 function set_ammo(player){
+    return;
+
     other = other_player(player);
     ammo_name = player + ".ammo";
     arm_id = other + ".arm";
@@ -61,6 +63,8 @@ function set_ammo(player){
 }
 
 function set_action(player){
+    return;
+
     other = other_player(player);
     action_name = player + ".action";
     action = document.getElementsByName(action_name)[0];
@@ -97,4 +101,8 @@ function set_action(player){
 function init_on_load(){
     set_action("p1");
     set_action("p2");
+}
+
+function raw_output(){
+    toggle_display("raw_output");
 }
