@@ -328,10 +328,10 @@ sub gen_attack_args{
     $cover = $ammo_codes->{param("$us.ammo")}{cover} // 1;
     $cover = param("$them.cover") * $cover;
 
-    if(param("$us.action") == 'bs'){
+    if(param("$us.action") eq 'bs'){
         # BS mods
         $mods = param("$them.ch") - $cover + param("$us.range") + param("$us.viz") + $link_bs;
-    }elsif(param("$us.action") == 'cc'){
+    }elsif(param("$us.action") eq 'cc'){
         # CC mods
         $mods = param("$them.ikohl") + $link_bs;
     }
