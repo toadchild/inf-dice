@@ -219,19 +219,41 @@ sub print_output{
     }
 
     if($output->{hits}){
-        print "<p>\n";
-        for my $h (sort keys %{$output->{hits}{1}}){
-            printf "P1 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h}, $h, $output->{cumul_hits}{1}{$h};
+        my %all_keys;
+        for my $h (keys %{$output->{hits}{1}}, keys %{$output->{hits}{2}}){
+            $all_keys{$h} = 1;
         }
-        print "</p>\n";
 
-        printf "<p>No successes: %.2f%%</p>\n", $output->{hits}{0};
+        print "<table id='output_data'>\n";
+        print "<tr><th colspan=4>Player 1</th><th colspan=2>vs.</th><th colspan=4>Player 2</th></tr>\n";
 
-        print "<p>\n";
-        for my $h (sort keys %{$output->{hits}{2}}){
-            printf "P2 scores %d success%s %.2f%%; %d or more successes: %.2f%%<br>\n", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h}, $h, $output->{cumul_hits}{2}{$h};
+        my $first_row = 1;
+        for my $h (sort {$a <=> $b} keys %all_keys){
+            print "<tr>";
+
+            if(exists $output->{hits}{1}{$h}){
+                printf "<td>%d success%s</td><td>%.2f%%</td><td>%d or more successes</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h}, $h, $output->{cumul_hits}{1}{$h};
+            }else{
+                print "<td colspan=4></td>";
+            }
+
+            if($first_row){
+                printf "<td>No successes</td><td>%.2f%%</td>", $output->{hits}{0};
+                $first_row = 0;
+            }else{
+                print "<td colspan=2></td>";
+            }
+
+            if(exists $output->{hits}{2}{$h}){
+                printf "<td>%d success%s</td><td>%.2f%%</td><td>%d or more successes</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h}, $h, $output->{cumul_hits}{2}{$h};
+            }else{
+                print "<td colspan=4></td>";
+            }
+
+            print "</tr>\n";
         }
-        print "</p>\n";
+
+        print "</table>\n";
     }
 
     if($output->{raw}){
@@ -338,7 +360,7 @@ sub generate_output{
                 $output->{cumul_hits}{$1}{$4} = $5;
             }elsif(m/^No Successes: +([0-9.]+)/){
                 $output->{hits}{0} = $1;
-            }elsif(m/^ERROR/){
+            }elsif(m/^ERROR/ || m/Assertion/){
                 $output->{error} = $_;
             }
         }

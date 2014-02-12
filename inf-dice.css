@@ -44,3 +44,7 @@
 .output_error {
     color: red;
 }
+
+#output_data {
+    width: 100%;
+}

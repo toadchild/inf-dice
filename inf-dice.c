@@ -7,8 +7,8 @@
 #include <pthread.h>
 
 #define B_MAX  5
-#define SAVESUCCESS_MAX  3
-#define SUCCESS_MAX (B_MAX * SAVESUCCESS_MAX)
+#define SAVES_MAX  3
+#define SUCCESS_MAX (B_MAX * SAVES_MAX)
 #define STAT_MAX 20
 #define ROLL_MAX 20
 #define DAM_MAX 15
@@ -276,7 +276,7 @@ static void calc_player_successes(struct player *p){
                 if(p->ammo == AMMO_FIRE){
                     // Fire ammo
                     // If you fail the save, you must roll again, ad infinitum.
-                    fire_damage(p, hits + crits, crits, p->hit[hits][crits], SAVESUCCESS_MAX - 1);
+                    fire_damage(p, hits + crits, crits, p->hit[hits][crits], SAVES_MAX - 1);
                 }else if(p->ammo == AMMO_NONE){
                     // Non-lethal skill (Dodge, Smoke)
                     // There is no saving throw. Number of successes still
@@ -297,7 +297,7 @@ static void calc_player_successes(struct player *p){
                             saves = hits;
                             break;
                         default:
-                            fprintf(stderr, "ERROR: Unknown ammo type: %d\n", p->ammo);
+                            printf("ERROR: Unknown ammo type: %d\n", p->ammo);
                             exit(1);
                             break;
                     }
@@ -616,7 +616,7 @@ static void tabulate(struct player *p1, struct player *p2){
         rval = (pthread_create(&threads[t], NULL, rolling_thread, &d[t]));
         //rolling_thread(&d[t]);
         if(rval){
-            fprintf(stderr, "ERROR: failed to create thread %d of %d\n", t, NUM_THREADS);
+            printf("ERROR: failed to create thread %d of %d\n", t, NUM_THREADS);
             exit(1);
         }
     }
@@ -716,7 +716,7 @@ int main(int argc, char *argv[]){
             p1.ammo = AMMO_NONE;
             break;
         default:
-            fprintf(stderr, "ERROR: AMMO 1 type %c unknown.  Must be one of N, D, E, F, -\n", ammo1);
+            printf("ERROR: AMMO 1 type %c unknown.  Must be one of N, D, E, F, -\n", ammo1);
             exit(1);
             break;
     }
@@ -738,7 +738,7 @@ int main(int argc, char *argv[]){
             p2.ammo = AMMO_NONE;
             break;
         default:
-            fprintf(stderr, "ERROR: AMMO 2 type %c unknown.  Must be one of N, D, E, F, -\n", ammo2);
+            printf("ERROR: AMMO 2 type %c unknown.  Must be one of N, D, E, F, -\n", ammo2);
             exit(1);
             break;
     }

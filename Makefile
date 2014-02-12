@@ -1,4 +1,4 @@
-CFLAGS=-O2
+CFLAGS=-O0
 LDFLAGS=
 LDLIBS=-lm -lpthread
 
