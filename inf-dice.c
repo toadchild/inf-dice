@@ -9,7 +9,7 @@
 #define B_MAX  5
 #define SAVES_MAX  3
 #define SUCCESS_MAX (B_MAX * SAVES_MAX)
-#define STAT_MAX 20
+#define STAT_MAX 40
 #define ROLL_MAX 20
 #define DAM_MAX 15
 
@@ -56,6 +56,7 @@ struct result{
  */
 struct player{
     int stat;                   // target number for rolls
+    int crit_val;               // minimum value for a crit
     int n;                      // number of dice
     int dam;                    // damage value
     enum ammo_t ammo;           // ammo type
@@ -491,14 +492,14 @@ static void count_roll_results(struct dice *d){
  * crititcal ranges.
  */
 static void annotate_roll(struct player *p, int n){
-    if(p->d[n].value == p->stat){
-        p->d[n].is_crit = 1;
-    }else{
-        p->d[n].is_crit = 0;
-    }
-
     if(p->d[n].value <= p->stat){
         p->d[n].is_hit = 1;
+
+        if(p->d[n].value >= p->crit_val){
+            p->d[n].is_crit = 1;
+        }else{
+            p->d[n].is_crit = 0;
+        }
     }else{
         p->d[n].is_hit = 0;
     }
@@ -608,6 +609,8 @@ static void tabulate(struct player *p1, struct player *p2){
         d[t].p2.n = p2->n;
         d[t].p1.stat = p1->stat;
         d[t].p2.stat = p2->stat;
+        d[t].p1.crit_val = p1->crit_val;
+        d[t].p2.crit_val = p2->crit_val;
         d[t].p1.dam = p1->dam;
         d[t].p2.dam = p2->dam;
         d[t].p1.ammo = p1->ammo;
@@ -646,7 +649,7 @@ static void tabulate(struct player *p1, struct player *p2){
 }   
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d BS %2d B %d DAM %2d AMMO %s\n", p_num, p->stat, p->n, p->dam, ammo_labels[p->ammo]);
+    printf("P%d BS %2d CRIT %2d B %d DAM %2d AMMO %s\n", p_num, p->stat, p->crit_val, p->n, p->dam, ammo_labels[p->ammo]);
 }
 
 int main(int argc, char *argv[]){
@@ -684,9 +687,21 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    if(p1.stat > ROLL_MAX){
+        p1.crit_val = ROLL_MAX - (p1.stat - ROLL_MAX);
+    }else{
+        p1.crit_val = p1.stat;
+    }
+
     if(p2.stat < 0 || p2.stat > STAT_MAX){
         printf("ERROR: BS 2 must be in the range of 0 to %d\n", STAT_MAX);
         return 1;
+    }
+
+    if(p2.stat > ROLL_MAX){
+        p2.crit_val = ROLL_MAX - (p2.stat - ROLL_MAX);
+    }else{
+        p2.crit_val = p2.stat;
     }
 
     if(p1.dam < 0 || p1.dam > DAM_MAX){
