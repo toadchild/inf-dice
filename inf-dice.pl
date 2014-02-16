@@ -241,19 +241,25 @@ sub print_output{
 
     if($output->{hits}){
         my %all_keys;
+
         for my $h (keys %{$output->{hits}{1}}, keys %{$output->{hits}{2}}){
             $all_keys{$h} = 1;
         }
 
         print "<table id='output_data'>\n";
-        print "<tr><th colspan=4>Player 1</th><th colspan=2>vs.</th><th colspan=4>Player 2</th></tr>\n";
+        print "<tr><th colspan=4 width='33%'>Player 1</th><th colspan=2 width='33%'>vs.</th><th colspan=4 width='33%'>Player 2</th></tr>\n";
 
         my $first_row = 1;
         for my $h (sort {$a <=> $b} keys %all_keys){
             print "<tr>";
 
             if(exists $output->{hits}{1}{$h}){
-                printf "<td>%d success%s</td><td>%.2f%%</td><td>%d or more successes</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h}, $h, $output->{cumul_hits}{1}{$h};
+                printf "<td>%d success%s</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h};
+                if(scalar keys $output->{hits}{1} > 1){
+                    printf "<td>%d or more successes</td><td>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
+                }else{
+                    print "<td></tc>";
+                }
             }else{
                 print "<td colspan=4></td>";
             }
@@ -266,7 +272,12 @@ sub print_output{
             }
 
             if(exists $output->{hits}{2}{$h}){
-                printf "<td>%d success%s</td><td>%.2f%%</td><td>%d or more successes</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h}, $h, $output->{cumul_hits}{2}{$h};
+                printf "<td>%d success%s</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h};
+                if(scalar keys $output->{hits}{2} > 1){
+                    printf "<td>%d or more successes</td><td>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
+                }else{
+                    print "<td></td>";
+                }
             }else{
                 print "<td colspan=4></td>";
             }
@@ -275,6 +286,16 @@ sub print_output{
         }
 
         print "</table>\n";
+
+        print "<table class='hitbar'><tr>\n";
+        for my $h (sort {$b <=> $a} keys %{$output->{hits}{1}}){
+            print "<td width='$output->{hits}{1}{$h}%' class='p1-hit-$h'>\n";
+        }
+        print "<td width='$output->{hits}{0}%' class='miss'>\n";
+        for my $h (sort {$a <=> $b} keys %{$output->{hits}{2}}){
+            print "<td width='$output->{hits}{2}{$h}%' class='p2-hit-$h'>\n";
+        }
+        print "</tr></table>\n"
     }
 
     if($output->{raw}){
@@ -385,7 +406,7 @@ sub generate_output{
         $output->{raw} = '';
         while(<DICE>){
             $output->{raw} .= $_;
-            if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%.*(\d+)\+ S[^0-9]*([0-9.]+)%/){
+            if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
                 $output->{hits}{$1}{$2} = $3;
                 $output->{cumul_hits}{$1}{$4} = $5;
             }elsif(m/^No Successes: +([0-9.]+)/){
