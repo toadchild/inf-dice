@@ -272,9 +272,9 @@ sub print_output{
             print "<tr>";
 
             if(exists $output->{hits}{1}{$h}){
-                printf "<td>%d success%s</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h};
+                printf "<td>%d success%s</td><td class='p1-hit-$h num'>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h};
                 if(scalar keys $output->{hits}{1} > 1){
-                    printf "<td>%d or more successes</td><td>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
+                    printf "<td>%d or more successes</td><td class='num'>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
                 }else{
                     print "<td colspan='2'></td>";
                 }
@@ -283,16 +283,16 @@ sub print_output{
             }
 
             if($first_row){
-                printf "<td>No successes</td><td>%.2f%%</td>", $output->{hits}{0};
+                printf "<td>No successes</td><td class='miss num'>%.2f%%</td>", $output->{hits}{0};
                 $first_row = 0;
             }else{
                 print "<td colspan=2></td>";
             }
 
             if(exists $output->{hits}{2}{$h}){
-                printf "<td>%d success%s</td><td>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h};
+                printf "<td>%d success%s</td><td class='p2-hit-$h num'>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h};
                 if(scalar keys $output->{hits}{2} > 1){
-                    printf "<td>%d or more successes</td><td>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
+                    printf "<td>%d or more successes</td><td class='num'>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
                 }else{
                     print "<td colspan='2'></td>";
                 }
