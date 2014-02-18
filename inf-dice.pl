@@ -275,7 +275,7 @@ sub print_output{
             if(exists $output->{hits}{1}{$h}){
                 printf "<td>%d success%s</td><td class='p1-hit-$h num'>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h};
                 if(scalar keys $output->{hits}{1} > 1){
-                    printf "<td>%d or more successes</td><td class='p1-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
+                    printf "<td>%d or more</td><td class='p1-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
                 }else{
                     print "<td colspan='2'></td>";
                 }
@@ -293,7 +293,7 @@ sub print_output{
             if(exists $output->{hits}{2}{$h}){
                 printf "<td>%d success%s</td><td class='p2-hit-$h num'>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h};
                 if(scalar keys $output->{hits}{2} > 1){
-                    printf "<td>%d or more successes</td><td class='p2-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
+                    printf "<td>%d or more</td><td class='p2-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
                 }else{
                     print "<td colspan='2'></td>";
                 }
@@ -308,11 +308,23 @@ sub print_output{
 
         print "<table class='hitbar'><tr>\n";
         for my $h (sort {$b <=> $a} keys %{$output->{hits}{1}}){
-            print "<td width='$output->{hits}{1}{$h}%' class='p1-hit-$h'>\n";
+            print "<td width='$output->{hits}{1}{$h}%' class='p1-hit-$h center'>";
+            if($output->{hits}{1}{$h} >= 5.0){
+                printf "%d%%", $output->{hits}{1}{$h};
+            }
+            print "</td>\n";
         }
-        print "<td width='$output->{hits}{0}%' class='miss'>\n";
+        print "<td width='$output->{hits}{0}%' class='miss center'>";
+        if($output->{hits}{0} >= 5.0){
+            printf "%d%%", $output->{hits}{0};
+        }
+        print "</td>\n";
         for my $h (sort {$a <=> $b} keys %{$output->{hits}{2}}){
-            print "<td width='$output->{hits}{2}{$h}%' class='p2-hit-$h'>\n";
+            print "<td width='$output->{hits}{2}{$h}%' class='p2-hit-$h center'>";
+            if($output->{hits}{2}{$h} >= 5.0){
+                printf "%d%%", $output->{hits}{2}{$h};
+            }
+            print "</td>\n";
         }
         print "</tr></table>\n"
     }
