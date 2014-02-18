@@ -27,11 +27,12 @@ Content-Type: text/html; charset=utf-8
 EOF
 }
 
-my $action = ['bs', 'cc', 'dodge'];
+my $action = ['bs', 'cc', 'dodge', 'none'];
 my $action_labels = {
     bs => 'BS Attack',
     cc => 'CC Attack',
     dodge => 'Dodge',
+    none => 'No Action',
 };
 
 my $burst = [1, 2, 3, 4, 5];
@@ -246,6 +247,11 @@ sub print_output{
             $all_keys{$h} = 1;
         }
 
+        # make sure there is at least one row
+        if(!keys %all_keys){
+            $all_keys{0} = 1;
+        }
+
         print "<table id='output_data'>\n";
         print "<tr><th colspan=4 width='33%'>Player 1</th><th colspan=2 width='33%'>vs.</th><th colspan=4 width='33%'>Player 2</th></tr>\n";
 
@@ -258,7 +264,7 @@ sub print_output{
                 if(scalar keys $output->{hits}{1} > 1){
                     printf "<td>%d or more successes</td><td>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
                 }else{
-                    print "<td></tc>";
+                    print "<td colspan='2'></td>";
                 }
             }else{
                 print "<td colspan=4></td>";
@@ -276,7 +282,7 @@ sub print_output{
                 if(scalar keys $output->{hits}{2} > 1){
                     printf "<td>%d or more successes</td><td>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
                 }else{
-                    print "<td></td>";
+                    print "<td colspan='2'></td>";
                 }
             }else{
                 print "<td colspan=4></td>";
@@ -378,6 +384,17 @@ sub gen_dodge_args{
     );
 }
 
+sub gen_none_args{
+    my ($us, $them) = @_;
+
+    return (
+        0,
+        1,
+        1,
+        '-',
+    );
+}
+
 sub gen_args{
     my ($us, $them) = @_;
 
@@ -385,6 +402,8 @@ sub gen_args{
         return gen_attack_args($us, $them);
     }elsif(param("$us.action") eq 'dodge'){
         return gen_dodge_args($us, $them);
+    }elsif(param("$us.action") eq 'none'){
+        return gen_none_args($us, $them);
     }
 
     return ();
