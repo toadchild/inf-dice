@@ -393,16 +393,23 @@ sub gen_args{
 sub generate_output{
     my $output;
     my (@args1, @args2);
+    my $mode;
 
     if(!defined param('p1.action') || !defined param('p2.action')){
         return;
+    }
+
+    if(param('p1.action') eq 'cc' && param('p2.action') eq 'cc'){
+        $mode = 'CC';
+    }else{
+        $mode = 'BS';
     }
 
     @args1 = gen_args('p1', 'p2');
     @args2 = gen_args('p2', 'p1');
 
     if(@args1 && @args2){
-        open DICE, '-|', 'inf-dice', (@args1, @args2);
+        open DICE, '-|', 'inf-dice', ($mode, @args1, @args2);
         $output->{raw} = '';
         while(<DICE>){
             $output->{raw} .= $_;
