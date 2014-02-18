@@ -451,7 +451,7 @@ static int miss_factor(struct player *p, int start){
  *
  * Test function that prints roll values and their multiplier.
  */
-void print_roll(struct dice *d, int64_t multiplier){
+void print_roll(struct dice *d, int64_t multiplier, int dam1, int dam2){
     int i;
     for(i = 0; i < d->p1.burst; i++){
         printf("%02d ", d->p1.d[i].value);
@@ -460,7 +460,9 @@ void print_roll(struct dice *d, int64_t multiplier){
     for(i = 0; i < d->p2.burst; i++){
         printf("%02d ", d->p2.d[i].value);
     }
-    printf("x %lld\n", multiplier);
+    printf("x %lld", multiplier);
+
+    printf("| dam1: %d dam2: %d\n", dam1, dam2);
 }
 
 /*
@@ -488,11 +490,10 @@ static void count_roll_results(struct dice *d){
     multiplier *= miss_factor(&d->p1, 0);
     multiplier *= miss_factor(&d->p2, 0);
 
-    print_roll(d, multiplier);
-
     count_player_results(&d->p1, &d->p2, &hits1, &crits1, &dam1);
     count_player_results(&d->p2, &d->p1, &hits2, &crits2, &dam2);
-    printf("P1: %d P2: %d dam1: %d dam2: %d\n", crits1+hits1, crits2+hits2, dam1, dam2);
+
+    //print_roll(d, multiplier, dam1, dam2);
 
     assert((crits1 + hits1 == 0) || (crits2 + hits2 == 0));
 
