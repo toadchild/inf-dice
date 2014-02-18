@@ -95,6 +95,14 @@ my $dodge_unit_labels = {
     -6 => 'REM/TAG/Motorcycle (-6 PH)',
 };
 
+sub span_popup_menu{
+    my (%args) = @_;
+    my $label = $args{-label};
+    delete $args{-label};
+
+    return "<span id='$args{-name}'><label>$label " .  popup_menu(%args) .  "</label></span>\n";
+}
+
 sub print_input_section{
     my ($player) = @_;
 
@@ -102,7 +110,7 @@ sub print_input_section{
 
     print "<div class='action'>
           <label>Action",
-    
+   
           popup_menu(-name => "$player.action",
               -values => $action,
               -default => param("$player.action") // '',
@@ -121,88 +129,92 @@ sub print_input_attack_section{
     my ($player) = @_;
 
     print "<div class='attack'>
-          <h2>Model Stats</h2>
-          <span id='$player.stat'>
-          <label>STAT
-          ",
-          popup_menu("$player.stat", [8 .. 22], param("$player.stat")),
-          "</label>
-          </span>
-
-          <span id='$player.b'>
-          <label>B",
-          popup_menu("$player.b", $burst, param("$player.b")),
-          "</label>
-          </span>
-
-          <br>
-
-          <span id='$player.ammo'>
-          <label>Ammo",
-          popup_menu(-name => "$player.ammo", 
-              -values => $ammo, 
+          <h2>Model Stats</h2>",
+          span_popup_menu(-name => "$player.stat",
+              -values => [8 .. 22],
+              -default => param("$player.stat") // '',
+              -label => "Stat",
+          ),
+          span_popup_menu(-name => "$player.b",
+              -values => $burst,
+              -default => param("$player.b") // '',
+              -label => "B",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.ammo",
+              -values => $ammo,
               -default => param("$player.ammo") // '',
               -onchange => "set_ammo('$player')",
+              -label => "Ammo",
           ),
-          "</label>
-          </span>
-
-          <span id='$player.dam'>
-          <label>DAM",
-          popup_menu("$player.dam", [6 .. 15], param("$player.dam")),
-          "</label>
-          </span>
-
-          <br>
-
-          <span id='$player.arm'>
-          <label>
-          ARM
-          ",
-          popup_menu("$player.arm", [0 .. 10], param("$player.arm")),
-          "</label>
-          </span>
-
-          <span id='$player.bts'>
-          <label>
-          BTS
-          ",
-          popup_menu("$player.bts", [0, -3, -6, -9], param("$player.bts")),
-          "</label>
-          </span>
-
-          </div>\n";
+          span_popup_menu(-name => "$player.dam",
+              -values => [6 .. 15],
+              -default => param("$player.dam") // 13,
+              -label => 'DAM',
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.arm",
+              -values => [0 .. 10],
+              -default => param("$player.arm") // '',
+              -label => "ARM",
+          ),
+          span_popup_menu(-name => "$player.bts",
+              -values => [0, -3, -6, -9],
+              -default => param("$player.bts") // '',
+              -label => "BTS",
+          ),
+          "</div>\n";
 
     print "<div class='modifiers'>
-           <h2>Modifiers</h2>
-           <label>Range",
-           popup_menu("$player.range", $range, param("$player.range") // '', $range_labels),
-           "</label><br>",
-
-           "<label>Link Team",
-           popup_menu("$player.link", $link, param("$player.link") // '', $link_labels),
-           "</label><br>",
-
-           "<label>Visibility Penalty",
-           popup_menu("$player.viz", $viz, param("$player.viz") // '', $viz_labels),
-           "</label><br>",
-
-           "<label>Unit Type",
-           popup_menu("$player.dodge_unit", $dodge_unit, param("$player.dodge_unit") // '', $dodge_unit_labels),
-           "</label><br>",
-
+           <h2>Modifiers</h2>",
+           span_popup_menu(-name => "$player.range",
+               -values => $range,
+               -default => param("$player.range") // 0,
+               -labels => $range_labels,
+               -label => "Range",
+           ),
+           "<br>",
+           span_popup_menu(-name => "$player.link",
+               -values => $link,
+               -default => param("$player.link") // '',
+               -labels => $link_labels,
+               -label => "Link Team",
+           ),
+           "<br>",
+           span_popup_menu(-name => "$player.viz",
+               -values => $viz,
+               -default => param("$player.viz") // '',
+               -labels => $viz_labels,
+               -label => "Visibility Penalty",
+           ),
+           "<br>",
+           span_popup_menu(-name => "$player.dodge_unit",
+               -values => $dodge_unit,
+               -default => param("$player.dodge_unit") // '',
+               -labels => $dodge_unit_labels,
+               -label => "Unit Type",
+           ),
+           "<br>",
            "<h2>Defensive Abilities</h2>",
 
+           "<span id='$player.cover'>",
            checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
-           "<br>\n",
-
-           "<label>Camo",
-           popup_menu("$player.ch", $ch, param("$player.ch") // '', $ch_labels),
-           "</label><br>",
-
-           "<label>i-Kohl",
-           popup_menu("$player.ikohl", $ikohl, param("$player.ikohl") // '', $ikohl_labels),
-           "</label><br>",
+           "</span>
+           <br>",
+           span_popup_menu(-name => "$player.ch",
+               -values => $ch,
+               -default => param("$player.ch") // '',
+               -labels => $ch_labels,
+               -label => "Camo",
+           ),
+           "<br>",
+           span_popup_menu(-name => "$player.ikohl",
+               -values => $ikohl,
+               -default => param("$player.ikohl") // '',
+               -labels => $ikohl_labels,
+               -label => "i-Kohl",
+           ),
+           "<br>",
 
            "</div>\n";
 }

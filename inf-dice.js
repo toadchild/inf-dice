@@ -8,16 +8,38 @@ function toggle_display(obj){
     }
 }
 
-function enable_display(obj){
-    el = document.getElementById(obj);
+function _set_style_recursive(obj, styles){
+    if("style" in obj){
+        for(i = 0; i < styles.length; i++){
+            obj.style.setProperty(styles[i][0], styles[i][1]);
+        }
 
-    el.style.display = "";
+        children = obj.childNodes;
+
+        for(i = 0; i < children.length; i++){
+            _set_style_recursive(children[i], styles);
+        }
+    }
 }
 
-function disable_display(obj){
-    el = document.getElementById(obj);
+function enable_input(id){
+    obj = document.getElementById(id);
+    styles = [
+        ["text-decoration", "none"],
+        ["color", "black"],
+    ];
 
-    el.style.display = "none";
+    _set_style_recursive(obj, styles);
+}
+
+function disable_input(id){
+    obj = document.getElementById(id);
+    styles = [
+        ["text-decoration", "line-through"],
+        ["color", "grey"],
+    ];
+
+    _set_style_recursive(obj, styles);
 }
 
 function other_player(player){
@@ -28,79 +50,117 @@ function other_player(player){
     }
 }
 
-function set_ammo(player){
-    return;
-
+function _set_ammo(player, ammo){
     other = other_player(player);
-    ammo_name = player + ".ammo";
     arm_id = other + ".arm";
+    bts_id = other + ".bts";
     dam_id = player + ".dam";
 
-    ammo = document.getElementsByName(ammo_name)[0];
-
-    if(ammo.value == "Smoke"){
-        disable_display(arm_id);
-        disable_display(dam_id);
+    if(ammo == "Smoke"){
+        disable_input(dam_id);
+        disable_input(arm_id);
+        disable_input(bts_id);
     }else{
-        if(ammo.value == "Viral" || ammo.value == "E/M" || ammo.value == "E/M2"){
-            arm_label_id_on = arm_id + ".label_bts";
-            arm_label_id_off = arm_id + ".label_arm";
-            sign = -1;
+        if(ammo == "Viral" || ammo.value == "E/M" || ammo.value == "E/M2"){
+            enable_input(bts_id);
+            disable_input(arm_id);
         }else{
-            arm_label_id_on = arm_id + ".label_arm";
-            arm_label_id_off = arm_id + ".label_bts";
-            sign = 1;
+            enable_input(arm_id);
+            disable_input(bts_id);
         }
 
-        enable_display(arm_label_id_on);
-        disable_display(arm_label_id_off);
-        enable_display(dam_id);
-        enable_display(arm_id);
-
-        arm_field = document.getElementsByName(arm_id)[0];
-        arm_field.value = sign * Math.abs(arm_field.value);
+        enable_input(dam_id);
     }
 }
 
-function set_action(player){
-    return;
+function set_ammo(player){
+    ammo_name = player + ".ammo";
+    ammo = document.getElementsByName(ammo_name)[0];
+    _set_ammo(player, ammo.value);
+}
 
+function set_action(player){
     other = other_player(player);
     action_name = player + ".action";
     action = document.getElementsByName(action_name)[0];
-    label_id = player + ".bs.label_";
 
-    if(action.value == "attack"){
-        enable_display(player + ".ammo");
-        enable_display(player + ".b");
-        enable_display(player + ".dam");
-        enable_display(other + ".arm");
-        enable_display(player + ".mods.attack");
-        disable_display(player + ".mods.dodge");
+    if(action.value == "bs"){
+        // stat block
+        enable_input(player + ".stat");
+        enable_input(player + ".b");
+        enable_input(player + ".ammo");
+        set_ammo(player);
 
-        label_id_on = label_id + "bs";
-        label_id_off = label_id + "ph";
-    }else{
-        disable_display(player + ".ammo");
-        disable_display(player + ".b");
-        disable_display(player + ".dam");
-        disable_display(other + ".arm");
-        disable_display(player + ".mods.attack");
-        enable_display(player + ".mods.dodge");
+        // modifiers
+        enable_input(player + ".range");
+        enable_input(player + ".link");
+        enable_input(player + ".viz");
+        disable_input(player + ".dodge_unit");
 
-        label_id_on = label_id + "ph";
-        label_id_off = label_id + "bs";
+        // defensive abilities
+        enable_input(other + ".cover");
+        enable_input(other + ".ch");
+        disable_input(other + ".ikohl");
+    }else if(action.value == "cc"){
+        // stat block
+        enable_input(player + ".stat");
+        disable_input(player + ".b");
+        enable_input(player + ".ammo");
+        set_ammo(player);
+
+        // modifiers
+        disable_input(player + ".range");
+        enable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".dodge_unit");
+
+        // defensive abilities
+        disable_input(other + ".cover");
+        disable_input(other + ".ch");
+        enable_input(other + ".ikohl");
+    }else if(action.value == "dodge"){
+        // stat block
+        enable_input(player + ".stat");
+        disable_input(player + ".b");
+        disable_input(player + ".ammo");
+        _set_ammo(player, "Smoke");
+
+        // modifiers
+        disable_input(player + ".range");
+        disable_input(player + ".link");
+        disable_input(player + ".viz");
+        enable_input(player + ".dodge_unit");
+
+        // defensive abilities
+        disable_input(other + ".cover");
+        disable_input(other + ".ch");
+        disable_input(other + ".ikohl");
+    }else if(action.value == "none"){
+        // stat block
+        disable_input(player + ".stat");
+        disable_input(player + ".b");
+        disable_input(player + ".ammo");
+        _set_ammo(player, "Smoke");
+
+        // modifiers
+        disable_input(player + ".range");
+        disable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".dodge_unit");
+
+        // defensive abilities
+        disable_input(other + ".cover");
+        disable_input(other + ".ch");
+        disable_input(other + ".ikohl");
     }
-
-    enable_display(label_id_on);
-    disable_display(label_id_off);
-
-    set_ammo(player);
 }
 
 function init_on_load(){
     set_action("p1");
     set_action("p2");
+
+    set_ammo("p1");
+    set_ammo("p2");
 }
 
 function raw_output(){
