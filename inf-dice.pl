@@ -131,8 +131,8 @@ sub print_input_attack_section{
     print "<div class='attack'>
           <h2>Model Stats</h2>",
           span_popup_menu(-name => "$player.stat",
-              -values => [8 .. 22],
-              -default => param("$player.stat") // '',
+              -values => [1 .. 22],
+              -default => param("$player.stat") // 11,
               -label => "Stat",
           ),
           span_popup_menu(-name => "$player.b",
