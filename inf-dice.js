@@ -50,13 +50,26 @@ function other_player(player){
     }
 }
 
-function _set_ammo(player, ammo){
+function set_ammo(player){
     other = other_player(player);
+
+    action_name = player + ".action";
+    action = document.getElementsByName(action_name)[0];
+
+    if(action == "BS" || action == "CC"){
+        ammo_name = player + ".ammo";
+        ammo_obj = document.getElementsByName(ammo_name)[0];
+        ammo = ammo_obj.value;
+    }else{
+        // Any case where we aren't attacking
+        ammo = "None";
+    }
+
     arm_id = other + ".arm";
     bts_id = other + ".bts";
     dam_id = player + ".dam";
 
-    if(ammo == "Smoke"){
+    if(ammo == "Smoke" || ammo == "None"){
         disable_input(dam_id);
         disable_input(arm_id);
         disable_input(bts_id);
@@ -73,12 +86,6 @@ function _set_ammo(player, ammo){
     }
 }
 
-function set_ammo(player){
-    ammo_name = player + ".ammo";
-    ammo = document.getElementsByName(ammo_name)[0];
-    _set_ammo(player, ammo.value);
-}
-
 function set_action(player){
     other = other_player(player);
     action_name = player + ".action";
@@ -89,7 +96,6 @@ function set_action(player){
         enable_input(player + ".stat");
         enable_input(player + ".b");
         enable_input(player + ".ammo");
-        set_ammo(player);
 
         // modifiers
         enable_input(player + ".range");
@@ -106,7 +112,6 @@ function set_action(player){
         enable_input(player + ".stat");
         disable_input(player + ".b");
         enable_input(player + ".ammo");
-        set_ammo(player);
 
         // modifiers
         disable_input(player + ".range");
@@ -123,7 +128,6 @@ function set_action(player){
         enable_input(player + ".stat");
         disable_input(player + ".b");
         disable_input(player + ".ammo");
-        _set_ammo(player, "Smoke");
 
         // modifiers
         disable_input(player + ".range");
@@ -140,7 +144,6 @@ function set_action(player){
         disable_input(player + ".stat");
         disable_input(player + ".b");
         disable_input(player + ".ammo");
-        _set_ammo(player, "Smoke");
 
         // modifiers
         disable_input(player + ".range");
@@ -153,6 +156,7 @@ function set_action(player){
         disable_input(other + ".ch");
         disable_input(other + ".ikohl");
     }
+    set_ammo(player);
 }
 
 function init_on_load(){
