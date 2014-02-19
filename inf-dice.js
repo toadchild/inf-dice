@@ -56,7 +56,7 @@ function set_ammo(player){
     action_name = player + ".action";
     action = document.getElementsByName(action_name)[0];
 
-    if(action == "BS" || action == "CC"){
+    if(action.value == "bs" || action.value == "cc"){
         ammo_name = player + ".ammo";
         ammo_obj = document.getElementsByName(ammo_name)[0];
         ammo = ammo_obj.value;
