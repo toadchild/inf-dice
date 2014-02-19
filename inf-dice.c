@@ -736,8 +736,8 @@ static void parse_b(const char *str, struct player *p){
 static void parse_dam(const char *str, struct player *p){
     p->dam = strtol(str, NULL, 10);
 
-    if(p->dam < 1 || p->dam > DAM_MAX){
-        printf("ERROR: DAM %d must be in the range of 1 to %d\n", p->dam, DAM_MAX);
+    if(p->dam < 0 || p->dam > DAM_MAX){
+        printf("ERROR: DAM %d must be in the range of 0 to %d\n", p->dam, DAM_MAX);
         exit(1);
     }
 }

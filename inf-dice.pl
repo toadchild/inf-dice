@@ -417,7 +417,7 @@ sub gen_none_args{
     return (
         0,
         1,
-        1,
+        0,
         '-',
     );
 }
