@@ -249,6 +249,10 @@ sub print_input{
 sub print_output{
     my ($output) = @_;
 
+    if(!$output){
+        return;
+    }
+
     print "<div id='output'>\n";
 
     if($output->{error}){
