@@ -105,9 +105,11 @@ sub span_popup_menu{
 }
 
 sub print_input_section{
-    my ($player) = @_;
+    my ($player_num) = @_;
+    my $player = "p" . $player_num;
 
     print "<div id='$player'>\n";
+    printf "<h1>Player %d</h1>\n", $player_num;
 
     print "<div class='action'>
           <label>Action",
@@ -130,7 +132,7 @@ sub print_input_attack_section{
     my ($player) = @_;
 
     print "<div class='attack'>
-          <h2>Model Stats</h2>",
+          <h2>Model Attributes</h2>",
           span_popup_menu(-name => "$player.stat",
               -values => [1 .. 22],
               -default => param("$player.stat") // 11,
@@ -167,7 +169,7 @@ sub print_input_attack_section{
           "</div>\n";
 
     print "<div class='modifiers'>
-           <h2>Modifiers</h2>",
+           <h2>Skill Modifiers</h2>",
            span_popup_menu(-name => "$player.range",
                -values => $range,
                -default => param("$player.range") // 0,
@@ -239,8 +241,8 @@ EOF
 
 sub print_input{
     print_input_head();
-    print_input_section('p1');
-    print_input_section('p2');
+    print_input_section(1);
+    print_input_section(2);
     print_input_tail();
 }
 
