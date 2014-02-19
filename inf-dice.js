@@ -162,9 +162,6 @@ function set_action(player){
 function init_on_load(){
     set_action("p1");
     set_action("p2");
-
-    set_ammo("p1");
-    set_ammo("p2");
 }
 
 function raw_output(){
