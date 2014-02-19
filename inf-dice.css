@@ -1,46 +1,37 @@
 #p1 {
-    width: 40%;
-    padding: 0 0px;
+    width: 45%;
     float:left;
-    text-align: left;
-    border: 2px solid #d9f3fd;
-    margin: 1em;
-    padding: 1em;
-
-    background-color: #0a2d32;
-    box-shadow: 0px 0px 20px #d9f3fd;
 }
 
 #p2 {
-    width: 40%;
-    padding: 0 0px;
+    width: 45%;
     float:right;
-    text-align: left;
-    border: 2px solid #d9f3fd;
-    margin: 1em;
-    padding: 1em;
-
-    background-color: #0a2d32;
-    box-shadow: 0px 0px 20px #d9f3fd;
-} 
+}
 
 #output {
     clear: both;
-    border: 2px solid #d9f3fd;
-    margin: 1em;
-    padding: 1em;
-
-    background-color: #0a2d32;
-    box-shadow: 0px 0px 20px #d9f3fd;
-}
-
-#input {
 }
 
 #submit {
     clear: both;
-    border: 1px solid black;
+    text-align: center;
+}
+
+.databox {
+    text-align: left;
+    border: 2px solid #d9f3fd;
+    border-radius: 9px;
     margin: 1em;
+
+    background-color: #0a2d32;
+    box-shadow: 0px 0px 20px #d9f3fd;
+}
+
+.databox .content {
+    margin: 1em;
+}
+
+#input {
 }
 
 #time {
@@ -57,6 +48,14 @@
 
 #output_data {
     width: 100%;
+}
+
+#output_data td {
+    width: 10%;
+}
+
+.output_section {
+    width: 33%;
 }
 
 td.num {

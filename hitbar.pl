@@ -14,9 +14,9 @@ my $colors = {
     },
     p2 => {
         pure => {
-            r => 0xff,
-            g => 0xd3,
-            b => 0x24,
+            r => 136,
+            g => 172,
+            b => 77,
         }
     },
     miss => {
@@ -27,12 +27,21 @@ my $colors = {
 
 my $steps = 15;
 
+sub initial_color{
+    my ($p) = @_;
+    return ($colors->{$p}{pure}{r} * 0.2,
+        $colors->{$p}{pure}{g} * 0.2,
+        $colors->{$p}{pure}{b} * 0.2,
+    );
+}
+
 print <<EOF;
 .hitbar {
     width: 100%;
     height: 2em;
     border-spacing: 0px;
-    margin: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 EOF
@@ -47,9 +56,7 @@ for my $p (@$players){
     my ($r, $g, $b);
     my ($step_r, $step_g, $step_b);
 
-    $r = $colors->{$p}{pure}{r} * 0.25;
-    $g = $colors->{$p}{pure}{g} * 0.25;
-    $b = $colors->{$p}{pure}{b} * 0.25;
+    ($r, $g, $b) = initial_color($p);
 
     $step_r = ($colors->{$p}{pure}{r} - $r) / $steps;
     $step_g = ($colors->{$p}{pure}{g} - $g) / $steps;
@@ -67,9 +74,7 @@ for my $p (@$players){
         $b += $step_b;
     }
 
-    $r = $colors->{$p}{pure}{r} * 0.1;
-    $g = $colors->{$p}{pure}{g} * 0.1;
-    $b = $colors->{$p}{pure}{b} * 0.1;
+    ($r, $g, $b) = initial_color($p);
 
     my $pure = sprintf "%02x%02x%02x", $colors->{$p}{pure}{r}, $colors->{$p}{pure}{g}, $colors->{$p}{pure}{b};
 

@@ -108,7 +108,8 @@ sub print_input_section{
     my ($player_num) = @_;
     my $player = "p" . $player_num;
 
-    print "<div id='$player'>\n";
+    print "<div id='$player' class='databox'>\n";
+    print "<div class='content'>\n";
     printf "<h1>Player %d</h1>\n", $player_num;
 
     print "<div class='action'>
@@ -125,6 +126,7 @@ sub print_input_section{
 
     print_input_attack_section($player);
 
+    print "</div>\n";
     print "</div>\n";
 }
 
@@ -231,8 +233,10 @@ EOF
 
 sub print_input_tail{
     print <<EOF
-    <div id="submit">
-        <input type="submit">
+    <div id="submit" class='databox'>
+    <div class='content'>
+        <input type="submit" value="Roll the Dice!">
+    </div>
     </div>
     </form>
 </div>
@@ -253,7 +257,8 @@ sub print_output{
         return;
     }
 
-    print "<div id='output'>\n";
+    print "<div id='output' class='databox'>\n";
+    print "<div class='content'>\n";
 
     if($output->{error}){
         print "<div class='output_error'>$output->{error}</div>\n";
@@ -272,7 +277,7 @@ sub print_output{
         }
 
         print "<table id='output_data'>\n";
-        print "<tr><th colspan=4 width='33%'>Player 1</th><th colspan=2 width='33%'>vs.</th><th colspan=4 width='33%'>Player 2</th></tr>\n";
+        print "<tr><th colspan=4 class='output_section'>Player 1</th><th colspan=2 class='output_section'>vs.</th><th colspan=4 class='output_section'>Player 2</th></tr>\n";
 
         my $first_row = 1;
         for my $h (sort {$a <=> $b} keys %all_keys){
@@ -301,10 +306,10 @@ sub print_output{
                 if(scalar keys $output->{hits}{2} > 1){
                     printf "<td>%d or more</td><td class='p2-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
                 }else{
-                    print "<td colspan='2'></td>";
+                    print "<td></td><td></td>";
                 }
             }else{
-                print "<td colspan=4></td>";
+                print "<td></td><td></td><td></td><td></td>";
             }
 
             print "</tr>\n";
@@ -314,19 +319,19 @@ sub print_output{
 
         print "<table class='hitbar'><tr>\n";
         for my $h (sort {$b <=> $a} keys %{$output->{hits}{1}}){
-            print "<td width='$output->{hits}{1}{$h}%' class='p1-hit-$h center'>";
+            print "<td style='width: $output->{hits}{1}{$h}%' class='p1-hit-$h center'>";
             if($output->{hits}{1}{$h} >= 5.0){
                 printf "%d%%", $output->{hits}{1}{$h};
             }
             print "</td>\n";
         }
-        print "<td width='$output->{hits}{0}%' class='miss center'>";
+        print "<td style='width: $output->{hits}{0}%' class='miss center'>";
         if($output->{hits}{0} >= 5.0){
             printf "%d%%", $output->{hits}{0};
         }
         print "</td>\n";
         for my $h (sort {$a <=> $b} keys %{$output->{hits}{2}}){
-            print "<td width='$output->{hits}{2}{$h}%' class='p2-hit-$h center'>";
+            print "<td style='width: $output->{hits}{2}{$h}%' class='p2-hit-$h center'>";
             if($output->{hits}{2}{$h} >= 5.0){
                 printf "%d%%", $output->{hits}{2}{$h};
             }
@@ -346,6 +351,7 @@ $output->{raw}
             </div>\n";
     }
 
+    print "</div>\n";
     print "</div>\n";
 }
 
