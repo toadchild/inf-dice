@@ -15,7 +15,7 @@
 
 // Other assumptions require that NUM_THREADS equals ROLL_MAX
 #define NUM_THREADS ROLL_MAX
-#define MULTITHREADED 1
+#define MULTI_THREADED 1
 
 #define MAX(a,b) (a > b ? a : b)
 
@@ -681,7 +681,7 @@ static void usage(const char *program){
     printf("Usage: %s <MODE> <STAT 1> <B 1> <DAM 1> <AMMO 1> <STAT 2> <B 2> <DAM 2> <AMMO 2>\n", program);
     printf("Modes:\n");
     printf("    BS - Used for most cases\n");
-    printf("    CC - If both models are in CC. ARM bonus is granted.");
+    printf("    CC - If both models are in CC. ARM bonus is granted.\n");
     exit(0);
 }
 
