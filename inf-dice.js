@@ -115,7 +115,7 @@ function set_action(player){
 
         // modifiers
         disable_input(player + ".range");
-        enable_input(player + ".link");
+        disable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
 

@@ -41,9 +41,9 @@ my $burst = [1, 2, 3, 4, 5];
 my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'E/M', 'E/M2', 'Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
-    AP => {code => 'N', arm => 0.5},
-    'AP+DA' => {code => 'D', arm => 0.5},
-    'AP+EXP' => {code => 'E', arm => 0.5},
+    AP => {code => 'N', ap => 0.5},
+    'AP+DA' => {code => 'D', ap => 0.5},
+    'AP+EXP' => {code => 'E', ap => 0.5},
     DA => {code => 'D'},
     EXP => {code => 'E'},
     Fire => {code => 'F'},
@@ -108,9 +108,9 @@ sub print_input_section{
     my ($player_num) = @_;
     my $player = "p" . $player_num;
 
-    print "<div id='$player' class='databox'>\n";
+    print "<div id='$player' class='inner-databox'>\n";
     print "<div class='content'>\n";
-    printf "<h1>Player %d</h1>\n", $player_num;
+    printf "<h2>Player %d</h2>\n", $player_num;
 
     print "<div class='action'>
           <label>Action",
@@ -134,7 +134,7 @@ sub print_input_attack_section{
     my ($player) = @_;
 
     print "<div class='attack'>
-          <h2>Model Attributes</h2>",
+          <h3>Model Attributes</h3>",
           span_popup_menu(-name => "$player.stat",
               -values => [1 .. 22],
               -default => param("$player.stat") // 11,
@@ -171,7 +171,7 @@ sub print_input_attack_section{
           "</div>\n";
 
     print "<div class='modifiers'>
-           <h2>Skill Modifiers</h2>",
+           <h3>Skill Modifiers</h3>",
            span_popup_menu(-name => "$player.range",
                -values => $range,
                -default => param("$player.range") // 0,
@@ -200,7 +200,7 @@ sub print_input_attack_section{
                -label => "Unit Type",
            ),
            "<br>",
-           "<h2>Defensive Abilities</h2>",
+           "<h3>Defensive Abilities</h3>",
 
            "<span id='$player.cover'>",
            checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
@@ -226,19 +226,22 @@ sub print_input_attack_section{
 
 sub print_input_head{
     print <<EOF
-    <div id="input">
+    <div id="input" class="databox">
+    <div class='content'>
+    <h1>Infinity Dice Calculator</h1>
     <form method="get">
 EOF
 }
 
 sub print_input_tail{
     print <<EOF
-    <div id="submit" class='databox'>
+    <div id="submit">
     <div class='content'>
         <input type="submit" value="Roll the Dice!">
     </div>
     </div>
     </form>
+</div>
 </div>
 EOF
 }
@@ -359,6 +362,7 @@ sub print_tail{
     my ($time) = @_;
 
     print <<EOF
+    <div id="contact">This tool was created by Jonathan Polley to help enhance your enjoyment of <a href="http://infinitythegame.com/">Infinity the Game</a> created and &copy; by Corvus Belli SLL. Please direct any issues or feedback to <a href="mailto:inf-dice\@ghostlords.com">inf-dice\@ghostlords.com</a>.</div>
     <div id="time">Content took $time seconds to generate.</div>
     </body>
 </html>
@@ -373,7 +377,8 @@ sub max{
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($arm, $ammo, $cover, $save);
+    my ($arm, $ap, $ammo, $cover, $ignore_cover, $save);
+    my $b;
     my $mods;
 
     if(param("$us.link") >= 3){
@@ -385,25 +390,28 @@ sub gen_attack_args{
     }
 
     # Lookup number of saves, invert BTS sign if needed
-    $arm = $ammo_codes->{param("$us.ammo")}{arm} // 1;
+    $ap = $ammo_codes->{param("$us.ammo")}{ap} // 1;
     $save = $ammo_codes->{param("$us.ammo")}{save} // 'arm';
-    $arm = ceil(abs(param("$them.$save")) * $arm);
+    $arm = ceil(abs(param("$them.$save")) * $ap);
     $ammo = $ammo_codes->{param("$us.ammo")}{code};
-    $cover = $ammo_codes->{param("$us.ammo")}{cover} // 1;
-    $cover = param("$them.cover") * $cover;
+    $ignore_cover = $ammo_codes->{param("$us.ammo")}{cover} // 1;
+    $cover = param("$them.cover") * $ignore_cover;
 
     if(param("$us.action") eq 'bs'){
         # BS mods
         $mods = param("$them.ch") - $cover + param("$us.range") + param("$us.viz") + $link_bs;
+        $b = param("$us.b") + $link_b;
+        $arm += $cover;
     }elsif(param("$us.action") eq 'cc'){
         # CC mods
-        $mods = param("$them.ikohl") + $link_bs;
+        $mods = param("$them.ikohl");
+        $b = 1;
     }
 
     return (
         max(param("$us.stat") + $mods, 0),
-        param("$us.b") + $link_b,
-        max(param("$us.dam") - $arm - param("$them.cover"), 0),
+        $b,
+        max(param("$us.dam") - $arm, 0),
         $ammo,
     );
 }
