@@ -674,7 +674,7 @@ static void tabulate(struct player *p1, struct player *p2){
 }   
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d BS %2d CRIT %2d B %d DAM %2d AMMO %s\n", p_num, p->stat, p->crit_val, p->burst, p->dam, ammo_labels[p->ammo]);
+    printf("P%d STAT %2d CRIT %2d B %d DAM %2d AMMO %s ARM_BONUS %d\n", p_num, p->stat, p->crit_val, p->burst, p->dam, ammo_labels[p->ammo], p->arm_bonus);
 }
 
 static void usage(const char *program){
