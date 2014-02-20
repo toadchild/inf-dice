@@ -298,7 +298,7 @@ sub print_output{
             }
 
             if($first_row){
-                printf "<td>No successes</td><td class='miss num'>%.2f%%</td>", $output->{hits}{0};
+                printf "<td>0 successes</td><td class='miss num'>%.2f%%</td>", $output->{hits}{0};
                 $first_row = 0;
             }else{
                 print "<td colspan=2></td>";
@@ -362,7 +362,11 @@ sub print_tail{
     my ($time) = @_;
 
     print <<EOF
-    <div id="contact">This tool was created by Jonathan Polley to help enhance your enjoyment of <a href="http://infinitythegame.com/">Infinity the Game</a> created and &copy; by Corvus Belli SLL. Please direct any issues or feedback to <a href="mailto:inf-dice\@ghostlords.com">inf-dice\@ghostlords.com</a>.</div>
+    <div id="contact">
+This tool was created by Jonathan Polley to help enhance your enjoyment of <a href="http://infinitythegame.com/">Infinity the Game</a>.
+Infinity is &copy; by Corvus Belli SLL.
+Please direct any issues or feedback to <a href="mailto:inf-dice\@ghostlords.com">inf-dice\@ghostlords.com</a>.
+    </div>
     <div id="time">Content took $time seconds to generate.</div>
     </body>
 </html>

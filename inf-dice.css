@@ -31,11 +31,6 @@
     margin: 20px;
 }
 
-.databox select {
-    background-color: #444444;
-    color: white;
-}
-
 .databox input {
     background-color: #444444;
     color: white;
@@ -52,6 +47,27 @@
     border-radius: 9px;
     margin: 0px;
     margin-bottom: 20px;
+
+    background-color: #d9f3fd;
+    color: black;
+}
+
+.inner-databox select {
+    background-color: white;
+    color: black;
+}
+
+.inner-databox input {
+    background-color: white;
+    color: black;
+}
+
+#p1.inner-databox {
+    background-color: #a27fb6;
+}
+
+#p2.inner-databox {
+    background-color: #80a248;
 }
 
 #input {

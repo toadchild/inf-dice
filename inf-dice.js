@@ -26,7 +26,7 @@ function enable_input(id){
     obj = document.getElementById(id);
     styles = [
         ["text-decoration", "none"],
-        ["color", "white"],
+        ["color", "black"],
     ];
 
     _set_style_recursive(obj, styles);
