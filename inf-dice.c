@@ -58,6 +58,7 @@ struct result{
  * Includes both player attributes and their hit/success tables.
  */
 struct player{
+    int player_num;             // ID of player
     int stat;                   // target number for rolls
     int crit_val;               // minimum value for a crit
     int arm_bonus;              // armor bonus if beaten in CC
@@ -313,7 +314,7 @@ static void calc_player_successes(struct player *p){
                                 saves = hits;
                                 break;
                             default:
-                                printf("ERROR: Unknown ammo type: %d\n", p->ammo);
+                                printf("ERROR: P%d Unknown ammo type: %d\n", p->player_num, p->ammo);
                                 exit(1);
                                 break;
                         }
@@ -706,7 +707,7 @@ static void parse_ammo(const char *ammo, struct player *p){
             p->ammo = AMMO_NONE;
             break;
         default:
-            printf("ERROR: AMMO type '%s' unknown.  Must be one of N, D, E, F, -\n", ammo);
+            printf("ERROR: P%d AMMO type '%s' unknown.  Must be one of N, D, E, F, -\n", p->player_num, ammo);
             exit(1);
             break;
     }
@@ -716,7 +717,7 @@ static void parse_stat(const char *str, struct player *p){
     p->stat = strtol(str, NULL, 10);
 
     if(p->stat < 0 || p->stat > STAT_MAX){
-        printf("ERROR: Stat %d must be in the range of 0 to %d\n", p->stat, STAT_MAX);
+        printf("ERROR: P%d Stat %d must be in the range of 0 to %d\n", p->player_num, p->stat, STAT_MAX);
         exit(1);
     }
 
@@ -731,7 +732,7 @@ static void parse_b(const char *str, struct player *p){
     p->burst = strtol(str, NULL, 10);
 
     if(p->burst < 1 || p->burst > B_MAX){
-        printf("ERROR: B %d must be in the range of 1 to %d\n", p->burst, B_MAX);
+        printf("ERROR: P%d B %d must be in the range of 1 to %d\n", p->player_num, p->burst, B_MAX);
         exit(1);
     }
 }
@@ -740,7 +741,7 @@ static void parse_dam(const char *str, struct player *p){
     p->dam = strtol(str, NULL, 10);
 
     if(p->dam < 0 || p->dam > DAM_MAX){
-        printf("ERROR: DAM %d must be in the range of 0 to %d\n", p->dam, DAM_MAX);
+        printf("ERROR: P%d DAM %d must be in the range of 0 to %d\n", p->player_num, p->dam, DAM_MAX);
         exit(1);
     }
 }
@@ -761,6 +762,12 @@ static void parse_args(int argc, const char *argv[], struct player *p1, struct p
     parse_b(argv[i++], p2);
     parse_dam(argv[i++], p2);
     parse_ammo(argv[i++], p2);
+
+    // Quick and dirty CPU limiter
+    if(p1->burst + p2->burst > 9){
+        printf("ERROR: Combined B value may not exceed 9\n");
+        exit(1);
+    }
 }
 
 int main(int argc, const char *argv[]){
@@ -768,6 +775,8 @@ int main(int argc, const char *argv[]){
 
     memset(&p1, 0, sizeof(p1));
     memset(&p2, 0, sizeof(p2));
+    p1.player_num = 1;
+    p2.player_num = 2;
 
     if(argc < 2){
         usage(argv[0]);
