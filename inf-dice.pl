@@ -98,6 +98,14 @@ my $dodge_unit_labels = {
     -6 => 'REM/TAG/Motorcycle (-6 PH)',
 };
 
+my $gang_up = [0, 3, 6, 9];
+my $gang_up_labels = {
+    0 => 'None',
+    3 => '1 Ally (+3 CC/Dodge)',
+    6 => '2 Allies (+6 CC/Dodge)',
+    9 => '3 Allies (+9 CC/Dodge)',
+};
+
 sub span_popup_menu{
     my (%args) = @_;
     my $label = $args{-label};
@@ -155,7 +163,7 @@ sub print_input_attack_section{
               -label => "Ammo",
           ),
           span_popup_menu(-name => "$player.dam",
-              -values => [6 .. 15],
+              -values => [6 .. 20],
               -default => param("$player.dam") // 13,
               -label => 'DAM',
           ),
@@ -200,6 +208,13 @@ sub print_input_attack_section{
                -default => param("$player.dodge_unit") // '',
                -labels => $dodge_unit_labels,
                -label => "Unit Type",
+           ),
+           "<br>",
+           span_popup_menu(-name => "$player.gang_up",
+               -values => $gang_up,
+               -default => param("$player.gang_up") // '',
+               -labels => $gang_up_labels,
+               -label => "Gang Up",
            ),
            "<br>",
            "<h3>Defensive Abilities</h3>",
@@ -418,7 +433,7 @@ sub gen_attack_args{
         $arm += $cover;
     }elsif(param("$us.action") eq 'cc'){
         # CC mods
-        $mods = param("$them.ikohl") // 0;
+        $mods = (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0);
         $b = 1;
     }
 
@@ -436,7 +451,7 @@ sub gen_dodge_args{
     # TODO
     # -6 if template
     return (
-        max(param("$us.stat") + param("$us.dodge_unit"), 0),
+        max(param("$us.stat") + param("$us.dodge_unit") + param("$us.gang_up"), 0),
         1,
         0,
         '-',

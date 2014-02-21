@@ -11,7 +11,7 @@
 #define SUCCESS_MAX (B_MAX * SAVES_MAX)
 #define STAT_MAX 40
 #define ROLL_MAX 20
-#define DAM_MAX 15
+#define DAM_MAX 20
 
 // Other assumptions require that NUM_THREADS equals ROLL_MAX
 #define NUM_THREADS ROLL_MAX

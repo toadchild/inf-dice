@@ -104,6 +104,7 @@ function set_action(player){
         enable_input(player + ".link");
         enable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+        disable_input(player + ".gang_up");
 
         // defensive abilities
         enable_input(other + ".cover");
@@ -120,6 +121,7 @@ function set_action(player){
         disable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+        enable_input(player + ".gang_up");
 
         // defensive abilities
         disable_input(other + ".cover");
@@ -136,6 +138,7 @@ function set_action(player){
         disable_input(player + ".link");
         disable_input(player + ".viz");
         enable_input(player + ".dodge_unit");
+        enable_input(player + ".gang_up");
 
         // defensive abilities
         disable_input(other + ".cover");
@@ -152,6 +155,7 @@ function set_action(player){
         disable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+        disable_input(player + ".gang_up");
 
         // defensive abilities
         disable_input(other + ".cover");
