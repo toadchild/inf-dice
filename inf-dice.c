@@ -86,7 +86,7 @@ struct dice{
     int thread_num;
     struct player p1, p2;
 
-    int64_t num_rolls;
+    int64_t num_rolls, rolls_made;
 };
 
 
@@ -159,6 +159,7 @@ static void print_tables(struct dice *d){
     double n2;
 
     printf("Total Hits: %lld\n", d->num_rolls);
+    printf("Actual Rolls Made: %lld\n", d->rolls_made);
     printf("\n");
 
     n_rolls += print_player_hits(&d->p1, 1, d->num_rolls);
@@ -505,6 +506,7 @@ static void count_roll_results(struct dice *d){
     }
 
     d->num_rolls += multiplier;
+    d->rolls_made++;
 }
 
 /*
@@ -654,6 +656,7 @@ static void tabulate(struct player *p1, struct player *p2){
 #endif
         //printf("thread %d num_rolls %lld\n", t, d[t].num_rolls);
         d[0].num_rolls += d[t].num_rolls;
+        d[0].rolls_made += d[t].rolls_made;
 
         // copy hit and crit data
         for(h = 0; h <= B_MAX; h++){
