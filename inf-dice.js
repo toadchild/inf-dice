@@ -73,16 +73,18 @@ function set_ammo(player){
         disable_input(dam_id);
         disable_input(arm_id);
         disable_input(bts_id);
-    }else{
-        if(ammo == "Viral" || ammo.value == "E/M" || ammo.value == "E/M2"){
-            enable_input(bts_id);
-            disable_input(arm_id);
-        }else{
-            enable_input(arm_id);
-            disable_input(bts_id);
-        }
-
+    }else if(ammo == "Monofilament" || ammo == "K1"){
+        disable_input(dam_id);
+        disable_input(arm_id);
+        disable_input(bts_id);
+    }else if(ammo == "Viral" || ammo == "E/M" || ammo == "E/M2"){
         enable_input(dam_id);
+        enable_input(bts_id);
+        disable_input(arm_id);
+    }else{
+        enable_input(dam_id);
+        enable_input(arm_id);
+        disable_input(bts_id);
     }
 }
 

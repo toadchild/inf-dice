@@ -38,7 +38,7 @@ my $action_labels = {
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'E/M', 'E/M2', 'Smoke'];
+my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'Monofilament', 'K1', 'E/M', 'E/M2', 'Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
     AP => {code => 'N', ap => 0.5},
@@ -47,6 +47,8 @@ my $ammo_codes = {
     DA => {code => 'D'},
     EXP => {code => 'E'},
     Fire => {code => 'F'},
+    Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1},
+    K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts'},
     'E/M' => {code => 'N', save => 'bts'},
     'E/M2' => {code => 'D', save => 'bts'},
@@ -381,9 +383,10 @@ sub max{
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($arm, $ap, $ammo, $cover, $ignore_cover, $save);
+    my ($arm, $ap, $ammo, $cover, $ignore_cover, $save, $dam);
     my $b;
     my $mods;
+    my $code;
 
     if(param("$us.link") >= 3){
         $link_b = 1;
@@ -393,13 +396,20 @@ sub gen_attack_args{
         $link_bs = 3;
     }
 
-    # Lookup number of saves, invert BTS sign if needed
-    $ap = $ammo_codes->{param("$us.ammo")}{ap} // 1;
-    $save = $ammo_codes->{param("$us.ammo")}{save} // 'arm';
+    $code = $ammo_codes->{param("$us.ammo")};
+    $ap = $code->{ap} // 1;
+    $save = $code->{save} // 'arm';
     $arm = ceil(abs(param("$them.$save")) * $ap);
-    $ammo = $ammo_codes->{param("$us.ammo")}{code};
-    $ignore_cover = $ammo_codes->{param("$us.ammo")}{cover} // 1;
+    $ammo = $code->{code};
+    $ignore_cover = $code->{cover} // 1;
     $cover = param("$them.cover") * $ignore_cover;
+    $dam = param("$us.dam") // 0;
+
+    # Monofilament and K1 have fixed damage
+    if($code->{fixed_dam}){
+        $arm = 0;
+        $dam = $code->{fixed_dam};
+    }
 
     if(param("$us.action") eq 'bs'){
         # BS mods
@@ -408,14 +418,14 @@ sub gen_attack_args{
         $arm += $cover;
     }elsif(param("$us.action") eq 'cc'){
         # CC mods
-        $mods = param("$them.ikohl");
+        $mods = param("$them.ikohl") // 0;
         $b = 1;
     }
 
     return (
         max(param("$us.stat") + $mods, 0),
         $b,
-        max(param("$us.dam") - $arm, 0),
+        max($dam - $arm, 0),
         $ammo,
     );
 }
@@ -467,9 +477,15 @@ sub generate_output{
         return;
     }
 
-    if(param('p1.action') eq 'cc' && param('p2.action') eq 'cc'){
+    # Use of Monofilament CCW prevents CC ARM bonus
+    if($ammo_codes->{param('p1.ammo')}{no_arm_bonus} || $ammo_codes->{param('p2.ammo')}{no_arm_bonus}){
+        # use BS mode of backend
+        $mode = 'BS';
+    }elsif(param('p1.action') eq 'cc' && param('p2.action') eq 'cc'){
+        # otherwise if both are in CC use CC backend (has ARM bonus)
         $mode = 'CC';
     }else{
+        # BS backend is default for all other skills
         $mode = 'BS';
     }
 

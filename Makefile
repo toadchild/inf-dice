@@ -8,7 +8,7 @@ BINDIR=/usr/local/bin
 all: inf-dice hitbar.css
 
 clean:
-	rm -f inf-dice inf-dice.o
+	rm -f inf-dice inf-dice.o hitbar.css
 
 inf-dice: inf-dice.o
 
