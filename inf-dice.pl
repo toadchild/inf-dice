@@ -123,7 +123,7 @@ sub print_input_section{
     printf "<h2>Player %d</h2>\n", $player_num;
 
     print "<div class='action'>
-          <label>Action",
+          <h3>Action</h3>",
    
           popup_menu(-name => "$player.action",
               -values => $action,
@@ -131,8 +131,7 @@ sub print_input_section{
               -labels => $action_labels,
               -onchange => "set_action('$player')",
           ),
-          "</label>
-          </div>\n";
+          "</div>\n";
 
     print_input_attack_section($player);
 
@@ -270,6 +269,153 @@ sub print_input{
     print_input_tail();
 }
 
+sub print_player_output{
+    my ($output, $p) = @_;
+
+    for my $h (sort {$a <=> $b} keys %{$output->{hits}{$p}}){
+        print "<tr>";
+
+        printf "<td class='p$p-hit-$h num'>%.2f%%</td><td>Player $p scores %d success%s</td>", $output->{hits}{$p}{$h}, $h, ($h > 1 ? 'es' : '');
+
+        if(scalar keys $output->{hits}{$p} > 1){
+            printf "<td class='p$p-cumul-hit-$h num'>%.2f%%</td><td>Player $p scores %d or more successes</td>", $output->{cumul_hits}{$p}{$h}, $h;
+        }else{
+            print "<td colspan='2'></td>";
+        }
+
+        print "</tr>\n";
+    }
+}
+
+sub print_miss_output{
+    my ($output, $text) = @_;
+
+    printf "<tr><td class='miss num'>%.2f%%</td><td>$text</td></tr>", $output->{hits}{0};
+}
+
+sub print_hitbar_player{
+    my ($output, $sort, $p) = @_;
+
+    for my $h (sort {$a * $sort <=> $b * $sort} keys %{$output->{hits}{$p}}){
+        print "<td style='width: $output->{hits}{$p}{$h}%' class='p$p-hit-$h center'>";
+        if($output->{hits}{$p}{$h} >= 5.0){
+            printf "%d%%", $output->{hits}{$p}{$h};
+        }
+        print "</td>\n";
+    }
+}
+
+sub print_hitbar_output{
+    my ($mode, $output) = @_;
+
+    # mode is normal or ftf
+    # ftf has p1 (decreasing) - miss - p2 (increasing)
+    # normal has p1 (decreasing) - p2 (decreasing) - miss
+
+    print "<table class='hitbar'><tr>\n";
+
+    if($mode eq 'ftf'){
+        print_hitbar_player($output, -1, 1);
+    }else{
+        print_hitbar_player($output, -1, 1);
+        print_hitbar_player($output, -1, 2);
+    }
+
+    print "<td style='width: $output->{hits}{0}%' class='miss center'>";
+    if($output->{hits}{0} >= 5.0){
+        printf "%d%%", $output->{hits}{0};
+    }
+    print "</td>\n";
+
+    if($mode eq 'ftf'){
+        print_hitbar_player($output, 1, 2);
+    }
+
+    print "</tr></table>\n"
+}
+
+sub print_ftf_output{
+    my ($output) = @_;
+
+    print "<h2>Face to Face Roll</h2>\n";
+    if($output->{hits}){
+        print "<table id='output_data'>\n";
+
+        print_player_output($output, 1);
+
+        print_miss_output($output, 'Neither player succeeds');
+
+        print_player_output($output, 2);
+
+        print "</table>\n";
+
+        print_hitbar_output('ftf', $output);
+    }
+}
+
+sub print_normal_output{
+    my ($output) = @_;
+
+    print "<h2>Normal Roll</h2>\n";
+    if($output->{hits}){
+        print "<table id='output_data'>\n";
+
+        print_player_output($output, 1);
+        print_player_output($output, 2);
+
+        print_miss_output($output, 'No success');
+
+        print "</table>\n";
+
+        print_hitbar_output('normal', $output);
+    }
+}
+
+sub print_simultaneous_output{
+    my ($output) = @_;
+
+    print "<h2>Simultaneous Normal Rolls</h2>\n";
+
+    if($output->{A}{hits}){
+        print "<table id='output_data'>\n";
+
+        print_player_output($output->{A}, 1);
+
+        print_miss_output($output->{A}, 'No success');
+
+        print "</table>\n";
+
+        print_hitbar_output('normal', $output->{A});
+    }
+
+    if($output->{B}{hits}){
+        print "<table id='output_data'>\n";
+
+        print_player_output($output->{B}, 2);
+
+        print_miss_output($output->{B}, 'No success');
+
+        print "</table>\n";
+
+        print_hitbar_output('normal', $output->{B});
+    }
+}
+
+sub print_none_output{
+    my ($output) = @_;
+
+    print "<h2>No Roll</h2>\n";
+    if($output->{hits}){
+        print "<table id='output_data'>\n";
+
+        print_miss_output($output->{B}, 'Nothing happens');
+
+        print "</table>\n";
+
+        print_hitbar_output('ftf', $output);
+    }
+}
+
 sub print_output{
     my ($output) = @_;
 
@@ -282,82 +428,14 @@ sub print_output{
 
     if($output->{error}){
         print "<div class='output_error'>$output->{error}</div>\n";
-    }
-
-    if($output->{hits}){
-        my %all_keys;
-
-        for my $h (keys %{$output->{hits}{1}}, keys %{$output->{hits}{2}}){
-            $all_keys{$h} = 1;
-        }
-
-        # make sure there is at least one row
-        if(!keys %all_keys){
-            $all_keys{0} = 1;
-        }
-
-        print "<table id='output_data'>\n";
-        print "<tr><th colspan=4 class='output_section'>Player 1</th><th colspan=2 class='output_section'>vs.</th><th colspan=4 class='output_section'>Player 2</th></tr>\n";
-
-        my $first_row = 1;
-        for my $h (sort {$a <=> $b} keys %all_keys){
-            print "<tr>";
-
-            if(exists $output->{hits}{1}{$h}){
-                printf "<td>%d success%s</td><td class='p1-hit-$h num'>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{1}{$h};
-                if(scalar keys $output->{hits}{1} > 1){
-                    printf "<td>%d or more</td><td class='p1-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{1}{$h};
-                }else{
-                    print "<td colspan='2'></td>";
-                }
-            }else{
-                print "<td colspan=4></td>";
-            }
-
-            if($first_row){
-                printf "<td>0 successes</td><td class='miss num'>%.2f%%</td>", $output->{hits}{0};
-                $first_row = 0;
-            }else{
-                print "<td colspan=2></td>";
-            }
-
-            if(exists $output->{hits}{2}{$h}){
-                printf "<td>%d success%s</td><td class='p2-hit-$h num'>%.2f%%</td>", $h, ($h > 1 ? 'es' : ''), $output->{hits}{2}{$h};
-                if(scalar keys $output->{hits}{2} > 1){
-                    printf "<td>%d or more</td><td class='p2-cumul-hit-$h num'>%.2f%%</td>", $h, $output->{cumul_hits}{2}{$h};
-                }else{
-                    print "<td></td><td></td>";
-                }
-            }else{
-                print "<td></td><td></td><td></td><td></td>";
-            }
-
-            print "</tr>\n";
-        }
-
-        print "</table>\n";
-
-        print "<table class='hitbar'><tr>\n";
-        for my $h (sort {$b <=> $a} keys %{$output->{hits}{1}}){
-            print "<td style='width: $output->{hits}{1}{$h}%' class='p1-hit-$h center'>";
-            if($output->{hits}{1}{$h} >= 5.0){
-                printf "%d%%", $output->{hits}{1}{$h};
-            }
-            print "</td>\n";
-        }
-        print "<td style='width: $output->{hits}{0}%' class='miss center'>";
-        if($output->{hits}{0} >= 5.0){
-            printf "%d%%", $output->{hits}{0};
-        }
-        print "</td>\n";
-        for my $h (sort {$a <=> $b} keys %{$output->{hits}{2}}){
-            print "<td style='width: $output->{hits}{2}{$h}%' class='p2-hit-$h center'>";
-            if($output->{hits}{2}{$h} >= 5.0){
-                printf "%d%%", $output->{hits}{2}{$h};
-            }
-            print "</td>\n";
-        }
-        print "</tr></table>\n"
+    }elsif($output->{type} eq 'ftf'){
+        print_ftf_output($output);
+    }elsif($output->{type} eq 'normal'){
+        print_normal_output($output);
+    }elsif($output->{type} eq 'simultaneous'){
+        print_simultaneous_output($output);
+    }elsif($output->{type} eq 'none'){
+        print_none_output($output);
     }
 
     if($output->{raw}){
@@ -403,21 +481,21 @@ sub gen_attack_args{
     my $mods;
     my $code;
 
-    if(param("$us.link") >= 3){
+    if((param("$us.link") // 0) >= 3){
         $link_b = 1;
     }
 
-    if(param("$us.link") >= 5){
+    if((param("$us.link") // 0) >= 5){
         $link_bs = 3;
     }
 
-    $code = $ammo_codes->{param("$us.ammo")};
+    $code = $ammo_codes->{param("$us.ammo") // 'Normal'};
     $ap = $code->{ap} // 1;
     $save = $code->{save} // 'arm';
-    $arm = ceil(abs(param("$them.$save")) * $ap);
+    $arm = ceil(abs(param("$them.$save") // 0) * $ap);
     $ammo = $code->{code};
     $ignore_cover = $code->{cover} // 1;
-    $cover = param("$them.cover") * $ignore_cover;
+    $cover = (param("$them.cover") // 0) * $ignore_cover;
     $dam = param("$us.dam") // 0;
 
     # Monofilament and K1 have fixed damage
@@ -426,19 +504,20 @@ sub gen_attack_args{
         $dam = $code->{fixed_dam};
     }
 
-    if(param("$us.action") eq 'bs'){
+    my $action = param("$us.action") // 'bs';
+    if($action eq 'bs'){
         # BS mods
-        $mods = param("$them.ch") - $cover + param("$us.range") + param("$us.viz") + $link_bs;
-        $b = param("$us.b") + $link_b;
+        $mods = (param("$them.ch") // 0) - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
+        $b = (param("$us.b") // 1) + $link_b;
         $arm += $cover;
-    }elsif(param("$us.action") eq 'cc'){
+    }elsif($action eq 'cc'){
         # CC mods
         $mods = (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0);
         $b = 1;
     }
 
     return (
-        max(param("$us.stat") + $mods, 0),
+        max((param("$us.stat") // 0) + $mods, 0),
         $b,
         max($dam - $arm, 0),
         $ammo,
@@ -451,7 +530,7 @@ sub gen_dodge_args{
     # TODO
     # -6 if template
     return (
-        max(param("$us.stat") + param("$us.dodge_unit") + param("$us.gang_up"), 0),
+        max((param("$us.stat") // 0) + (param("$us.dodge_unit") // 0) + (param("$us.gang_up") // 0), 0),
         1,
         0,
         '-',
@@ -472,55 +551,98 @@ sub gen_none_args{
 sub gen_args{
     my ($us, $them) = @_;
 
-    if(param("$us.action") eq 'cc' || param("$us.action") eq 'bs'){
+    my $action = param("$us.action") // 'bs';
+    if($action eq 'cc' || $action eq 'bs'){
         return gen_attack_args($us, $them);
-    }elsif(param("$us.action") eq 'dodge'){
+    }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them);
-    }elsif(param("$us.action") eq 'none'){
+    }elsif($action eq 'none'){
         return gen_none_args($us, $them);
     }
 
     return ();
 }
 
+sub execute_backend{
+    my (@args) = @_;
+    my $output;
+
+    open DICE, '-|', 'inf-dice', @args;
+    $output->{raw} = '';
+    while(<DICE>){
+        $output->{raw} .= $_;
+        if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
+            $output->{hits}{$1}{$2} = $3;
+            $output->{cumul_hits}{$1}{$4} = $5;
+        }elsif(m/^No Successes: +([0-9.]+)/){
+            $output->{hits}{0} = $1;
+        }elsif(m/^ERROR/ || m/Assertion/){
+            $output->{error} = $_;
+        }
+    }
+
+    return $output;
+}
+
 sub generate_output{
     my $output;
     my (@args1, @args2);
-    my $mode;
 
     if(!defined param('p1.action') || !defined param('p2.action')){
         return;
     }
+    my $act_1 = param('p1.action');
+    my $act_2 = param('p2.action');
 
-    # Use of Monofilament CCW prevents CC ARM bonus
-    if($ammo_codes->{param('p1.ammo')}{no_arm_bonus} || $ammo_codes->{param('p2.ammo')}{no_arm_bonus}){
-        # use BS mode of backend
-        $mode = 'BS';
-    }elsif(param('p1.action') eq 'cc' && param('p2.action') eq 'cc'){
-        # otherwise if both are in CC use CC backend (has ARM bonus)
-        $mode = 'CC';
+    # determine if it's FtF or Normal
+    my $type;
+    if($act_1 eq 'none' && $act_2 eq 'none'){
+        # There is no roll
+        $output->{type} = 'none';
+        $output->{hits}{0} = 100;
+    }elsif($act_1 eq 'none' || $act_2 eq 'none'){
+        # One player is making a Normal Roll
+        @args1 = gen_args('p1', 'p2');
+        @args2 = gen_args('p2', 'p1');
+        $output = execute_backend('BS', @args1, @args2);
+        $output->{type} = 'normal';
+    }elsif($act_1 ne 'bs' && $act_1 ne 'cc' &&
+            $act_2 ne 'bs' && $act_2 ne 'cc'){
+        # neither player is attacking
+        # Simultaneous Normal Rolls
+        @args1 = gen_args('p1', 'p2');
+        @args2 = gen_args('p2', 'p1');
+
+        my ($o1, $o2);
+        $o1 = execute_backend('BS', @args1, gen_none_args());
+        $o2 = execute_backend('BS', gen_none_args(), @args2);
+
+        $output->{raw} = $o1->{raw} . '<hr>' . $o2->{raw};
+        $output->{type} = 'simultaneous';
+        $output->{A} = $o1;
+        $output->{B} = $o2;
     }else{
-        # BS backend is default for all other skills
-        $mode = 'BS';
-    }
+        # Face to Face Roll
 
-    @args1 = gen_args('p1', 'p2');
-    @args2 = gen_args('p2', 'p1');
-
-    if(@args1 && @args2){
-        open DICE, '-|', 'inf-dice', ($mode, @args1, @args2);
-        $output->{raw} = '';
-        while(<DICE>){
-            $output->{raw} .= $_;
-            if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
-                $output->{hits}{$1}{$2} = $3;
-                $output->{cumul_hits}{$1}{$4} = $5;
-            }elsif(m/^No Successes: +([0-9.]+)/){
-                $output->{hits}{0} = $1;
-            }elsif(m/^ERROR/ || m/Assertion/){
-                $output->{error} = $_;
-            }
+        # Determine if we should use BS or CC backend
+        # The only difference is that the CC backend allows
+        # the loser an ARM bonus when hit.
+        my $mode;
+        if($ammo_codes->{param('p1.ammo') // 'Normal'}{no_arm_bonus} || $ammo_codes->{param('p2.ammo') // 'Normal'}{no_arm_bonus}){
+            # Use of Monofilament CCW prevents CC ARM bonus
+            $mode = 'BS';
+        }elsif($act_1 eq 'cc' && $act_2 eq 'cc'){
+            # otherwise if both are in CC use CC backend
+            $mode = 'CC';
+        }else{
+            # BS backend is default for all other skills
+            $mode = 'BS';
         }
+
+        @args1 = gen_args('p1', 'p2');
+        @args2 = gen_args('p2', 'p1');
+        $output = execute_backend($mode, @args1, @args2);
+        $output->{type} = 'ftf';
     }
 
     return $output;

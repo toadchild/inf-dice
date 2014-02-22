@@ -92,15 +92,10 @@
 }
 
 #output_data {
-    width: 100%;
 }
 
 #output_data td {
-    width: 10%;
-}
-
-.output_section {
-    width: 33%;
+    padding: 3px;
 }
 
 td.num {
