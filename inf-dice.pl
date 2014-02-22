@@ -38,7 +38,7 @@ my $action_labels = {
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'Monofilament', 'K1', 'E/M', 'E/M2', 'Smoke'];
+my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'Monofilament', 'K1', 'Nanotech', 'E/M', 'E/M2', 'Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
     AP => {code => 'N', ap => 0.5},
@@ -50,6 +50,7 @@ my $ammo_codes = {
     Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1},
     K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts'},
+    Nanotech => {code => 'N', save => 'bts'},
     'E/M' => {code => 'N', save => 'bts'},
     'E/M2' => {code => 'D', save => 'bts'},
     'Smoke' => {code => '-', cover => 0},

@@ -77,7 +77,7 @@ function set_ammo(player){
         disable_input(dam_id);
         disable_input(arm_id);
         disable_input(bts_id);
-    }else if(ammo == "Viral" || ammo == "E/M" || ammo == "E/M2"){
+    }else if(ammo == "Viral" || ammo == "E/M" || ammo == "E/M2" || ammo == "Nanotech"){
         enable_input(dam_id);
         enable_input(bts_id);
         disable_input(arm_id);
