@@ -544,7 +544,7 @@ static void annotate_roll(struct player *p, int n){
 static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, int thread_num){
     int i, b;
     int step;
- 
+
     // step is used for outermost loop to divide up data between threads
     // Each thread does a single digit of first die roll
     if(thread_num >= 0){
@@ -671,11 +671,11 @@ static void tabulate(struct player *p1, struct player *p2){
     }
     //printf("total rolls %lld should be %.0f\n", d[0].num_rolls, pow(ROLL_MAX, d[0].p1.burst + d[0].p2.burst));
     assert(d[0].num_rolls == pow(ROLL_MAX, d[0].p1.burst + d[0].p2.burst));
-    
+
     calc_successes(d);
 
     print_tables(d);
-}   
+}
 
 static void print_player(const struct player *p, int p_num){
     printf("P%d STAT %2d CRIT %2d B %d DAM %2d AMMO %s ARM_BONUS %d\n", p_num, p->stat, p->crit_val, p->burst, p->dam, ammo_labels[p->ammo], p->arm_bonus);

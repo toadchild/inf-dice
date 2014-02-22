@@ -124,7 +124,7 @@ sub print_input_section{
 
     print "<div class='action'>
           <h3>Action</h3>",
-   
+
           popup_menu(-name => "$player.action",
               -values => $action,
               -default => param("$player.action") // '',
