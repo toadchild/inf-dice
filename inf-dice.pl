@@ -633,8 +633,9 @@ sub generate_output{
         @args2 = gen_args('p2', 'p1');
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'ftf';
-    }elsif($act_1 ne 'bs' && $act_1 ne 'cc' &&
-            $act_2 ne 'bs' && $act_2 ne 'cc'){
+    }elsif($act_1 eq 'dtw' || $act_2 eq 'dtw' ||
+            ($act_1 ne 'bs' && $act_1 ne 'cc' &&
+            $act_2 ne 'bs' && $act_2 ne 'cc')){
         # neither player is attacking
         # Simultaneous Normal Rolls
         @args1 = gen_args('p1', 'p2');
