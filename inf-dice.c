@@ -28,11 +28,11 @@ enum ammo_t{
 };
 
 static const char *ammo_labels[] = {
-    "Normal",
+    "NORMAL",
     "DA",
     "EXP",
-    "Fire",
-    "None",
+    "FIRE",
+    "NONE",
 };
 
 /*
@@ -65,6 +65,7 @@ struct player{
     int burst;                  // number of dice
     int dam;                    // damage value
     int modified_dam;           // damage value after conditional modifiers
+    int template;               // Is this a template weapon
     enum ammo_t ammo;           // ammo type
 
     struct result d[B_MAX];     // current set of dice being evaluated
@@ -293,7 +294,7 @@ static void calc_player_successes(struct player *p){
                     if(p->ammo == AMMO_FIRE){
                         // Fire ammo
                         // If you fail the save, you must roll again, ad infinitum.
-                        fire_damage(p, hits + crits, crits, dam, p->hit[hits][crits][dam], SAVES_MAX - 1);
+                        fire_damage(p, hits + crits, crits, dam, p->hit[hits][crits][dam], SAVES_MAX);
                     }else if(p->ammo == AMMO_NONE){
                         // Non-lethal skill (Dodge, Smoke)
                         // There is no saving throw. Number of successes still
@@ -380,9 +381,11 @@ static void count_player_results(struct player *us, struct player *them, int *hi
                 }
             }else{
                 // it was a regular hit, see if it was canceled
-                if(!them->d[best].is_hit || (!them->d[best].is_crit &&
+                if(!(us->template && them->d[best].is_hit) &&
+                        (them->template || !them->d[best].is_hit ||
+                        (!them->d[best].is_crit &&
                         (them->d[best].value < us->d[i].value ||
-                        (them->d[best].value == us->d[i].value && them->stat < us->stat)))){
+                        (them->d[best].value == us->d[i].value && them->stat < us->stat))))){
                     (*hits)++;
                 }else{
                     // All lower dice will also be canceled
@@ -434,11 +437,11 @@ static int repeat_factor(struct player *p){
  * Counts how many die rolls we didn't bother rolling because we know
  * they were going to miss.
  */
-static int miss_factor(struct player *p, int start){
+static int miss_factor(struct player *p){
     int i;
     int fact = 1;
 
-    for(i = start; i < p->burst; i++){
+    for(i = 0; i < p->burst; i++){
         if(p->d[i].is_hit){
             continue;
         }
@@ -446,6 +449,22 @@ static int miss_factor(struct player *p, int start){
     }
 
     return fact;
+}
+
+/*
+ * template_factor()
+ *
+ * Helper for count_roll_results()
+ *
+ * Counts how many die rolls we didn't bother rolling because template
+ * weapons auto-hit.
+ */
+static int template_factor(struct player *p){
+    if(p->template){
+        return pow(ROLL_MAX, p->burst);
+    }
+
+    return 1;
 }
 
 /*
@@ -489,21 +508,29 @@ static void count_roll_results(struct dice *d){
     multiplier = factorial(d->p1.burst) / fact1 * factorial(d->p2.burst) / fact2;
 
     // more multipliers for rolling up all misses
-    multiplier *= miss_factor(&d->p1, 0);
-    multiplier *= miss_factor(&d->p2, 0);
+    multiplier *= miss_factor(&d->p1);
+    multiplier *= miss_factor(&d->p2);
+
+    // more multipliers for template weapons
+    multiplier *= template_factor(&d->p1);
+    multiplier *= template_factor(&d->p2);
 
     count_player_results(&d->p1, &d->p2, &hits1, &crits1, &dam1);
     count_player_results(&d->p2, &d->p1, &hits2, &crits2, &dam2);
 
     //print_roll(d, multiplier, dam1, dam2);
 
-    assert((crits1 + hits1 == 0) || (crits2 + hits2 == 0));
-
-    // Need to ensure we only count totally whiffed rolls once
     if(crits1 + hits1){
         d->p1.hit[hits1][crits1][dam1] += multiplier;
-    }else{
+    }
+
+    if(hits2 + crits2){
         d->p2.hit[hits2][crits2][dam2] += multiplier;
+    }
+
+    // Need to ensure we only count totally whiffed rolls once
+    if(hits1 + crits1 + hits2 + crits2 == 0){
+        d->p2.hit[0][0][0] += multiplier;
     }
 
     d->num_rolls += multiplier;
@@ -569,7 +596,13 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
             // Don't do it on the start value, as that has a different multiplier on the back-end
             roll_dice(b1 - 1, b2, i, 1, d, -1);
 
+            // Only roll a miss once; all subsequent misses are multiplied out
             if(!d->p1.d[b].is_hit){
+                break;
+            }
+
+            // Only do a template once; they auto-hit
+            if(d->p1.template){
                 break;
             }
         }
@@ -584,7 +617,13 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
 
             roll_dice(0, b2 - 1, 21, i, d, -1);
 
+            // Only roll a miss once; all subsequent misses are multiplied out
             if(!d->p2.d[b].is_hit){
+                break;
+            }
+
+            // Only do a template once; they auto-hit
+            if(d->p2.template){
                 break;
             }
         }
@@ -601,7 +640,9 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
 void *rolling_thread(void *data){
     struct dice *d = data;
 
-    if(d->thread_num <= d->p1.stat){
+    // Misses and auto-hits are corrected for with multipliers.
+    // In those cases, only roll one time and short-circuit the rest.
+    if(d->thread_num <= d->p1.stat && (!d->p1.template || d->thread_num == 0)){
         roll_dice(d->p1.burst, d->p2.burst, 1, 1, d, d->thread_num);
     }
 
@@ -678,7 +719,7 @@ static void tabulate(struct player *p1, struct player *p2){
 }
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d STAT %2d CRIT %2d B %d DAM %2d AMMO %s ARM_BONUS %d\n", p_num, p->stat, p->crit_val, p->burst, p->dam, ammo_labels[p->ammo], p->arm_bonus);
+    printf("P%d STAT %2d CRIT %2d B %d TEMPLATE %d DAM %2d ARM_BONUS %d AMMO %s\n", p_num, p->stat, p->crit_val, p->burst, p->template, p->dam, p->arm_bonus, ammo_labels[p->ammo]);
 }
 
 static void usage(const char *program){
@@ -714,17 +755,35 @@ static void parse_ammo(const char *ammo, struct player *p){
 }
 
 static void parse_stat(const char *str, struct player *p){
-    p->stat = strtol(str, NULL, 10);
+    char *end;
 
-    if(p->stat < 0 || p->stat > STAT_MAX){
-        printf("ERROR: P%d Stat %d must be in the range of 0 to %d\n", p->player_num, p->stat, STAT_MAX);
-        exit(1);
-    }
+    if(strcmp(str, "T") == 0){
+        // Template weapon
+        // Automatically hits, cannot crit
 
-    if(p->stat > ROLL_MAX){
-        p->crit_val = ROLL_MAX - (p->stat - ROLL_MAX);
+        p->stat = ROLL_MAX;
+        p->crit_val = ROLL_MAX + 1;
+        p->template = 1;
     }else{
-        p->crit_val = p->stat;
+        // Normal weapon that needs a roll
+        // Crits if it hits the target number
+
+        p->stat = strtol(str, &end, 10);
+        if(*str && *end){
+            printf("ERROR: P%d Stat %s cannot be read\n", p->player_num, str);
+            exit(1);
+        }
+
+        if(p->stat < 0 || p->stat > STAT_MAX){
+            printf("ERROR: P%d Stat %d must be in the range of 0 to %d\n", p->player_num, p->stat, STAT_MAX);
+            exit(1);
+        }
+
+        if(p->stat > ROLL_MAX){
+            p->crit_val = ROLL_MAX - (p->stat - ROLL_MAX);
+        }else{
+            p->crit_val = p->stat;
+        }
     }
 }
 
@@ -766,6 +825,12 @@ static void parse_args(int argc, const char *argv[], struct player *p1, struct p
     // Quick and dirty CPU limiter
     if(p1->burst + p2->burst > 9){
         printf("ERROR: Combined B value may not exceed 9\n");
+        exit(1);
+    }
+
+    // Template Sanity
+    if(p1->template && p2->template){
+        printf("ERROR: FtF roll cannot have two templates\n");
         exit(1);
     }
 }

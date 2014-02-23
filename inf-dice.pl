@@ -28,11 +28,12 @@ Content-Type: text/html; charset=utf-8
 EOF
 }
 
-my $action = ['bs', 'cc', 'dodge', 'none'];
+my $action = ['bs', 'dtw', 'cc', 'dodge', 'none'];
 my $action_labels = {
-    bs => 'BS Attack',
-    cc => 'CC Attack',
-    dodge => 'Dodge',
+    bs => 'Attack - Shoot (Roll against BS or other attribute)',
+    cc => 'Attack - Close Combat (Roll against CC)',
+    dtw => 'Attack - Direct Template Weapon (Automaticall hits)',
+    dodge => 'Dodge (Roll against PH)',
     none => 'No Action',
 };
 
@@ -479,7 +480,7 @@ sub gen_attack_args{
     my ($link_bs, $link_b) = (0, 0);
     my ($arm, $ap, $ammo, $cover, $ignore_cover, $save, $dam);
     my $b;
-    my $mods;
+    my $stat;
     my $code;
 
     if((param("$us.link") // 0) >= 3){
@@ -499,6 +500,8 @@ sub gen_attack_args{
     $cover = (param("$them.cover") // 0) * $ignore_cover;
     $dam = param("$us.dam") // 0;
 
+    $stat = param("$us.stat") // 0;
+
     # Monofilament and K1 have fixed damage
     if($code->{fixed_dam}){
         $arm = 0;
@@ -508,17 +511,26 @@ sub gen_attack_args{
     my $action = param("$us.action") // 'bs';
     if($action eq 'bs'){
         # BS mods
-        $mods = (param("$them.ch") // 0) - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
+        $stat += (param("$them.ch") // 0) - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
+        $stat = max($stat, 0);
+
+        $b = (param("$us.b") // 1) + $link_b;
+        $arm += $cover;
+    }elsif($action eq 'dtw'){
+        # DTW mods
+        $stat = 'T';
         $b = (param("$us.b") // 1) + $link_b;
         $arm += $cover;
     }elsif($action eq 'cc'){
         # CC mods
-        $mods = (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0);
+        $stat += (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0);
+        $stat = max($stat, 0);
+
         $b = 1;
     }
 
     return (
-        max((param("$us.stat") // 0) + $mods, 0),
+        $stat,
         $b,
         max($dam - $arm, 0),
         $ammo,
@@ -528,10 +540,17 @@ sub gen_attack_args{
 sub gen_dodge_args{
     my ($us, $them) = @_;
 
-    # TODO
-    # -6 if template
+    my $stat = param("$us.stat") // 0;
+    $stat += param("$us.dodge_unit") // 0;
+    $stat += param("$us.gang_up") // 0;
+
+    # -6 to dodge templates
+    if(param("$them.action") eq 'dtw'){
+        $stat -= 6;
+    }
+
     return (
-        max((param("$us.stat") // 0) + (param("$us.dodge_unit") // 0) + (param("$us.gang_up") // 0), 0),
+        max($stat, 0),
         1,
         0,
         '-',
@@ -553,7 +572,7 @@ sub gen_args{
     my ($us, $them) = @_;
 
     my $action = param("$us.action") // 'bs';
-    if($action eq 'cc' || $action eq 'bs'){
+    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them);
@@ -607,6 +626,13 @@ sub generate_output{
         @args2 = gen_args('p2', 'p1');
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'normal';
+    }elsif(($act_1 eq 'dtw' && $act_2 eq 'dodge') || ($act_1 eq 'dodge' && $act_2 eq 'dtw')){
+        # Dodge vs. Template
+        # This is the only time a template can be a FtF roll
+        @args1 = gen_args('p1', 'p2');
+        @args2 = gen_args('p2', 'p1');
+        $output = execute_backend('BS', @args1, @args2);
+        $output->{type} = 'ftf';
     }elsif($act_1 ne 'bs' && $act_1 ne 'cc' &&
             $act_2 ne 'bs' && $act_2 ne 'cc'){
         # neither player is attacking
@@ -622,6 +648,17 @@ sub generate_output{
         $output->{type} = 'simultaneous';
         $output->{A} = $o1;
         $output->{B} = $o2;
+
+        if($o1->{error}){
+            $output->{error} = $o1->{error};
+        }
+        if($o2->{error}){
+            if($output->{error}){
+                $output->{error} .= '<br>' . $o2->{error};
+            }else{
+                $output->{error} = $o2->{error};
+            }
+        }
     }else{
         # Face to Face Roll
 

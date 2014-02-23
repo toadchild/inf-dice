@@ -25,7 +25,6 @@ function _set_style_recursive(obj, styles){
 function enable_input(id){
     obj = document.getElementById(id);
     styles = [
-        ["text-decoration", "none"],
         ["color", "black"],
     ];
 
@@ -35,8 +34,7 @@ function enable_input(id){
 function disable_input(id){
     obj = document.getElementById(id);
     styles = [
-        ["text-decoration", "line-through"],
-        ["color", "grey"],
+        ["color", "#555555"],
     ];
 
     _set_style_recursive(obj, styles);
@@ -56,7 +54,7 @@ function set_ammo(player){
     action_name = player + ".action";
     action = document.getElementsByName(action_name)[0];
 
-    if(action.value == "bs" || action.value == "cc"){
+    if(action.value == "bs" || action.value == "cc" || action.value == "dtw"){
         ammo_name = player + ".ammo";
         ammo_obj = document.getElementsByName(ammo_name)[0];
         ammo = ammo_obj.value;
@@ -109,6 +107,23 @@ function set_action(player){
         // defensive abilities
         enable_input(other + ".cover");
         enable_input(other + ".ch");
+        disable_input(other + ".ikohl");
+    }else if(action.value == "dtw"){
+        // stat block
+        disable_input(player + ".stat");
+        enable_input(player + ".b");
+        enable_input(player + ".ammo");
+
+        // modifiers
+        disable_input(player + ".range");
+        enable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".dodge_unit");
+        disable_input(player + ".gang_up");
+
+        // defensive abilities
+        enable_input(other + ".cover");
+        disable_input(other + ".ch");
         disable_input(other + ".ikohl");
     }else if(action.value == "cc"){
         // stat block
