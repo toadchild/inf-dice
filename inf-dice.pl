@@ -108,6 +108,14 @@ my $gang_up_labels = {
     9 => '3 Allies (+9 CC/Dodge)',
 };
 
+my $hyperdynamics = [0, 3, 6, 9];
+my $hyperdynamics_labels = {
+    0 => 'None',
+    3 => 'Level 1 (+3 Dodge)',
+    6 => 'Level 2 (+6 Dodge)',
+    9 => 'Level 3 (+9 Dodge)',
+};
+
 sub span_popup_menu{
     my (%args) = @_;
     my $label = $args{-label};
@@ -236,6 +244,13 @@ sub print_input_attack_section{
                -default => param("$player.ikohl") // '',
                -labels => $ikohl_labels,
                -label => "i-Kohl",
+           ),
+           "<br>",
+           span_popup_menu(-name => "$player.hyperdynamics",
+               -values => $hyperdynamics,
+               -default => param("$player.hyperdynamics") // '',
+               -labels => $hyperdynamics_labels,
+               -label => "Hyperdynamics",
            ),
            "<br>",
 
@@ -543,6 +558,7 @@ sub gen_dodge_args{
     my $stat = param("$us.stat") // 0;
     $stat += param("$us.dodge_unit") // 0;
     $stat += param("$us.gang_up") // 0;
+    $stat += param("$us.hyperdynamics") // 0;
 
     # -6 to dodge templates
     if(param("$them.action") eq 'dtw'){
@@ -587,7 +603,9 @@ sub execute_backend{
     my (@args) = @_;
     my $output;
 
-    open DICE, '-|', 'inf-dice', @args;
+    if(!open DICE, '-|', '/usr/local/bin/inf-dice', @args){
+        $output->{error} = 'Unable to execute backend component.';
+    }
     $output->{raw} = '';
     while(<DICE>){
         $output->{raw} .= $_;

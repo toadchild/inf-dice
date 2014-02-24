@@ -108,6 +108,7 @@ function set_action(player){
         enable_input(other + ".cover");
         enable_input(other + ".ch");
         disable_input(other + ".ikohl");
+        disable_input(player + ".hyperdynamics");
     }else if(action.value == "dtw"){
         // stat block
         disable_input(player + ".stat");
@@ -125,6 +126,7 @@ function set_action(player){
         enable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(other + ".ikohl");
+        disable_input(player + ".hyperdynamics");
     }else if(action.value == "cc"){
         // stat block
         enable_input(player + ".stat");
@@ -142,6 +144,7 @@ function set_action(player){
         disable_input(other + ".cover");
         disable_input(other + ".ch");
         enable_input(other + ".ikohl");
+        disable_input(player + ".hyperdynamics");
     }else if(action.value == "dodge"){
         // stat block
         enable_input(player + ".stat");
@@ -159,6 +162,7 @@ function set_action(player){
         disable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(other + ".ikohl");
+        enable_input(player + ".hyperdynamics");
     }else if(action.value == "none"){
         // stat block
         disable_input(player + ".stat");
@@ -176,6 +180,7 @@ function set_action(player){
         disable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(other + ".ikohl");
+        disable_input(player + ".hyperdynamics");
     }
     set_ammo(player);
 }
