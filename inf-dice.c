@@ -18,6 +18,7 @@
 #define MULTI_THREADED 1
 
 #define MAX(a,b) (a > b ? a : b)
+#define MIN(a,b) (a < b ? a : b)
 
 enum ammo_t{
     AMMO_NORMAL,
@@ -251,10 +252,9 @@ static double hit_prob(int successes, int trials, double probability){
 static void fire_damage(struct player *p, int hits, int total_hits, int dam, double prob, int depth){
     int success;
 
-    if(depth == 0){
-        // record damage at bottom of stack
-        assert(total_hits <= SUCCESS_MAX);
-        p->success[total_hits] += prob;
+    // record damage at bottom of stack or when we hit the cap
+    if(total_hits >= SUCCESS_MAX || depth == 0){
+        p->success[MIN(total_hits, SUCCESS_MAX)] += prob;
         return;
     }
 
@@ -294,7 +294,7 @@ static void calc_player_successes(struct player *p){
                     if(p->ammo == AMMO_FIRE){
                         // Fire ammo
                         // If you fail the save, you must roll again, ad infinitum.
-                        fire_damage(p, hits + crits, crits, dam, p->hit[hits][crits][dam], SAVES_MAX);
+                        fire_damage(p, hits + crits, crits, dam, p->hit[hits][crits][dam], SUCCESS_MAX);
                     }else if(p->ammo == AMMO_NONE){
                         // Non-lethal skill (Dodge, Smoke)
                         // There is no saving throw. Number of successes still
