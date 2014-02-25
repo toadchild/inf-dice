@@ -124,6 +124,12 @@ sub span_popup_menu{
     return "<span id='$args{-name}'><label>$label " .  popup_menu(%args) .  "</label></span>\n";
 }
 
+sub span_checkbox{
+    my (%args) = @_;
+
+    return "<span id='$args{-name}'>" .  checkbox(%args) .  "</span>\n";
+}
+
 sub print_input_section{
     my ($player_num) = @_;
     my $player = "p" . $player_num;
@@ -219,24 +225,12 @@ sub print_input_attack_section{
                -label => "Unit Type",
            ),
            "<br>",
+           "<h3>CC Modifiers</h3>",
            span_popup_menu(-name => "$player.gang_up",
                -values => $gang_up,
                -default => param("$player.gang_up") // '',
                -labels => $gang_up_labels,
                -label => "Gang Up",
-           ),
-           "<br>",
-           "<h3>Defensive Abilities</h3>",
-
-           "<span id='$player.cover'>",
-           checkbox("$player.cover", defined(param("$player.cover")), 3, 'Cover (+3 ARM, -3 Opponent BS)'),
-           "</span>
-           <br>",
-           span_popup_menu(-name => "$player.ch",
-               -values => $ch,
-               -default => param("$player.ch") // '',
-               -labels => $ch_labels,
-               -label => "Camo",
            ),
            "<br>",
            span_popup_menu(-name => "$player.ikohl",
@@ -246,13 +240,29 @@ sub print_input_attack_section{
                -label => "i-Kohl",
            ),
            "<br>",
+           span_checkbox(-name => "$player.berserk",
+               -checked => defined(param("$player.berserk")),
+               -value => 3,
+               -label => 'Berserk (+9 CC, Normal Rolls)'),
+           "<h3>Defensive Abilities</h3>",
+           span_checkbox(-name => "$player.cover",
+               -checked => defined(param("$player.cover")),
+               -value => 3,
+               -label => 'Cover (+3 ARM, -3 Opponent BS)'),
+           "<br>",
+           span_popup_menu(-name => "$player.ch",
+               -values => $ch,
+               -default => param("$player.ch") // '',
+               -labels => $ch_labels,
+               -label => "Camo",
+           ),
+           "<br>",
            span_popup_menu(-name => "$player.hyperdynamics",
                -values => $hyperdynamics,
                -default => param("$player.hyperdynamics") // '',
                -labels => $hyperdynamics_labels,
                -label => "Hyperdynamics",
            ),
-           "<br>",
 
            "</div>\n";
 }
@@ -523,7 +533,7 @@ sub gen_attack_args{
         $dam = $code->{fixed_dam};
     }
 
-    my $action = param("$us.action") // 'bs';
+    my $action = param("$us.action");
     if($action eq 'bs'){
         # BS mods
         $stat += (param("$them.ch") // 0) - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
@@ -538,7 +548,14 @@ sub gen_attack_args{
         $arm += $cover;
     }elsif($action eq 'cc'){
         # CC mods
-        $stat += (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0);
+
+        # berserk only works if they CC or Dodge in response
+        my $berserk = 0;
+        if(param("$us.berserk") && (param("$them.action") eq 'cc' || param("$them.action") eq 'dodge' || param("$them.action") eq 'none')){
+            $berserk = 9;
+        }
+
+        $stat += (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0) + $berserk;
         $stat = max($stat, 0);
 
         $b = 1;
@@ -587,12 +604,12 @@ sub gen_none_args{
 sub gen_args{
     my ($us, $them) = @_;
 
-    my $action = param("$us.action") // 'bs';
+    my $action = param("$us.action");
     if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them);
-    }elsif($action eq 'none'){
+    }else{
         return gen_none_args($us, $them);
     }
 
@@ -622,6 +639,33 @@ sub execute_backend{
     return $output;
 }
 
+# wrapper for execute_backend that does a pair of simultaneous normal rolls
+sub execute_backend_simultaneous{
+    my ($args1, $args2) = @_;
+    my ($o1, $o2, $output);
+
+    $o1 = execute_backend('BS', @$args1, gen_none_args());
+    $o2 = execute_backend('BS', gen_none_args(), @$args2);
+
+    $output->{raw} = $o1->{raw} . '<hr>' . $o2->{raw};
+    $output->{type} = 'simultaneous';
+    $output->{A} = $o1;
+    $output->{B} = $o2;
+
+    if($o1->{error}){
+        $output->{error} = $o1->{error};
+    }
+    if($o2->{error}){
+        if($output->{error}){
+            $output->{error} .= '<br>' . $o2->{error};
+        }else{
+            $output->{error} = $o2->{error};
+        }
+    }
+
+    return $output;
+}
+
 sub generate_output{
     my $output;
     my (@args1, @args2);
@@ -632,6 +676,9 @@ sub generate_output{
     my $act_1 = param('p1.action');
     my $act_2 = param('p2.action');
 
+    @args1 = gen_args('p1', 'p2');
+    @args2 = gen_args('p2', 'p1');
+
     # determine if it's FtF or Normal
     my $type;
     if($act_1 eq 'none' && $act_2 eq 'none'){
@@ -640,15 +687,11 @@ sub generate_output{
         $output->{hits}{0} = 100;
     }elsif($act_1 eq 'none' || $act_2 eq 'none'){
         # One player is making a Normal Roll
-        @args1 = gen_args('p1', 'p2');
-        @args2 = gen_args('p2', 'p1');
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'normal';
     }elsif(($act_1 eq 'dtw' && $act_2 eq 'dodge') || ($act_1 eq 'dodge' && $act_2 eq 'dtw')){
         # Dodge vs. Template
         # This is the only time a template can be a FtF roll
-        @args1 = gen_args('p1', 'p2');
-        @args2 = gen_args('p2', 'p1');
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'ftf';
     }elsif($act_1 eq 'dtw' || $act_2 eq 'dtw' ||
@@ -656,28 +699,14 @@ sub generate_output{
             $act_2 ne 'bs' && $act_2 ne 'cc')){
         # neither player is attacking
         # Simultaneous Normal Rolls
-        @args1 = gen_args('p1', 'p2');
-        @args2 = gen_args('p2', 'p1');
-
-        my ($o1, $o2);
-        $o1 = execute_backend('BS', @args1, gen_none_args());
-        $o2 = execute_backend('BS', gen_none_args(), @args2);
-
-        $output->{raw} = $o1->{raw} . '<hr>' . $o2->{raw};
-        $output->{type} = 'simultaneous';
-        $output->{A} = $o1;
-        $output->{B} = $o2;
-
-        if($o1->{error}){
-            $output->{error} = $o1->{error};
-        }
-        if($o2->{error}){
-            if($output->{error}){
-                $output->{error} .= '<br>' . $o2->{error};
-            }else{
-                $output->{error} = $o2->{error};
-            }
-        }
+        $output = execute_backend_simultaneous(\@args1, \@args2);
+    }elsif(($act_1 eq 'cc' && param('p1.berserk') &&
+            ($act_2 eq 'cc' || $act_2 eq 'dodge' || $act_2 eq 'none')) ||
+            ($act_2 eq 'cc' && param('p2.berserk') &&
+            ($act_1 eq 'cc' || $act_1 eq 'dodge' || $act_1 eq 'none'))){
+        # Berserk CC
+        # Pair of Normal Rolls.  No CC ARM bonus.
+        $output = execute_backend_simultaneous(\@args1, \@args2);
     }else{
         # Face to Face Roll
 
@@ -696,8 +725,6 @@ sub generate_output{
             $mode = 'BS';
         }
 
-        @args1 = gen_args('p1', 'p2');
-        @args2 = gen_args('p2', 'p1');
         $output = execute_backend($mode, @args1, @args2);
         $output->{type} = 'ftf';
     }

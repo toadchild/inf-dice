@@ -86,10 +86,35 @@ function set_ammo(player){
     }
 }
 
+// helper function for set_action
+// berserk works in CC vs. CC, Dodge, or None
+function set_berserk(player, other){
+    action_name = player + ".action";
+    action = document.getElementsByName(action_name)[0].value;
+    other_action_name = other + ".action";
+    other_action = document.getElementsByName(other_action_name)[0].value;
+
+    if(action == "cc" && other_action == "cc"){
+        enable_input(player + ".berserk");
+        enable_input(other + ".berserk");
+    }else if(action == "cc" && (other_action == "dodge" || other_action == "none")){
+        enable_input(player + ".berserk");
+        disable_input(other + ".berserk");
+    }else if(other_action == "cc" && (action == "dodge" || action == "none")){
+        disable_input(player + ".berserk");
+        enable_input(other + ".berserk");
+    }else{
+        disable_input(player + ".berserk");
+        disable_input(other + ".berserk");
+    }
+}
+
 function set_action(player){
     other = other_player(player);
     action_name = player + ".action";
     action = document.getElementsByName(action_name)[0];
+    other_action_name = other + ".action";
+    other_action = document.getElementsByName(other_action_name)[0];
 
     if(action.value == "bs"){
         // stat block
@@ -102,12 +127,15 @@ function set_action(player){
         enable_input(player + ".link");
         enable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+
+        // cc modifiers
         disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+        set_berserk(player, other);
 
         // defensive abilities
         enable_input(other + ".cover");
         enable_input(other + ".ch");
-        disable_input(other + ".ikohl");
         disable_input(player + ".hyperdynamics");
     }else if(action.value == "dtw"){
         // stat block
@@ -120,12 +148,15 @@ function set_action(player){
         enable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+
+        // cc modifiers
         disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+        set_berserk(player, other);
 
         // defensive abilities
         enable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".ikohl");
         disable_input(player + ".hyperdynamics");
     }else if(action.value == "cc"){
         // stat block
@@ -138,12 +169,15 @@ function set_action(player){
         disable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+
+        // cc modifiers
         enable_input(player + ".gang_up");
+        enable_input(other + ".ikohl");
+        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        enable_input(other + ".ikohl");
         disable_input(player + ".hyperdynamics");
     }else if(action.value == "dodge"){
         // stat block
@@ -156,12 +190,15 @@ function set_action(player){
         disable_input(player + ".link");
         disable_input(player + ".viz");
         enable_input(player + ".dodge_unit");
+
+        // cc modifiers
         enable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".ikohl");
         enable_input(player + ".hyperdynamics");
     }else if(action.value == "none"){
         // stat block
@@ -174,12 +211,15 @@ function set_action(player){
         disable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".dodge_unit");
+
+        // cc modifiers
         disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".ikohl");
         disable_input(player + ".hyperdynamics");
     }
     set_ammo(player);
