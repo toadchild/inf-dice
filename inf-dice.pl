@@ -97,7 +97,7 @@ my $link_labels = {
 my $dodge_unit = [0, -6];
 my $dodge_unit_labels = {
     0 => 'None',
-    -6 => 'REM/TAG/Motorcycle (-6 PH)',
+    -6 => 'REM/TAG/Motorcycle (-6 PH to Dodge)',
 };
 
 my $gang_up = [0, 3, 6, 9];
@@ -111,9 +111,9 @@ my $gang_up_labels = {
 my $hyperdynamics = [0, 3, 6, 9];
 my $hyperdynamics_labels = {
     0 => 'None',
-    3 => 'Level 1 (+3 Dodge)',
-    6 => 'Level 2 (+6 Dodge)',
-    9 => 'Level 3 (+9 Dodge)',
+    3 => 'Level 1 (+3 PH to Dodge)',
+    6 => 'Level 2 (+6 PH to Dodge)',
+    9 => 'Level 3 (+9 PH to Dodge)',
 };
 
 sub span_popup_menu{
@@ -225,6 +225,12 @@ sub print_input_attack_section{
                -label => "Unit Type",
            ),
            "<br>",
+           span_popup_menu(-name => "$player.hyperdynamics",
+               -values => $hyperdynamics,
+               -default => param("$player.hyperdynamics") // '',
+               -labels => $hyperdynamics_labels,
+               -label => "Hyperdynamics",
+           ),
            "<h3>CC Modifiers</h3>",
            span_popup_menu(-name => "$player.gang_up",
                -values => $gang_up,
@@ -244,7 +250,7 @@ sub print_input_attack_section{
                -checked => defined(param("$player.berserk")),
                -value => 3,
                -label => 'Berserk (+9 CC, Normal Rolls)'),
-           "<h3>Defensive Abilities</h3>",
+           "<h3>Defensive Modifiers</h3>",
            span_checkbox(-name => "$player.cover",
                -checked => defined(param("$player.cover")),
                -value => 3,
@@ -257,12 +263,6 @@ sub print_input_attack_section{
                -label => "Camo",
            ),
            "<br>",
-           span_popup_menu(-name => "$player.hyperdynamics",
-               -values => $hyperdynamics,
-               -default => param("$player.hyperdynamics") // '',
-               -labels => $hyperdynamics_labels,
-               -label => "Hyperdynamics",
-           ),
 
            "</div>\n";
 }
