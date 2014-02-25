@@ -48,13 +48,14 @@ my $ammo_codes = {
     DA => {code => 'D'},
     EXP => {code => 'E'},
     Fire => {code => 'F'},
-    Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1},
-    K1 => {code => 'N', fixed_dam => 12},
-    Viral => {code => 'D', save => 'bts'},
+    Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, not_immune => 1},
+    K1 => {code => 'N', fixed_dam => 12, not_immune => 1},
+    Viral => {code => 'D', save => 'bts', not_immune => 1},
     Nanotech => {code => 'N', save => 'bts'},
-    'E/M' => {code => 'N', save => 'bts'},
-    'E/M2' => {code => 'D', save => 'bts'},
-    'Smoke' => {code => '-', cover => 0},
+    'E/M' => {code => 'N', save => 'bts', not_immune => 1},
+    # TODO verify what happens when a TI model is hit with E/M2
+    'E/M2' => {code => 'D', save => 'bts', not_immune => 1},
+    'Smoke' => {code => '-', cover => 0, not_immune => 1},
 };
 
 my $ch = ['0', '-3', '-6'];
@@ -67,9 +68,9 @@ my $ch_labels = {
 my $ikohl = ['0', '-3', '-6', '-9'];
 my $ikohl_labels = {
     0 => 'None',
-    -3 => 'L1 (-3 Opponent CC)',
-    -6 => 'L2 (-6 Opponent CC)',
-    -9 => 'L3 (-9 Opponent CC)',
+    -3 => 'Level 1 (-3 Opponent CC)',
+    -6 => 'Level 2 (-6 Opponent CC)',
+    -9 => 'Level 3 (-9 Opponent CC)',
 };
 
 my $range = ['3', '0', '-3', '-6'];
@@ -98,6 +99,12 @@ my $dodge_unit = [0, -6];
 my $dodge_unit_labels = {
     0 => 'None',
     -6 => 'REM/TAG/Motorcycle (-6 PH to Dodge)',
+};
+
+my $immunity = [0, 2];
+my $immunity_labels = {
+    0 => 'None',
+    2 => 'Total',
 };
 
 my $gang_up = [0, 3, 6, 9];
@@ -263,6 +270,12 @@ sub print_input_attack_section{
                -label => "Camo",
            ),
            "<br>",
+           span_popup_menu(-name => "$player.immunity",
+               -values => $immunity,
+               -default => param("$player.immunity") // '',
+               -labels => $immunity_labels,
+               -label => "Immunity",
+           ),
 
            "</div>\n";
 }
@@ -506,7 +519,7 @@ sub gen_attack_args{
     my ($arm, $ap, $ammo, $cover, $ignore_cover, $save, $dam);
     my $b;
     my $stat;
-    my $code;
+    my ($code, $immunity);
 
     if((param("$us.link") // 0) >= 3){
         $link_b = 1;
@@ -517,13 +530,22 @@ sub gen_attack_args{
     }
 
     $code = $ammo_codes->{param("$us.ammo") // 'Normal'};
-    $ap = $code->{ap} // 1;
-    $save = $code->{save} // 'arm';
+    $immunity = param("$them.immunity") // 0;
+
+    # Total Immunity ignores most ammo types
+    if($immunity >= 2 && !$code->{not_immune}){
+        $ap = 1;
+        $save = 'arm';
+        $ammo = 'N';
+    }else{
+        $ap = $code->{ap} // 1;
+        $save = $code->{save} // 'arm';
+        $ammo = $code->{code};
+    }
     $arm = ceil(abs(param("$them.$save") // 0) * $ap);
-    $ammo = $code->{code};
+    $dam = param("$us.dam") // 0;
     $ignore_cover = $code->{cover} // 1;
     $cover = (param("$them.cover") // 0) * $ignore_cover;
-    $dam = param("$us.dam") // 0;
 
     $stat = param("$us.stat") // 0;
 
@@ -748,9 +770,12 @@ sub print_page{
     print_tail($end - $start);
 }
 
-#my $IN;
-#open $IN, "test.in" or die;
-#restore_parameters($IN);
-#close $IN;
+if($ARGV[0]){
+    my $IN;
+    warn "reading parameters from $ARGV[0]";
+    open $IN, $ARGV[0] or die;
+    restore_parameters($IN);
+    close $IN;
+}
 
 print_page();
