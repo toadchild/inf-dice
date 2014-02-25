@@ -253,7 +253,7 @@ static void fire_damage(struct player *p, int hits, int total_hits, int dam, dou
     int success;
 
     // record damage at bottom of stack or when we hit the cap
-    if(total_hits >= SUCCESS_MAX || depth == 0){
+    if(hits == 0 || total_hits >= SUCCESS_MAX || depth == 0){
         p->success[MIN(total_hits, SUCCESS_MAX)] += prob;
         return;
     }
@@ -261,11 +261,6 @@ static void fire_damage(struct player *p, int hits, int total_hits, int dam, dou
     for(success = 0; success <= hits; success++){
         double new_prob = hit_prob(success, hits, ((double)dam) / ROLL_MAX);
         int new_depth = depth - 1;
-
-        if(success == 0){
-            // record data if no additional hits were scored.
-            new_depth = 0;
-        }
 
         fire_damage(p, success, total_hits + success, dam, prob * new_prob, new_depth);
     }
