@@ -317,9 +317,9 @@ sub print_player_output{
         return;
     }
 
-    print "<tr><th colspan=2>Player $p Successes</th>";
+    print "<tr><th colspan=2>Player $p</th>";
     if(scalar keys %{$output->{hits}{$p}} > 1){
-        print "<th colspan=2>Player $p Cumulative Successes</th>";
+        print "<th colspan=2>Cumulative</th>";
     }else{
         print "<th colspan='2'></th>";
     }
