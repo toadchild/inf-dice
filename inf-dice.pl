@@ -312,13 +312,26 @@ sub print_input{
 sub print_player_output{
     my ($output, $p) = @_;
 
+    if(scalar keys %{$output->{hits}{$p}} == 0){
+        # empty list, nothing to print
+        return;
+    }
+
+    print "<tr><th colspan=2>Player $p Successes</th>";
+    if(scalar keys %{$output->{hits}{$p}} > 1){
+        print "<th colspan=2>Player $p Cumulative Successes</th>";
+    }else{
+        print "<th colspan='2'></th>";
+    }
+    print "</tr>\n";
+
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$p}}){
         print "<tr>";
 
-        printf "<td class='p$p-hit-$h num'>%.2f%%</td><td>Player $p scores %d success%s</td>", $output->{hits}{$p}{$h}, $h, ($h > 1 ? 'es' : '');
+        printf "<td class='p$p-hit-$h num'>%.2f%%</td><td>%d success%s</td>", $output->{hits}{$p}{$h}, $h, ($h > 1 ? 'es' : '');
 
-        if(scalar keys $output->{hits}{$p} > 1){
-            printf "<td class='p$p-cumul-hit-$h num'>%.2f%%</td><td>Player $p scores %d or more successes</td>", $output->{cumul_hits}{$p}{$h}, $h;
+        if(scalar keys %{$output->{hits}{$p}} > 1){
+            printf "<td class='p$p-cumul-hit-$h num'>%.2f%%</td><td>%d or more successes</td>", $output->{cumul_hits}{$p}{$h}, $h;
         }else{
             print "<td colspan='2'></td>";
         }
@@ -330,7 +343,8 @@ sub print_player_output{
 sub print_miss_output{
     my ($output, $text) = @_;
 
-    printf "<tr><td class='miss num'>%.2f%%</td><td>$text</td></tr>", $output->{hits}{0};
+    print "<tr><th colspan=2>Failures</th></tr>\n";
+    printf "<tr><td class='miss num'>%.2f%%</td><td>$text</td></tr>\n", $output->{hits}{0};
 }
 
 sub print_hitbar_player{
