@@ -91,10 +91,10 @@
     color: red;
 }
 
-#output_data {
+.output_data {
 }
 
-#output_data td {
+.output_data td {
     padding: 3px;
 }
 

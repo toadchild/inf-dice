@@ -39,23 +39,48 @@ my $action_labels = {
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'Monofilament', 'K1', 'Nanotech', 'E/M', 'E/M2', 'Smoke'];
+my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'E/M', 'E/M2', 'Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
+    Shock => {code => 'N', fatal => 1},
+    T2 => {code => 'N', dam => 2},
     AP => {code => 'N', ap => 0.5},
     'AP+DA' => {code => 'D', ap => 0.5},
     'AP+EXP' => {code => 'E', ap => 0.5},
     DA => {code => 'D'},
     EXP => {code => 'E'},
     Fire => {code => 'F'},
-    Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, not_immune => 1},
-    K1 => {code => 'N', fixed_dam => 12, not_immune => 1},
-    Viral => {code => 'D', save => 'bts', not_immune => 1},
+    Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, fatal => 9},
+    K1 => {code => 'N', fixed_dam => 12},
+    Viral => {code => 'D', save => 'bts', fatal => 1},
     Nanotech => {code => 'N', save => 'bts'},
-    'E/M' => {code => 'N', save => 'bts', not_immune => 1},
-    # TODO verify what happens when a TI model is hit with E/M2
-    'E/M2' => {code => 'D', save => 'bts', not_immune => 1},
-    'Smoke' => {code => '-', cover => 0, not_immune => 1},
+    'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
+    'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
+    'Smoke' => {code => '-', cover => 0},
+};
+
+my $immunity = ['', 'shock', 'bio', 'total'];
+my $immunity_labels = {
+    '' => 'None',
+    'shock' => 'Shock',
+    'bio' => 'Bio',
+    'total' => 'Total',
+};
+
+my $immunities = {
+    shock => {Shock => 'arm'},
+    bio => {Shock => 'arm', Viral => 'bts'},
+    total => {
+        Shock => 'arm',
+        AP => 'arm',
+        'AP+DA' => 'arm',
+        'AP+EXP' => 'arm',
+        DA => 'arm',
+        EXP => 'arm',
+        Fire => 'arm',
+        Nanotech => 'arm',
+        # TODO verify what happens when a TI model is hit with E/M2
+    },
 };
 
 my $ch = ['0', '-3', '-6'];
@@ -99,12 +124,6 @@ my $dodge_unit = [0, -6];
 my $dodge_unit_labels = {
     0 => 'None',
     -6 => 'REM/TAG/Motorcycle (-6 PH to Dodge)',
-};
-
-my $immunity = [0, 2];
-my $immunity_labels = {
-    0 => 'None',
-    2 => 'Total',
 };
 
 my $gang_up = [0, 3, 6, 9];
@@ -199,6 +218,29 @@ sub print_input_attack_section{
               -values => [0, -3, -6, -9],
               -default => param("$player.bts") // '',
               -label => "BTS",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.w",
+              -values => [1 .. 4],
+              -default => param("$player.w") // '',
+              -label => "Base Wounds",
+          ),
+          span_popup_menu(-name => "$player.w_taken",
+              -values => [0 .. 4],
+              -default => param("$player.w_taken") // '',
+              -label => "Wounds Taken",
+          ),
+          "<br>",
+          span_checkbox(-name => "$player.nwi",
+              -checked => defined(param("$player.nwi")),
+              -value => 1,
+              -label => 'No Wound Incapacitation',
+          ),
+          "<br>",
+          span_checkbox(-name => "$player.shasvastii",
+              -checked => defined(param("$player.shasvastii")),
+              -value => 1,
+              -label => 'Shasvastii Spawn-Embryo',
           ),
           "</div>\n";
 
@@ -310,33 +352,56 @@ sub print_input{
 }
 
 sub print_player_output{
-    my ($output, $p) = @_;
+    my ($output, $player, $other) = @_;
+    my $label = '';
+    my $w = param("p$other.w") // 1;
+    my $w_taken = param("p$other.w_taken") // 0;
+    my $immunity = param("p$other.immunity") // '';
+    my $ammo = param("p$player.ammo") // 'Normal';
+    my $nwi = param("p$other.nwi");
+    my $shasvastii = param("p$other.shasvastii");
 
-    if(scalar keys %{$output->{hits}{$p}} == 0){
+    my $fatal = $w + 1;
+
+    if($shasvastii){
+        $fatal++;
+    }
+
+    if($ammo_codes->{$ammo}{fatal} >= $w && !$immunities->{$immunity}{$ammo}){
+        # This ammo is instantly fatal, and we are not immune
+        $fatal = $w - $ammo_codes->{$ammo}{fatal};
+    }
+
+    if(scalar keys %{$output->{hits}{$player}} == 0){
         # empty list, nothing to print
         return;
     }
 
-    print "<tr><th colspan=2>Player $p</th>";
-    if(scalar keys %{$output->{hits}{$p}} > 1){
-        print "<th colspan=2>Cumulative</th>";
-    }else{
-        print "<th colspan='2'></th>";
-    }
+    print "<tr><th colspan=2>Player $player</th>";
     print "</tr>\n";
 
-    for my $h (sort {$a <=> $b} keys %{$output->{hits}{$p}}){
-        print "<tr>";
+    for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
+        my $done;
 
-        printf "<td class='p$p-hit-$h num'>%.2f%%</td><td>%d success%s</td>", $output->{hits}{$p}{$h}, $h, ($h > 1 ? 'es' : '');
-
-        if(scalar keys %{$output->{hits}{$p}} > 1){
-            printf "<td class='p$p-cumul-hit-$h num'>%.2f%%</td><td>%d or more successes</td>", $output->{cumul_hits}{$p}{$h}, $h;
-        }else{
-            print "<td colspan='2'></td>";
+        if($h + $w_taken >= $fatal){
+            $label = sprintf " (%s)", $ammo_codes->{$ammo}{label} // 'Dead';
+            $done = 1;
+        }elsif($h + $w_taken == $w && !$nwi){
+            $label = ' (Unconscious)';
+        }elsif($h + $w_taken == $w + 1){
+            $label = ' (Spawn Embryo)';
         }
 
+        print "<tr>";
+
+        printf "<td class='p$player-cumul-hit-$h num'>%.2f%%</td><td>Inflict %d or more successes%s</td>", $output->{cumul_hits}{$player}{$h}, $h, $label;
+
         print "</tr>\n";
+
+        # Stop once we print a line about them being dead
+        if($done){
+            last;
+        }
     }
 }
 
@@ -393,13 +458,13 @@ sub print_ftf_output{
 
     print "<h2>Face to Face Roll</h2>\n";
     if($output->{hits}){
-        print "<table id='output_data'>\n";
+        print "<table class='output_data'>\n";
 
-        print_player_output($output, 1);
+        print_player_output($output, 1, 2);
 
         print_miss_output($output, 'Neither player succeeds');
 
-        print_player_output($output, 2);
+        print_player_output($output, 2, 1);
 
         print "</table>\n";
 
@@ -412,10 +477,10 @@ sub print_normal_output{
 
     print "<h2>Normal Roll</h2>\n";
     if($output->{hits}){
-        print "<table id='output_data'>\n";
+        print "<table class='output_data'>\n";
 
-        print_player_output($output, 1);
-        print_player_output($output, 2);
+        print_player_output($output, 1, 2);
+        print_player_output($output, 2, 1);
 
         print_miss_output($output, 'No success');
 
@@ -431,9 +496,9 @@ sub print_simultaneous_output{
     print "<h2>Simultaneous Normal Rolls</h2>\n";
 
     if($output->{A}{hits}){
-        print "<table id='output_data'>\n";
+        print "<table class='output_data'>\n";
 
-        print_player_output($output->{A}, 1);
+        print_player_output($output->{A}, 1, 2);
 
         print_miss_output($output->{A}, 'No success');
 
@@ -443,9 +508,9 @@ sub print_simultaneous_output{
     }
 
     if($output->{B}{hits}){
-        print "<table id='output_data'>\n";
+        print "<table class='output_data'>\n";
 
-        print_player_output($output->{B}, 2);
+        print_player_output($output->{B}, 2, 1);
 
         print_miss_output($output->{B}, 'No success');
 
@@ -460,7 +525,7 @@ sub print_none_output{
 
     print "<h2>No Roll</h2>\n";
     if($output->{hits}){
-        print "<table id='output_data'>\n";
+        print "<table class='output_data'>\n";
 
         print_miss_output($output->{B}, 'Nothing happens');
 
@@ -533,7 +598,7 @@ sub gen_attack_args{
     my ($arm, $ap, $ammo, $cover, $ignore_cover, $save, $dam);
     my $b;
     my $stat;
-    my ($code, $immunity);
+    my ($ammo_name, $code, $immunity);
 
     if((param("$us.link") // 0) >= 3){
         $link_b = 1;
@@ -543,13 +608,14 @@ sub gen_attack_args{
         $link_bs = 3;
     }
 
-    $code = $ammo_codes->{param("$us.ammo") // 'Normal'};
-    $immunity = param("$them.immunity") // 0;
+    $ammo_name = param("$us.ammo") // 'Normal';
+    $code = $ammo_codes->{$ammo_name};
+    $immunity = param("$them.immunity") // '';
 
     # Total Immunity ignores most ammo types
-    if($immunity >= 2 && !$code->{not_immune}){
+    if($immunities->{$immunity}{$ammo_name}){
         $ap = 1;
-        $save = 'arm';
+        $save = $immunities->{$immunity}{$ammo_name};
         $ammo = 'N';
     }else{
         $ap = $code->{ap} // 1;
@@ -655,6 +721,10 @@ sub gen_args{
 sub execute_backend{
     my (@args) = @_;
     my $output;
+    my %dam;
+
+    $dam{1} = $ammo_codes->{param('p1.ammo') // 'Normal'}{dam} // 1;
+    $dam{2} = $ammo_codes->{param('p2.ammo') // 'Normal'}{dam} // 1;
 
     if(!open DICE, '-|', '/usr/local/bin/inf-dice', @args){
         $output->{error} = 'Unable to execute backend component.';
@@ -663,8 +733,8 @@ sub execute_backend{
     while(<DICE>){
         $output->{raw} .= $_;
         if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
-            $output->{hits}{$1}{$2} = $3;
-            $output->{cumul_hits}{$1}{$4} = $5;
+            $output->{hits}{$1}{$2 * $dam{$1}} = $3;
+            $output->{cumul_hits}{$1}{$4 * $dam{$1}} = $5;
         }elsif(m/^No Successes: +([0-9.]+)/){
             $output->{hits}{0} = $1;
         }elsif(m/^ERROR/ || m/Assertion/){
