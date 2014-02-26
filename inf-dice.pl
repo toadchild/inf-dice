@@ -39,7 +39,7 @@ my $action_labels = {
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'E/M', 'E/M2', 'Smoke'];
+my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'AP+Shock', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'Flash', 'E/M', 'E/M2', 'Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
     Shock => {code => 'N', fatal => 1},
@@ -47,6 +47,7 @@ my $ammo_codes = {
     AP => {code => 'N', ap => 0.5},
     'AP+DA' => {code => 'D', ap => 0.5},
     'AP+EXP' => {code => 'E', ap => 0.5},
+    'AP+Shock' => {code => 'N', ap => 0.5, fatal => 1},
     DA => {code => 'D'},
     EXP => {code => 'E'},
     Fire => {code => 'F'},
@@ -54,6 +55,7 @@ my $ammo_codes = {
     K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts', fatal => 1},
     Nanotech => {code => 'N', save => 'bts'},
+    Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded'},
     'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
     'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
     'Smoke' => {code => '-', cover => 0},
@@ -75,6 +77,7 @@ my $immunities = {
         AP => 'arm',
         'AP+DA' => 'arm',
         'AP+EXP' => 'arm',
+        'AP+Shock' => 'arm',
         DA => 'arm',
         EXP => 'arm',
         Fire => 'arm',
