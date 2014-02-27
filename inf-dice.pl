@@ -53,7 +53,7 @@ my $ammo_codes = {
     Fire => {code => 'F'},
     Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, fatal => 9},
     K1 => {code => 'N', fixed_dam => 12},
-    Viral => {code => 'D', save => 'bts', fatal => 1},
+    Viral => {code => 'D', save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
     Nanotech => {code => 'N', save => 'bts'},
     Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded'},
     'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
@@ -85,6 +85,8 @@ my $immunities = {
         # TODO verify what happens when a TI model is hit with E/M2
     },
 };
+
+my $w_type = ['W', 'STR'];
 
 my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
@@ -233,6 +235,11 @@ sub print_input_attack_section{
               -default => param("$player.w_taken") // '',
               -label => "Wounds Taken",
           ),
+          span_popup_menu(-name => "$player.w_type",
+              -values => $w_type,
+              -default => param("$player.w_type") // '',
+              -label => "Wound Type",
+          ),
           "<br>",
           span_checkbox(-name => "$player.nwi",
               -checked => defined(param("$player.nwi")),
@@ -363,6 +370,7 @@ sub print_player_output{
     my $ammo = param("p$player.ammo") // 'Normal';
     my $nwi = param("p$other.nwi");
     my $shasvastii = param("p$other.shasvastii");
+    my $w_type = param("p$other.w_type") // 'W';
 
     my $fatal = $w + 1;
 
@@ -370,9 +378,13 @@ sub print_player_output{
         $fatal++;
     }
 
-    if($ammo_codes->{$ammo}{fatal} >= $w && !$immunities->{$immunity}{$ammo}){
+    if($ammo_codes->{$ammo}{fatal} >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $ammo_codes->{$ammo}{str_resist})){
         # This ammo is instantly fatal, and we are not immune
         $fatal = $w - $ammo_codes->{$ammo}{fatal};
+    }
+
+    if($ammo_codes->{$ammo}{ignore_nwi}){
+        $nwi = 0;
     }
 
     if(scalar keys %{$output->{hits}{$player}} == 0){
