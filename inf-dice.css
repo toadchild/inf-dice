@@ -48,8 +48,8 @@
     margin: 0px;
     margin-bottom: 20px;
 
-    background-color: #d9f3fd;
     color: black;
+    background-image:url('hex.png');
 }
 
 .inner-databox select {
@@ -109,6 +109,7 @@ td.center {
 body {
     background-color: #0e4759;
     color: white;
+    font-family: sans-serif;
 }
 
 a:link {
