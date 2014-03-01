@@ -94,16 +94,11 @@
 .output_data {
 }
 
-.output_data td {
-    padding: 3px;
-}
-
-td.num {
+.hit_chance {
+    width: 4em;
     text-align: right;
-}
-
-td.center {
-    text-align: center;
+    margin-right: 5px;
+    display: inline-block;
 }
 
 body {

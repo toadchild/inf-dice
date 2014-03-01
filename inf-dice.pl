@@ -392,8 +392,8 @@ sub print_player_output{
         return;
     }
 
-    print "<tr><th colspan=2>Player $player</th>";
-    print "</tr>\n";
+    print "<h3>Player $player</h3>";
+    print "<p>\n";
 
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
         my $done;
@@ -407,31 +407,29 @@ sub print_player_output{
             $label = ' (Spawn Embryo)';
         }
 
-        print "<tr>";
-
-        printf "<td class='p$player-cumul-hit-$h num'>%.2f%%</td><td>Inflict %d or more successes%s</td>", $output->{cumul_hits}{$player}{$h}, $h, $label;
-
-        print "</tr>\n";
+        printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> Inflict %d or more successes%s<br>", $output->{cumul_hits}{$player}{$h}, $h, $label;
 
         # Stop once we print a line about them being dead
         if($done){
             last;
         }
     }
+
+    print "</p>\n";
 }
 
 sub print_miss_output{
     my ($output, $text) = @_;
 
-    print "<tr><th colspan=2>Failures</th></tr>\n";
-    printf "<tr><td class='miss num'>%.2f%%</td><td>$text</td></tr>\n", $output->{hits}{0};
+    print "<h3>Failures</h3>\n";
+    printf "<p><span class='miss hit_chance'>%.2f%%</span> $text</p>\n", $output->{hits}{0};
 }
 
 sub print_hitbar_player{
     my ($output, $sort, $p) = @_;
 
     for my $h (sort {$a * $sort <=> $b * $sort} keys %{$output->{hits}{$p}}){
-        print "<td style='width: $output->{hits}{$p}{$h}%' class='p$p-hit-$h center'>";
+        print "<td style='width: $output->{hits}{$p}{$h}%' class='p$p-hit-$h'>";
         if($output->{hits}{$p}{$h} >= 2.0){
             printf "%d", $h;
         }
@@ -473,15 +471,11 @@ sub print_ftf_output{
 
     print "<h2>Face to Face Roll</h2>\n";
     if($output->{hits}){
-        print "<table class='output_data'>\n";
-
         print_player_output($output, 1, 2);
 
         print_miss_output($output, 'Neither player succeeds');
 
         print_player_output($output, 2, 1);
-
-        print "</table>\n";
 
         print_hitbar_output('ftf', $output);
     }
@@ -492,14 +486,10 @@ sub print_normal_output{
 
     print "<h2>Normal Roll</h2>\n";
     if($output->{hits}){
-        print "<table class='output_data'>\n";
-
         print_player_output($output, 1, 2);
         print_player_output($output, 2, 1);
 
         print_miss_output($output, 'No success');
-
-        print "</table>\n";
 
         print_hitbar_output('normal', $output);
     }
@@ -511,25 +501,17 @@ sub print_simultaneous_output{
     print "<h2>Simultaneous Normal Rolls</h2>\n";
 
     if($output->{A}{hits}){
-        print "<table class='output_data'>\n";
-
         print_player_output($output->{A}, 1, 2);
 
         print_miss_output($output->{A}, 'No success');
-
-        print "</table>\n";
 
         print_hitbar_output('normal', $output->{A});
     }
 
     if($output->{B}{hits}){
-        print "<table class='output_data'>\n";
-
         print_player_output($output->{B}, 2, 1);
 
         print_miss_output($output->{B}, 'No success');
-
-        print "</table>\n";
 
         print_hitbar_output('normal', $output->{B});
     }
@@ -540,11 +522,7 @@ sub print_none_output{
 
     print "<h2>No Roll</h2>\n";
     if($output->{hits}){
-        print "<table class='output_data'>\n";
-
         print_miss_output($output->{B}, 'Nothing happens');
-
-        print "</table>\n";
 
         print_hitbar_output('ftf', $output);
     }
