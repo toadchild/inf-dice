@@ -430,7 +430,7 @@ sub print_hitbar_player{
 
     for my $h (sort {$a * $sort <=> $b * $sort} keys %{$output->{hits}{$p}}){
         print "<td style='width: $output->{hits}{$p}{$h}%' class='p$p-hit-$h'>";
-        if($output->{hits}{$p}{$h} >= 2.0){
+        if($output->{hits}{$p}{$h} >= 3.0){
             printf "%d", $h;
         }
         print "</td>\n";
