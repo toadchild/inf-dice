@@ -5,10 +5,13 @@ LDLIBS=-lm -lpthread
 WWWDIR=/var/www/inf-dice
 BINDIR=/usr/local/bin
 
-all: inf-dice hitbar.css hex.png
+WWW_TARGETS=hitbar.css hex.png unit_data.js
+BIN_TARGETS=inf-dice
+
+all: ${WWW_TARGETS} ${BIN_TARGETS}
 
 clean:
-	rm -f inf-dice inf-dice.o hitbar.css hex.png
+	rm -f ${WWW_TARGETS} ${BIN_TARGETS}
 
 inf-dice: inf-dice.o
 
@@ -20,6 +23,9 @@ hitbar.css: hitbar.pl
 hex.png: hexgrid.pl
 	./hexgrid.pl 100 hex.png
 
-install: inf-dice hitbar.css hex.png
-	cp inf-dice.js inf-dice.css hitbar.css hex.png inf-dice.pl ${WWWDIR}
+unit_data.js: process_unit.pl ia-data/*
+	./process_unit.pl
+
+install: ${WWW_TARGETS} ${BIN_TARGETS}
+	cp inf-dice.js inf-dice.css inf-dice.pl ${WWW_TARGETS} ${WWWDIR}
 	cp inf-dice ${BINDIR}

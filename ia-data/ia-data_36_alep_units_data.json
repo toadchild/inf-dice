@@ -1,0 +1,2827 @@
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280812-0271"
+  ],
+  "bts": "-6",
+  "isc": "Achilles",
+  "name": "Achilles",
+  "bs": "15",
+  "note": "",
+  "cube":"2",
+  "type": "HI",
+  "ph": "16",
+  "cc": "20",
+  "arm": "5",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "Martial Arts L4",
+   "Multiterrain",
+   "ODD: Optical Disruptor",
+   "Personality"
+  ],
+  "ccw": [
+   "EXP CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "80",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "80",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "80",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "75",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire Lt",
+    "cost": "80",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun Lt",
+    "cost": "75",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Heavy Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280817-0304"
+  ],
+  "bts": "-6",
+  "isc": "Asuras",
+  "name": "Asura",
+  "bs": "14",
+  "note": "",
+  "cube":"2",
+  "type": "HI",
+  "ph": "14",
+  "cc": "16",
+  "arm": "5",
+  "irr": "",
+  "w": "2",
+  "ava": "2",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "Multispectral Visor L3",
+   "V: No Wound Incapacitation"
+  ],
+  "ccw": [
+   "AP CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "73",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "73",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "77",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device Plus"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "72",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280806-0238",
+   "280818-0309"
+  ],
+  "bts": "-3",
+  "isc": "Dakini Tacbots",
+  "name": "Dakini Tacbot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "6",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "G: Remote Presence"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "13",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Paramedic",
+    "cost": "17",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Paramedic",
+     "MediKit"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "27",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Light GL",
+    "cost": "18",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Light GL",
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "22",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280811-0261"
+  ],
+  "bts": "-3",
+  "isc": "Daleth Rebots",
+  "name": "Daleth Rebot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [
+   "Climbing Plus",
+   "Forward Observer",
+   "G: Remote Presence",
+   "Repeater",
+   "Sensor"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "21",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "14",
+  "cbcode": [
+   "280808-0248",
+   "280815-0291",
+   "280824-0350"
+  ],
+  "bts": "0",
+  "isc": "Dasyus",
+  "name": "Dasyu",
+  "bs": "12",
+  "note": "",
+  "cube":"2",
+  "type": "SK",
+  "ph": "13",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "CH: TO Camouflage",
+   "Infiltration",
+   "V: No Wound Incapacitation"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "35",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "35",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Observer",
+    "cost": "37",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Forward Observer"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "46",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "48",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "35",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280804-0229",
+   "280805-0233",
+   "280825-0356"
+  ],
+  "bts": "-3",
+  "isc": "Deva Functionaries",
+  "name": "Deva",
+  "bs": "12",
+  "note": "",
+  "cube":"2",
+  "type": "LI",
+  "ph": "11",
+  "cc": "14",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "4",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "V: No Wound Incapacitation"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "23",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+	"hiddenalias": "Devabot",
+    "cost": "26",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant",
+     "Companion: Devabot"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire+MSV",
+    "cost": "34",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Multispectral Visor L2"
+    ],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sensor",
+    "cost": "26",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Sensor"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "35",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Devabot",
+    "cost": "27",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Companion: Devabot"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "11",
+  "cbcode": [
+   "280804-0229",
+   "280805-0233",
+   "280825-0356"
+  ],
+  "bts": "-3",
+  "isc": "Devabot",
+  "name": "Devabot",
+  "bs": "10",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "C",
+  "bsw": [
+   "Heavy Flamethrower"
+  ],
+  "spec": [
+   "G: Synchronized"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "0",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280802-0222",
+   "280810-0254"
+  ],
+  "bts": "-3",
+  "isc": "Garuda Tacbots",
+  "name": "Garuda Tacbot",
+  "bs": "12",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "11",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "AD: Combat Jump",
+   "CH: Mimetism"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "22",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "22",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "31",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-6",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280811-0261"
+  ],
+  "bts": "-3",
+  "isc": "Lamedh Rebots",
+  "name": "Lamedh Rebot",
+  "bs": "8",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "3",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "G: Remote Presence",
+   "Multiterrain",
+   "Repeater"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "8",
+    "codename": "Repeater",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280807-0242"
+  ],
+  "bts": "-9",
+  "isc": "Maruts",
+  "name": "Marut",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "17",
+  "cc": "18",
+  "arm": "8",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "MULTI HMG",
+   "Nanopulser"
+  ],
+  "spec": [
+   "ECM",
+   "G: Remote Presence",
+   "Multispectral Visor L2",
+   "Multiterrain"
+  ],
+  "ccw": [
+   "AP CCW"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "126",
+    "codename": "MHMG,HGL",
+    "swc": "3",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy GL"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "122",
+    "codename": "",
+    "swc": "3",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant",
+     "Strategos L3"
+    ],
+    "bsw": [
+     "Heavy Flamethrower"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "14",
+  "cbcode": [
+   "280819-0313"
+  ],
+  "bts": "-3",
+  "isc": "Myrmidon Officer",
+  "name": "Myrmidon Officer",
+  "bs": "12",
+  "note": "",
+  "cube":"2",
+  "type": "WB",
+  "ph": "13",
+  "cc": "17",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "Martial Arts L3",
+   "ODD: Optical Disruptor",
+   "V: No Wound Incapacitation", 
+   "Fireteam: Enomotarchos"
+  ],
+  "ccw": [
+   "AP CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "32",
+    "codename": "Combi Lt",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle",
+	 "Smoke Grenades"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "ChainComm",
+    "cost": "39",
+    "codename": "BS CC",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Chain of Command"
+    ],
+    "bsw": [
+     "Boarding Shotgun",
+	 "Zero-V Smoke Grenades"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "ChainCommCombi",
+    "cost": "39",
+    "codename": "Combi CC",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Chain of Command"
+    ],
+    "bsw": [
+     "Combi Rifle",
+	 "Smoke Grenades"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "BS Lt",
+    "cost": "32",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Boarding Shotgun",
+	 "Zero-V Smoke Grenades"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280813-0276",
+   "280823-0341"
+  ],
+  "bts": "0",
+  "isc": "Myrmidons",
+  "name": "Myrmidon",
+  "bs": "12",
+  "note": "",
+  "cube":"2",
+  "type": "WB",
+  "ph": "13",
+  "cc": "17",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "T",
+  "bsw": [
+   "Nanopulser",
+   "Smoke Grenades"
+  ],
+  "spec": [
+   "Martial Arts L3",
+   "ODD: Optical Disruptor"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "25",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "37",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "25",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Chain",
+    "cost": "16",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Chain Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "32",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "EXP CCW",
+    "cost": "27",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [
+     "EXP CCW"
+    ],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "14",
+  "cbcode": [
+   "280803-0228",
+   "280809-0250"
+  ],
+  "bts": "0",
+  "isc": "Nagas",
+  "name": "Naga",
+  "bs": "12",
+  "note": "",
+  "cube":"2",
+  "type": "SK",
+  "ph": "12",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "CH: Camouflage",
+   "Infiltration",
+   "V: Dogged"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "26",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "37",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Minelayer",
+    "cost": "27",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Minelayer"
+    ],
+    "bsw": [
+     "Boarding Shotgun",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "39",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Monofilament",
+    "cost": "32",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Monofilament Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "0-0",
+  "army": "Aleph",
+  "wip": "0",
+  "cbcode": [
+   "280820-0318"
+  ],
+  "bts": "-3",
+  "isc": "Netrods",
+  "name": "Netrod",
+  "bs": "0",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "12",
+  "cc": "0",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "3",
+  "bsw": [],
+  "spec": [
+   "AD: Combat Jump",
+   "AI Beacon"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "4",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280821-0328"
+  ],
+  "bts": "0",
+  "isc": "Patroclus",
+  "name": "Patroclus",
+  "bs": "13",
+  "note": "",
+  "cube":"2",
+  "type": "MI",
+  "ph": "13",
+  "cc": "18",
+  "arm": "3",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Nanopulser",
+   "Smoke Grenades"
+  ],
+  "spec": [
+   "Holoprojector L1",
+   "ODD: Optical Disruptor",
+   "Martial Arts L3",
+   "V: No Wound Incapacitation",
+   "Fireteam: Enomotarchos",
+   "Personality"
+  ],
+  "ccw": [
+   "EXP CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "57",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "56",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "51",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280816-0299"
+  ],
+  "bts": "-3",
+  "isc": "Probots",
+  "name": "Probot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "Baggage",
+   "G: Remote Presence",
+   "Repeater"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "8",
+    "codename": "Minesweeper",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Minesweeper"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Rifle",
+    "cost": "21",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Total Reaction"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "EVO",
+    "cost": "13",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "EVO Repeater"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280811-0261"
+  ],
+  "bts": "-3",
+  "isc": "Samekh Rebots",
+  "name": "Samekh Rebot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Guided Missile Launcher"
+  ],
+  "spec": [
+   "G: Remote Presence"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "34",
+    "codename": "GML",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280814-0281"
+  ],
+  "bts": "0",
+  "isc": "Sophotects",
+  "name": "Sophotects",
+  "bs": "11",
+  "note": "",
+  "cube":"2",
+  "type": "LI",
+  "ph": "11",
+  "cc": "13",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [
+   "Doctor",
+   "Engineer",
+   "V: No Wound Incapacitation"
+  ],
+  "ccw": [
+   "D-Charges",
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "31",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280820-0318"
+  ],
+  "bts": "-3",
+  "isc": "Yudbots",
+  "name": "Yudbot",
+  "bs": "8",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "G: Servant"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "3",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Aleph",
+  "wip": "13",
+  "cbcode": [
+   "280811-0261"
+  ],
+  "bts": "-3",
+  "isc": "Zayin Rebots",
+  "name": "Zayin Rebot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "HMG"
+  ],
+  "spec": [
+   "360° Visor",
+   "Climbing Plus",
+   "G: Remote Presence",
+   "Repeater",
+   "Total Reaction"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "27",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Monofilament",
+    "cost": "34",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Monofilament Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "E/M LGL",
+    "cost": "36",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "E/M LGL"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280822-0332"
+  ],
+  "bts": "-3",
+  "isc": "Posthumans Proxy Mk.1",
+  "name": "Proxy Mk.1",
+  "bs": "13",
+  "note": "",
+  "cube": "J",
+  "type": "LI",
+  "ph": "11",
+  "cc": "13",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Combi Rifle",
+   "Nanopulser"
+  ],
+  "spec": [
+   "G: Jumper L1",
+   "CH: Mimetism",
+   "V: No Wound Incapacitation"
+  ],
+  "ccw": [
+   "Pistol",
+   "Knife"
+  ],
+  "childs": [
+   {
+    "code": "Doctor",
+    "cost": "14",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Doctor"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Engineer",
+    "cost": "14",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Engineer"
+    ],
+    "bsw": [],
+    "ccw": [
+     "D-Charges"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "22",
+    "codename": "Hacker",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280822-0332"
+  ],
+  "bts": "0",
+  "isc": "Posthumans Proxy Mk.2",
+  "name": "Proxy Mk.2",
+  "bs": "13",
+  "note": "",
+  "cube": "J",
+  "type": "SK",
+  "ph": "13",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "G: Jumper L1",
+   "CH: TO Camouflage",
+   "Infiltration",
+   "V: No Wound Incapacitation"
+  ],
+  "ccw": [
+   "Pistol",
+   "Knife"
+  ],
+  "childs": [
+   {
+    "code": "Hacker",
+    "cost": "27",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "29",
+    "codename": "Sniper",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "15",
+  "cbcode": [
+   "280822-0332"
+  ],
+  "bts": "-3",
+  "isc": "Posthumans Proxy Mk.3",
+  "name": "Proxy Mk.3",
+  "bs": "13",
+  "note": "",
+  "cube": "J",
+  "type": "HI",
+  "ph": "14",
+  "cc": "13",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [
+   "Spitfire",
+   "Nanopulser"
+  ],
+  "spec": [
+   "G: Jumper L1"
+    ],
+  "ccw": [
+   "Pistol",
+   "Knife"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "30",
+    "codename": "Spitfire",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Aleph",
+  "wip": "14",
+  "cbcode": [
+   "280383-0457",
+   "280826-0364"
+  ],
+  "bts": "0",
+  "isc": "Ekdromoi",
+  "name": "Ekdromos",
+  "bs": "12",
+  "note": "",
+  "cube":"2",
+  "type": "LI",
+  "ph": "13",
+  "cc": "18",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Nanopulser"
+  ],
+  "spec": [
+   "AD: Combat Jump",
+   "Super-Jump",
+   "Martial Arts L3"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Hacker",
+    "cost": "34",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Chain Rifle"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "31",
+    "codename": "BS",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Chain",
+    "cost": "22",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Chain Rifle"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "40",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "AP",
+    "cost": "31",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "31",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "childs": [
+   {
+    "bsw": [],
+    "swc": "0",
+    "cbcode": [],
+    "code": "Default",
+    "note": "",
+    "ccw": [],
+    "codename": "",
+    "cost": "0",
+    "spec": []
+   }
+  ],
+  "ccw": [],
+  "bsw": [],
+  "ava": "0",
+  "irr": "",
+  "arm": "X",
+  "cbcode": [
+   "280827-0372"
+  ],
+  "bts": "X",
+  "army": "Aleph",
+  "note": "",
+  "cube": "",
+  "bs": "X",
+  "cc": "X",
+  "imp": "",
+  "name": "Chandra",
+  "isc": "Chandra Spec-Ops",
+  "mov": "X-X",
+  "type": "LI",
+  "ph": "X",
+  "spec": [
+   "Spec-Op"
+  ],
+  "w": "X",
+  "wip": "X"
+ },
+{
+ "arm": "3",
+ "army": "Aleph",
+ "ava": "3",
+ "bs": "12",
+ "bsw": [],
+ "bts": "0",
+ "cbcode": ["280829-0383"],
+ "cc": "14",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [
+    "Submachine gun",
+    "Chain Rifle",
+    "Flash Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "smg",
+   "cost": "13",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Combi Rifle",
+    "Nanopulser",
+    "Flash Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "combi",
+   "codename": "",
+   "cost": "16",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Spitfire",
+    "Nanopulser"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Spitfire",
+   "codename": "",
+   "cost": "23",
+   "note": "",
+   "spec": [],
+   "swc": "1"
+  },
+  {
+   "bsw": [
+    "Submachine gun",
+    "Light Rocket Launcher"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "LRL",
+   "codename": "",
+   "cost": "25",
+   "note": "",
+   "spec": [],
+   "swc": "1"
+  },
+  {
+   "bsw": [
+    "Combi Rifle",
+    "Nanopulser",
+    "Flash Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [
+    "D-Charges"
+   ],
+   "code": "Eng",
+   "codename": "",
+   "cost": "20",
+   "note": "",
+   "spec": [
+    "Engineer"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Submachine gun",
+    "Chain Rifle",
+    "Flash Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "FO",
+   "codename": "",
+   "cost": "16",
+   "note": "",
+   "spec": [
+    "Forward Observer"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Submachine gun",
+    "Chain Rifle",
+    "Flash Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Param",
+   "codename": "",
+   "cost": "16",
+   "note": "",
+   "spec": [
+    "Medikit"
+   ],
+   "swc": "0"
+  }
+ ],
+ "cube": "2",
+ "imp": "F",
+ "irr": "",
+ "isc": "Throakitai",
+ "mov": "4-2",
+ "name": "Throakites",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "360° Visor"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "13"
+}
+,
+{
+ "arm": "2",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "13",
+ "bsw": [],
+ "bts": "-3",
+ "cbcode": ["280829-0383"],
+ "cc": "14",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [
+    "Mk12"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "Mk12",
+   "cost": "28",
+   "note": "",
+   "spec": [
+    "X Visor"
+   ],
+   "swc": "0.5"
+  },
+  {
+   "bsw": [
+    "MULTI Sniper Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Sniper",
+   "codename": "",
+   "cost": "36",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Missile Launcher"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "ML",
+   "codename": "",
+   "cost": "38",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "",
+ "irr": "",
+ "isc": "Agema Marksman",
+ "mov": "4-2",
+ "name": "Agema",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "Multispectral Visor L2",
+  "V: Courage"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "3",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "13",
+ "bsw": [
+  "Mk12",
+  "Nanopulser",
+  "Zero-V Smoke Grenades"
+ ],
+ "bts": "-6",
+ "cbcode": ["280829-0383"],
+ "cc": "18",
+ "ccw": [
+  "Pistol",
+  "DA CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "40",
+   "note": "",
+   "spec": [],
+   "swc": "0.5"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "40",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "X",
+ "irr": "",
+ "isc": "Eudoros",
+ "mov": "4-4",
+ "name": "Eudoros",
+ "note": "",
+ "ph": "13",
+ "spec": [
+  "Fireteam: Enomotarchos",
+  "Martial Arts L4",
+  "Number 2",
+  "ODD: Optical Disruptor",
+  "V: No Wound Incapacitation",
+   "Personality"
+ ],
+ "type": "WB",
+ "w": "1",
+ "wip": "14"
+},
+{
+ "arm": "3",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "13",
+ "bsw": [
+  "Spitfire",
+  "Nanopulser"
+ ],
+ "bts": "-3",
+ "cbcode": [
+    "280835-0440"
+    ],
+ "cc": "14",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "27",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "27",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "1.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "F",
+ "irr": "",
+ "isc": "Nesaie Alke",
+ "mov": "4-2",
+ "name": "Alke",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "Fireteam: Enomotarchos",
+  "360° Visor",
+  "V: Courage",
+   "Personality"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "2",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "14",
+ "bsw": [
+  "MULTI Sniper Rifle"
+ ],
+ "bts": "-6",
+ "cbcode": [],
+ "cc": "14",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "48",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "",
+ "irr": "",
+ "isc": "Atlanta",
+ "mov": "4-2",
+ "name": "Atlanta",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "Multispectral Visor L2",
+  "Companion: Spotbot",
+   "Personality"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "1",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "8",
+ "bsw": [],
+ "bts": "-6",
+ "cbcode": [],
+ "cc": "8",
+ "ccw": [
+  "Electric Pulse"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "0",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  }
+ ],
+ "cube": "G",
+ "imp": "",
+ "irr": "",
+ "isc": "Spotbot",
+ "mov": "4-4",
+ "name": "Spotbot",
+ "note": "",
+ "ph": "8",
+ "spec": [
+  "Spotter",
+  "Multispectral Visor L2",
+  "CH: Mimetism",
+  "G: Synchronized",
+   "Personality"
+ ],
+ "type": "REM",
+ "w": "1",
+ "wip": "13"
+}
+,
+{
+ "arm": "2",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Mk12",
+  "Nanopulser"
+ ],
+ "bts": "-3",
+ "cbcode": ["280833-0418"],
+ "cc": "19",
+ "ccw": [
+  "Assault Pistol",
+  "DA CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "44",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "44",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0"
+  }
+ ],
+ "cube": "2",
+ "imp": "",
+ "irr": "",
+ "isc": "Diomedes",
+ "mov": "4-4",
+ "name": "Diomedes",
+ "note": "",
+ "ph": "13",
+ "spec": [
+  "Martial Arts L3",
+  "AD: Combat Jump",
+  "Super-Jump",
+  "V: No Wound Incapacitation",
+   "Personality"
+ ],
+ "type": "LI",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "2",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Combi Rifle",
+  "Nanopulser",
+  "Zero-V Smoke Grenades"
+ ],
+ "bts": "-3",
+ "cbcode": ["280837-0448"],
+ "cc": "18",
+ "ccw": [
+  "Pistol",
+  "DA CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "39",
+   "note": "",
+   "spec": [],
+   "swc": "0.5"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "39",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "F",
+ "irr": "",
+ "isc": "Machaon",
+ "mov": "4-4",
+ "name": "Machaon",
+ "note": "",
+ "ph": "13",
+ "spec": [
+  "Fireteam: Enomotarchos",
+  "Martial Arts L3",
+  "Doctor",
+  "ODD: Optical Disruptor",
+  "V: No Wound Incapacitation",
+   "Personality"
+ ],
+ "type": "WB",
+ "w": "1",
+ "wip": "15"
+}
+,
+{
+ "arm": "2",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "13",
+ "bsw": [
+  "Heavy Rocket Launcher",
+  "Nanopulser",
+  "Smoke Grenades"
+ ],
+ "bts": "-3",
+ "cbcode": [
+	 "280830-0393"
+ ],
+ "cc": "19",
+ "ccw": [
+  "Pistol",
+  "DA CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "44",
+   "note": "",
+   "spec": [],
+   "swc": "2"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "44",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "2"
+  }
+ ],
+ "cube": "2",
+ "imp": "F",
+ "irr": "",
+ "isc": "Phoneix",
+ "mov": "4-4",
+ "name": "Phoneix",
+ "note": "",
+ "ph": "13",
+ "spec": [
+  "Fireteam: Enomotarchos",
+  "Martial Arts L3",
+  "ODD: Optical Disruptor",
+  "V: No Wound Incapacitation",
+   "Personality"
+ ],
+ "type": "WB",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "5",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "13",
+ "bsw": [
+  "Combi Rifle (2)",
+  "Nanopulser"
+ ],
+ "bts": "-6",
+ "cbcode": ["280828-0387"],
+ "cc": "18",
+ "ccw": [
+  "Pistol",
+  "EXP CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "43",
+   "note": "",
+   "spec": [],
+   "swc": "0.5"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "43",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "I",
+ "irr": "",
+ "isc": "Ajax",
+ "mov": "4-4",
+ "name": "Ajax",
+ "note": "",
+ "ph": "16",
+ "spec": [
+  "Fireteam: Enomotarchos",
+  "Berserk",
+  "Natural Born Warrior",
+  "V: No Wound Incapacitation",
+   "Personality"
+ ],
+ "type": "HI",
+ "w": "2",
+ "wip": "12"
+}
+,
+{
+ "arm": "1",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "13",
+ "bsw": [
+  "Combi Rifle",
+  "Contender",
+  "Nanopulser"
+ ],
+ "bts": "-3",
+ "cbcode": ["280832-0409"],
+ "cc": "18",
+ "ccw": [
+  "Pistol",
+  "Monofilament CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "46",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  }
+ ],
+ "cube": "2",
+ "imp": "I",
+ "irr": "",
+ "isc": "Penthesilea",
+ "mov": "8-6",
+ "altp":[{
+     "isc":"(Dismounted)",
+     "mov":"4-4",
+     "ava":"",
+     "spec":[],
+     "bsw":[],
+     "ccw":[]
+ }],
+ "name": "Penthesilea",
+ "note": "",
+ "ph": "12",
+ "spec": [
+  "i-Khol L2",
+  "Motorcycle",
+  "ODD: Optical Disruptor",
+  "V: No Wound Incapacitation",
+   "Personality"
+ ],
+ "type": "WB",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "1",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Marker",
+  "Nanopulser"
+ ],
+ "bts": "-3",
+ "cbcode": [],
+ "cc": "16",
+ "ccw": [
+  "Assault Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "29",
+   "note": "",
+   "spec": [],
+   "swc": "0.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "",
+ "irr": "",
+ "isc": "Thamyris",
+ "mov": "4-4",
+ "name": "Thamyris",
+ "note": "",
+ "ph": "12",
+ "spec": [
+  "Journalist L2",
+  "V: No Wound Incapacitation",
+  "Hacker",
+  "Hacking Device",
+   "Personality"
+ ],
+ "type": "LI",
+ "w": "1",
+ "wip": "14"
+}
+,
+{
+ "arm": "3",
+ "army": "Aleph",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Submachine gun",
+  "Nanopulser",
+  "Flash Grenades"
+ ],
+ "bts": "0",
+ "cbcode": ["280003-0443"],
+ "cc": "19",
+ "ccw": [
+  "Pistol",
+  "Shock CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "Inf",
+   "cost": "27",
+   "note": "",
+   "spec": [
+    "Infiltration"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Light Rocket Launcher"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "LRL",
+   "codename": "",
+   "cost": "29",
+   "note": "",
+   "spec": [
+    "Fireteam: Enomotarchos"
+   ],
+   "swc": "0.5"
+  }
+ ],
+ "cube": "2",
+ "imp": "F",
+ "irr": "",
+ "isc": "Chandra Sergeant Thrasymedes",
+ "mov": "4-2",
+ "name": "Thrasymedes",
+ "note": "Special Spec-Op",
+ "ph": "13",
+ "spec": [
+  "ODD: Optical Disruptor Device",
+  "360° Visor",
+  "Specialist Troop"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "13"
+}

@@ -23,14 +23,16 @@ Content-Type: text/html; charset=utf-8
         <link href="inf-dice.css" rel="stylesheet" type="text/css">
         <link href="hitbar.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="inf-dice.js"></script>
+        <script type="text/javascript" src="unit_data.js"></script>
     </head>
     <body onload="init_on_load()">
 EOF
 }
 
-my $action = ['bs', 'dtw', 'cc', 'dodge', 'none'];
+my $action = ['bs', 'throw', 'dtw', 'cc', 'dodge', 'none'];
 my $action_labels = {
-    bs => 'Attack - Shoot (Roll against BS or other attribute)',
+    bs => 'Attack - Shoot (Roll against BS)',
+    throw => 'Attack - Thrown Weapon (Roll against PH)',
     cc => 'Attack - Close Combat (Roll against CC)',
     dtw => 'Attack - Direct Template Weapon (Automaticall hits)',
     dodge => 'Dodge (Roll against PH)',
@@ -147,6 +149,18 @@ my $hyperdynamics_labels = {
     9 => 'Level 3 (+9 PH to Dodge)',
 };
 
+my $factions = [
+    'Aleph',
+    'Ariadna',
+    'Combined Army',
+    'Haqqislam',
+    'Mercenary',
+    'Nomads',
+    'Panoceania',
+    'Tohaa',
+    'Yu Jing',
+];
+
 sub span_popup_menu{
     my (%args) = @_;
     my $label = $args{-label};
@@ -180,6 +194,18 @@ sub print_input_section{
           ),
           "</div>\n";
 
+    print popup_menu(-name => "$player.faction",
+              -values => $factions,
+              -default => param("$player.faction") // '',
+              -onchange => "set_faction('$player')",
+              -label => 'Faction',
+          ),
+          popup_menu(-name => "$player.unit",
+              -default => param("$player.unit") // '',
+              -onchange => "set_unit('$player')",
+              -label => 'Unit',
+          );
+
     print_input_attack_section($player);
 
     print "</div>\n";
@@ -189,29 +215,27 @@ sub print_input_section{
 sub print_input_attack_section{
     my ($player) = @_;
 
-    print "<div class='attack'>
-          <h3>Model Attributes</h3>",
-          span_popup_menu(-name => "$player.stat",
+    print "<div id='$player.attributes'>\n",
+          "<h3>Model Attributes</h3>\n",
+          span_popup_menu(-name => "$player.bs",
               -values => [1 .. 22],
-              -default => param("$player.stat") // 11,
-              -label => "Stat",
+              -default => param("$player.bs") // 11,
+              -label => "BS",
           ),
-          span_popup_menu(-name => "$player.b",
-              -values => $burst,
-              -default => param("$player.b") // '',
-              -label => "B",
+          span_popup_menu(-name => "$player.ph",
+              -values => [1 .. 22],
+              -default => param("$player.ph") // 11,
+              -label => "PH",
           ),
-          "<br>",
-          span_popup_menu(-name => "$player.ammo",
-              -values => $ammo,
-              -default => param("$player.ammo") // '',
-              -onchange => "set_ammo('$player')",
-              -label => "Ammo",
+          span_popup_menu(-name => "$player.cc",
+              -values => [1 .. 22],
+              -default => param("$player.cc") // 11,
+              -label => "CC",
           ),
-          span_popup_menu(-name => "$player.dam",
-              -values => [6 .. 20],
-              -default => param("$player.dam") // 13,
-              -label => 'DAM',
+          span_popup_menu(-name => "$player.wip",
+              -values => [1 .. 22],
+              -default => param("$player.wip") // 11,
+              -label => "WIP",
           ),
           "<br>",
           span_popup_menu(-name => "$player.arm",
@@ -225,6 +249,7 @@ sub print_input_attack_section{
               -label => "BTS",
           ),
           "<br>",
+          "<h3>Wounds</h3>",
           span_popup_menu(-name => "$player.w",
               -values => [1 .. 4],
               -default => param("$player.w") // '',
@@ -252,7 +277,53 @@ sub print_input_attack_section{
               -value => 1,
               -label => 'Shasvastii Spawn-Embryo',
           ),
-          "</div>\n";
+          "<br>",
+          "<h3>Special Skills and Equipment</h3>",
+          span_popup_menu(-name => "$player.immunity",
+              -values => $immunity,
+              -default => param("$player.immunity") // '',
+              -labels => $immunity_labels,
+              -label => "Immunity",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.dodge_unit",
+              -values => $dodge_unit,
+              -default => param("$player.dodge_unit") // '',
+              -labels => $dodge_unit_labels,
+              -label => "Unit Type",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.hyperdynamics",
+              -values => $hyperdynamics,
+              -default => param("$player.hyperdynamics") // '',
+              -labels => $hyperdynamics_labels,
+              -label => "Hyperdynamics",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.ikohl",
+              -values => $ikohl,
+              -default => param("$player.ikohl") // '',
+              -labels => $ikohl_labels,
+              -label => "i-Kohl",
+          ),
+          "</div>\n",
+          "<h3>Weapon Attributes</h3>\n",
+          span_popup_menu(-name => "$player.b",
+              -values => $burst,
+              -default => param("$player.b") // '',
+              -label => "B",
+          ),
+          span_popup_menu(-name => "$player.ammo",
+              -values => $ammo,
+              -default => param("$player.ammo") // '',
+              -onchange => "set_ammo('$player')",
+              -label => "Ammo",
+          ),
+          span_popup_menu(-name => "$player.dam",
+              -values => [6 .. 20],
+              -default => param("$player.dam") // 13,
+              -label => 'DAM',
+          );
 
     print "<div class='modifiers'>
            <h3>Skill Modifiers</h3>",
@@ -276,33 +347,12 @@ sub print_input_attack_section{
                -labels => $viz_labels,
                -label => "Visibility Penalty",
            ),
-           "<br>",
-           span_popup_menu(-name => "$player.dodge_unit",
-               -values => $dodge_unit,
-               -default => param("$player.dodge_unit") // '',
-               -labels => $dodge_unit_labels,
-               -label => "Unit Type",
-           ),
-           "<br>",
-           span_popup_menu(-name => "$player.hyperdynamics",
-               -values => $hyperdynamics,
-               -default => param("$player.hyperdynamics") // '',
-               -labels => $hyperdynamics_labels,
-               -label => "Hyperdynamics",
-           ),
            "<h3>CC Modifiers</h3>",
            span_popup_menu(-name => "$player.gang_up",
                -values => $gang_up,
                -default => param("$player.gang_up") // '',
                -labels => $gang_up_labels,
                -label => "Gang Up",
-           ),
-           "<br>",
-           span_popup_menu(-name => "$player.ikohl",
-               -values => $ikohl,
-               -default => param("$player.ikohl") // '',
-               -labels => $ikohl_labels,
-               -label => "i-Kohl",
            ),
            "<br>",
            span_checkbox(-name => "$player.berserk",
@@ -320,13 +370,6 @@ sub print_input_attack_section{
                -default => param("$player.ch") // '',
                -labels => $ch_labels,
                -label => "Camo",
-           ),
-           "<br>",
-           span_popup_menu(-name => "$player.immunity",
-               -values => $immunity,
-               -default => param("$player.immunity") // '',
-               -labels => $immunity_labels,
-               -label => "Immunity",
            ),
 
            "</div>\n";
@@ -371,6 +414,8 @@ sub print_player_output{
     my $nwi = param("p$other.nwi");
     my $shasvastii = param("p$other.shasvastii");
     my $w_type = param("p$other.w_type") // 'W';
+    my $name = param("p$player.unit") // 'Model';
+    my $other_name = param("p$other.unit") // 'Model';
 
     my $fatal = $w + 1;
 
@@ -407,7 +452,7 @@ sub print_player_output{
             $label = ' (Spawn Embryo)';
         }
 
-        printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> Inflict %d or more successes%s<br>", $output->{cumul_hits}{$player}{$h}, $h, $label;
+        printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> %s inflicts %d or more successes on %s%s<br>", $output->{cumul_hits}{$player}{$h}, $name, $h, $other_name, $label;
 
         # Stop once we print a line about them being dead
         if($done){
@@ -620,8 +665,6 @@ sub gen_attack_args{
     $ignore_cover = $code->{cover} // 1;
     $cover = (param("$them.cover") // 0) * $ignore_cover;
 
-    $stat = param("$us.stat") // 0;
-
     # Monofilament and K1 have fixed damage
     if($code->{fixed_dam}){
         $arm = 0;
@@ -629,13 +672,19 @@ sub gen_attack_args{
     }
 
     my $action = param("$us.action");
-    if($action eq 'bs'){
+    if($action eq 'bs' || $action eq 'throw'){
         # BS mods
         $stat += (param("$them.ch") // 0) - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
         $stat = max($stat, 0);
 
         $b = (param("$us.b") // 1) + $link_b;
         $arm += $cover;
+
+        if($action eq 'throw'){
+            $stat = param("$us.ph") // 0;
+        }else{
+            $stat = param("$us.bs") // 0;
+        }
     }elsif($action eq 'dtw'){
         # DTW mods
         $stat = 'T';
@@ -654,6 +703,8 @@ sub gen_attack_args{
         $stat = max($stat, 0);
 
         $b = 1;
+
+        $stat = param("$us.cc") // 0;
     }
 
     return (
@@ -667,7 +718,7 @@ sub gen_attack_args{
 sub gen_dodge_args{
     my ($us, $them) = @_;
 
-    my $stat = param("$us.stat") // 0;
+    my $stat = param("$us.ph") // 0;
     $stat += param("$us.dodge_unit") // 0;
     $stat += param("$us.gang_up") // 0;
     $stat += param("$us.hyperdynamics") // 0;
@@ -700,7 +751,7 @@ sub gen_args{
     my ($us, $them) = @_;
 
     my $action = param("$us.action");
-    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw'){
+    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'throw'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them);
@@ -794,8 +845,8 @@ sub generate_output{
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'ftf';
     }elsif($act_1 eq 'dtw' || $act_2 eq 'dtw' ||
-            ($act_1 ne 'bs' && $act_1 ne 'cc' &&
-            $act_2 ne 'bs' && $act_2 ne 'cc')){
+            ($act_1 ne 'bs' && $act_1 ne 'cc' && $act_1 ne 'throw' &&
+            $act_2 ne 'bs' && $act_2 ne 'cc' && $act_2 ne 'throw')){
         # neither player is attacking
         # Simultaneous Normal Rolls
         $output = execute_backend_simultaneous(\@args1, \@args2);

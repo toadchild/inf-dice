@@ -1,0 +1,4075 @@
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280207-0020",
+   "280209-0027",
+   "280210-0028",
+   "280218-0101",
+   "280235-0203"
+  ],
+  "bts": "0",
+  "isc": "Fusiliers",
+  "name": "Fusilier",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "T",
+  "bsw": [],
+  "spec": [],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "10",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "19",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "22",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Missile",
+    "cost": "26",
+    "codename": "ML",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Missile Launcher"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Grenadier",
+    "cost": "15",
+    "codename": "LGL",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Light GL",
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "24",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "10",
+    "codename": "Lt",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Paramedic",
+    "cost": "14",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "MediKit"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "FO",
+    "cost": "14",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Forward Observer"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280222-0120",
+   "280224-0135"
+  ],
+  "bts": "-6",
+  "isc": "Kamau",
+  "name": "Kamau",
+  "bs": "13",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "3",
+  "bsw": [],
+  "spec": [
+   "Aquatic Terrain"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "16",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "25",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "28",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Grenadier",
+    "cost": "23",
+    "codename": "LGL",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "X Visor"
+    ],
+    "bsw": [
+     "Light GL",
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "32",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [
+     "X Visor"
+    ],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "16",
+    "codename": "Lt",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Paramedic",
+    "cost": "20",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "MediKit"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280211-0037",
+   "280231-0171",
+   "280237-0218"
+  ],
+  "bts": "0",
+  "isc": "Bagh-Mari",
+  "name": "Bagh-Mari",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "MI",
+  "ph": "11",
+  "cc": "14",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "Multispectral Visor L1",
+   "Multiterrain (Aquatic, Desert or Jungle)"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "HMG Lt",
+    "cost": "27",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "34",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [
+     "Minelayer"
+    ],
+    "bsw": [
+     "MULTI Sniper Rifle",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "18",
+    "codename": "BS",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "22",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "27",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "34",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "22",
+    "codename": "Lt",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Paramedic",
+    "cost": "26",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "MediKit"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280204-0013",
+   "280220-0112"
+  ],
+  "bts": "0",
+  "isc": "Akalis",
+  "name": "Akal",
+  "bs": "13",
+  "note": "",
+  "cube": "X",
+  "type": "MI",
+  "ph": "11",
+  "cc": "14",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "3",
+  "bsw": [],
+  "spec": [
+   "AD: Combat Jump",
+   "Religious Troop"
+  ],
+  "ccw": [
+   "CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "23",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "E/Mitter",
+    "cost": "25",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "E/Mitter"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "32",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "35",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "23",
+    "codename": "BS",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "37",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "23",
+    "codename": "Lt",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280223-0130",
+   "280227-0148",
+   "280251-0319"
+  ],
+  "bts": "0",
+  "isc": "Nisses",
+  "name": "Nisse",
+  "bs": "13",
+  "note": "",
+  "cube": "X",
+  "type": "MI",
+  "ph": "12",
+  "cc": "14",
+  "arm": "3",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "Multispectral Visor L2",
+   "Multiterrain (Aquatic / Mountain / Zero-G)"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "31",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "36",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "43",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "41",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [
+    ],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "31",
+    "codename": "Lt",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Paramedic",
+    "cost": "35",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "MediKit"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280202-0006",
+   "280206-0015",
+   "280221-0116"
+  ],
+  "bts": "-3",
+  "isc": "Orc Troops",
+  "name": "Orc",
+  "bs": "14",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "15",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "3",
+  "bsw": [],
+  "spec": [],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "40",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "41",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "32",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "40",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280208-0021",
+   "280260-0389"
+  ],
+  "bts": "-6",
+  "isc": "Knights Hospitaller",
+  "name": "Knight Hospitaller",
+  "bs": "14",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "16",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "Martial Arts L2",
+   "Religious Troop",
+   "Sixth Sense L1"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "48",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "49",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Exp",
+    "cost": "50",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [
+     "EXP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Doctor",
+    "cost": "52",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Doctor"
+    ],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "48",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280214-0069",
+   "280236-0206"
+  ],
+  "bts": "-6",
+  "isc": "Aquila Guard",
+  "name": "Aquila",
+  "bs": "15",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "15",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "Multispectral Visor L3"
+  ],
+  "ccw": [
+   "Pistol",
+   "Shock CCW"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "59",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "60",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Grenadier",
+    "cost": "66",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "E/M LGL",
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "59",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280219-0109",
+   "280230-0167"
+  ],
+  "bts": "-6",
+  "isc": "Swiss Guard",
+  "name": "Swiss Guard",
+  "bs": "15",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "15",
+  "arm": "5",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "CH: TO Camouflage"
+  ],
+  "ccw": [
+   "AP CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "70",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "HMG",
+    "cost": "67",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "HMG"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Missile",
+    "cost": "74",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Missile Launcher"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "82",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "MULTI Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "70",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "MULTI Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280203-0007"
+  ],
+  "bts": "-6",
+  "isc": "Armoured Cavalry",
+  "name": "Squalo",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "17",
+  "cc": "18",
+  "arm": "8",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "MULTI HMG"
+  ],
+  "spec": [
+   "ECM",
+   "G: Remote Presence"
+  ],
+  "ccw": [],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "101",
+    "codename": "HGL",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy GL"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Flamer",
+    "cost": "93",
+    "codename": "HFT",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy Flamethrower"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "101",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Heavy GL"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280252-0324"
+  ],
+  "bts": "-6",
+  "isc": "Dragoes",
+  "name": "Dragao",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "17",
+  "cc": "18",
+  "arm": "8",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "HMC",
+   "Heavy Flamethrower"
+  ],
+  "spec": [
+   "ECM",
+   "G: Remote Presence"
+  ],
+  "ccw": [],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "94",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280216-0088"
+  ],
+  "bts": "-6",
+  "isc": "Cutters",
+  "name": "Cutter",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "17",
+  "cc": "18",
+  "arm": "8",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "Heavy Flamethrower",
+   "MULTI HMG"
+  ],
+  "spec": [
+   "Aquatic Terrain",
+   "CH: TO Camouflage",
+   "ECM",
+   "G: Remote Presence"
+  ],
+  "ccw": [],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "117",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "117",
+    "codename": "",
+    "swc": "3",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280254-0338"
+  ],
+  "bts": "-9",
+  "isc": "Jotums",
+  "name": "Jotum",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "18",
+  "cc": "18",
+  "arm": "10",
+  "irr": "",
+  "w": "3",
+  "ava": "2",
+  "bsw": [
+   "MULTI HMG",
+   "Heavy Flamethrower",
+   "D.E.P."
+  ],
+  "spec": [
+   "ECM",
+   "G: Remote Presence",
+   "Mountain Terrain"
+  ],
+  "ccw": [],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "104",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "104",
+    "codename": "",
+    "swc": "3",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280212-0045",
+   "280232-0183",
+   "280266-0437"
+  ],
+  "bts": "0",
+  "isc": "Croc Men",
+  "name": "Croc Man",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "SK",
+  "ph": "12",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Antipersonnel Mines"
+  ],
+  "spec": [
+   "CH: TO Camouflage",
+   "Infiltration",
+   "X Visor"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "33",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Minelayer",
+    "cost": "34",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Minelayer"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "45",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Observer/Repeater",
+    "cost": "37",
+    "codename": "FO/Repeater",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Forward Observer",
+     "Deployable Repeater"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "29",
+    "codename": "BShotgun",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "43",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "33",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Light Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280215-0078"
+  ],
+  "bts": "0",
+  "isc": "Trauma-Doc",
+  "name": "Trauma-Doc",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [
+   "Doctor"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "14",
+    "codename": "Doctor",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280217-0096"
+  ],
+  "bts": "-3",
+  "isc": "Machinist",
+  "name": "Machinist",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [
+   "Engineer"
+  ],
+  "ccw": [
+   "D-Charges",
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "15",
+    "codename": "Engineer",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280205-0014"
+  ],
+  "bts": "-3",
+  "isc": "Pathfinder Dronbot",
+  "name": "Pathfinder Dronbot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [
+   "Forward Observer",
+   "G: Remote Presence",
+   "Repeater",
+   "Sensor"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "21",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280205-0014"
+  ],
+  "bts": "-3",
+  "isc": "Sierra Dronbot",
+  "name": "Sierra Dronbot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "HMG"
+  ],
+  "spec": [
+   "360° Visor",
+   "G: Remote Presence",
+   "Repeater",
+   "Total Reaction"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "28",
+    "codename": "HMG",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Grenadier",
+    "cost": "34",
+    "codename": "E/M LGL",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "E/M LGL"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Monofilament",
+    "cost": "34",
+    "codename": "Mono",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+    ],
+    "bsw": [
+     "Monofilament Mines"
+     ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280205-0014"
+  ],
+  "bts": "-3",
+  "isc": "Clipper Dronbot",
+  "name": "Clipper Dronbot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Guided Missile Launcher"
+  ],
+  "spec": [
+   "G: Remote Presence"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "34",
+    "codename": "GML",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-6",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280205-0014"
+  ],
+  "bts": "-3",
+  "isc": "Fugazi Dronbot",
+  "name": "Fugazi Dronbot",
+  "bs": "8",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "G: Remote Presence",
+   "Multiterrain",
+   "Repeater"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "8",
+    "codename": "Repeater",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "15",
+  "cbcode": [
+   "280213-0061"
+  ],
+  "bts": "-6",
+  "isc": "Joan of Arc",
+  "name": "Joan of Arc",
+  "bs": "15",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "15",
+  "cc": "18",
+  "arm": "5",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [
+   "MULTI Rifle",
+   "Nanopulser"
+  ],
+  "spec": [
+   "Inspiring Leadership",
+   "Martial Arts L3",
+   "Religious Troop",
+   "V: No Wound Incapacitation",
+   "Personality"
+  ],
+  "ccw": [
+   "AP CCW",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "61",
+    "codename": "MULTI",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "61",
+    "codename": "",
+    "swc": "-1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280229-0162",
+   "280238-0221",
+   "280239-0235"
+  ],
+  "bts": "0",
+  "isc": "Acontecimento Regulars",
+  "name": "Acontecimento",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "13",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "Jungle Terrain"
+  ],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "10",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Grenadier",
+    "cost": "15",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Light GL",
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "17",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Observer",
+    "cost": "13",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Forward Observer"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "27",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [
+     "Sapper"
+    ],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "23",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device",
+     "Deployable Repeater"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "MineLayer",
+    "cost": "14",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Minelayer",
+     "Sensor"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Paramedic",
+    "cost": "14",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "MediKit"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "10",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "11",
+  "cbcode": [
+   "280225-0138"
+  ],
+  "bts": "-3",
+  "isc": "Auxbot",
+  "name": "Auxbot",
+  "bs": "10",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Heavy Flamethrower"
+  ],
+  "spec": [
+   "G: Synchronized"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "0",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Observer",
+    "cost": "0",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Forward Observer"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280225-0138"
+  ],
+  "bts": "0",
+  "isc": "Auxilia",
+  "name": "Auxilia",
+  "bs": "11",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "13",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [],
+  "ccw": [
+   "Knife",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "14",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Companion: Auxbot"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Observer",
+    "cost": "20",
+    "codename": "FO",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Forward Observer",
+     "Companion: Auxbot-Observer"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "14",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant",
+     "Companion: Auxbot"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280243-0263",
+   "280250-0310"
+  ],
+  "bts": "0",
+  "isc": "Hexas, Strategic Security Division",
+  "name": "Hexa",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "11",
+  "cc": "15",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "CH: TO Camouflage"
+  ],
+  "ccw": [
+   "Electric Pulse",
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "24",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "36",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "38",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "31",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280226-0143",
+   "280264-0415"
+  ],
+  "bts": "-3",
+  "isc": "Knights Of Santiago",
+  "name": "Santiago",
+  "bs": "14",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "13",
+  "cc": "18",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [
+   "E/M Grenades"
+  ],
+  "spec": [
+   "360° Visor",
+   "Religious Troop",
+   "Zero-G Terrain"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "51",
+    "codename": "Spitfire",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [
+   "AP CCW"
+],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "44",
+    "codename": "BS",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Boarding Shotgun"
+    ],
+    "ccw": [
+   "AP CCW"],
+    "note": ""
+   },
+   {
+    "code": "Combi",
+    "cost": "44",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [
+   "DA CCW"],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "51",
+    "codename": "Lt",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [
+   "AP CCW"],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280254-0352"
+  ],
+  "bts": "-3",
+  "isc": "Mulebots",
+  "name": "Mulebot",
+  "bs": "11",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "Baggage",
+   "G: Remote Presence",
+   "Repeater"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "8",
+    "codename": "Minesweeper",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Minesweeper"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Rifle",
+    "cost": "21",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Total Reaction"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "EVO",
+    "cost": "13",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "EVO Repeater"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280228-0154"
+  ],
+  "bts": "-3",
+  "isc": "Palbots",
+  "name": "Palbot",
+  "bs": "8",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "3",
+  "bsw": [],
+  "spec": [
+   "CH: Mimetism",
+   "G: Servant"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "3",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "14",
+  "cbcode": [
+   "280255-0347"
+  ],
+  "bts": "-6",
+  "isc": "Father-Officer Gabriele De Fersen",
+  "name": "De Fersen",
+  "bs": "14",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "17",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [
+   "Spitfire"
+  ],
+  "spec": [
+   "Martial Arts L3",
+   "Religious Troop",
+   "Hacker",
+   "Hacking Device",
+   "Personality"
+  ],
+  "ccw": [
+   "Pistol",
+   "Templar CCW"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "65",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "65",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280246-0283",
+   "280249-0300"
+  ],
+  "bts": "0",
+  "isc": "Order Sergeants",
+  "name": "Order Sergeant",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "LI",
+  "ph": "10",
+  "cc": "15",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "Religious Troop"
+  ],
+  "ccw": [
+   "Pistol",
+   "Knife"
+  ],
+  "childs": [
+   {
+    "code": "TO Sniper",
+    "cost": "39",
+    "codename": "",
+    "swc": "2.5",
+    "cbcode": [],
+    "spec": [
+     "CH: TO Camouflage",
+     "Infiltration"
+    ],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "TO Infiltrator",
+    "cost": "29",
+    "codename": "TO FO",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "CH: TO Camouflage",
+     "Infiltration",
+     "Forward Observer"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Antipersonnel Mines"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "MSV2 Spitfire",
+    "cost": "25",
+    "codename": "",
+    "swc": "2.5",
+    "cbcode": [],
+    "spec": [
+     "Multispectral Visor L2"
+    ],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Hacker",
+    "cost": "25",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [
+     "Hacker",
+     "Hacking Device"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Auxbot",
+    "cost": "17",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Companion: Auxbot"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "20",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Sniper",
+    "cost": "27",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Sniper Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "13",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280248-0296"
+  ],
+  "bts": "-3",
+  "isc": "Guarda de Assalto",
+  "name": "Guarda de Assalto",
+  "bs": "15",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "15",
+  "arm": "3",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [
+   "Heavy Flamethrower"
+  ],
+  "spec": [
+   "Companion: Auxbot GdA"
+  ],
+  "ccw": [
+   "Pistol",
+   "Knife"
+  ],
+  "childs": [
+   {
+    "code": "Spitfire",
+    "cost": "50",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "51",
+    "codename": "MULTI",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "MULTI Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "11",
+  "cbcode": [
+   "280248-0296"
+  ],
+  "bts": "-3",
+  "isc": "Auxbot GdA",
+  "name": "Auxbot GdA",
+  "bs": "10",
+  "note": "",
+  "cube": "S",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "0",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Light Shotgun",
+   "Zero-V Smoke LGL"
+  ],
+  "spec": [
+   "G: Synchronized"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "0",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280240-0241"
+  ],
+  "bts": "-3",
+  "isc": "Knights of Montesa",
+  "name": "Knight of Montesa",
+  "bs": "14",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "13",
+  "cc": "16",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "Mechanized Deployment",
+   "Religious Troop"
+  ],
+  "ccw": [
+   "Pistol",
+   "AP CCW"
+  ],
+  "childs": [
+   {
+    "code": "Lieutenant",
+    "cost": "46",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Grenadier",
+    "cost": "51",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Light GL"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "53",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "46",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "14",
+  "cbcode": [
+   "280257-0361"
+  ],
+  "bts": "-3",
+  "isc": "Knights of the Holy Sepulchre",
+  "name": "Knight of the Holy Sepulchre",
+  "bs": "14",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "17",
+  "arm": "4",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "Martial Arts L2",
+   "Holoprojector L2",
+   "Religious Troop"
+  ],
+  "ccw": [
+   "Pistol",
+   "EXP CCW"
+  ],
+  "childs": [
+   {
+    "code": "Spitfire Lt",
+    "cost": "58",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "58",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant",
+    "cost": "52",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "D.E.P."
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "52",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "D.E.P."
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280245-0277",
+   "280253-0333"
+  ],
+  "bts": "-6",
+  "isc": "Teutonic Knights",
+  "name": "Teutonic Knight",
+  "bs": "14",
+  "note": "",
+  "cube": "",
+  "type": "HI",
+  "ph": "14",
+  "cc": "18",
+  "arm": "3",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "Berserk",
+   "Jungle Terrain",
+   "Religious Troop",
+   "V: Courage"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Lieutenant",
+    "cost": "42",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [
+     "Combi Rifle",
+     "Panzerfaust"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Spitfire",
+    "cost": "46",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "EXP CCW",
+    "cost": "44",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Panzerfaust"
+    ],
+    "ccw": [
+     "EXP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "42",
+    "codename": "Combi",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Combi Rifle",
+     "Panzerfaust"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [
+   "280247-0288"
+  ],
+  "bts": "-3",
+  "isc": "Magister Knights",
+  "name": "Magister Knight",
+  "bs": "12",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "18",
+  "arm": "3",
+  "irr": "",
+  "imp": "X",
+  "w": "2",
+  "ava": "1",
+  "bsw": [],
+  "spec": [
+   "Martial Arts L2",
+   "Religious Troop",
+   "Hyper-Dynamics L1"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Missile",
+    "cost": "49",
+    "codename": "",
+    "swc": "1.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Missile Launcher"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Shotgun",
+    "cost": "31",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Panzerfaust",
+     "Light Shotgun"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "DA CCW",
+    "cost": "27",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Panzerfaust"
+    ],
+    "ccw": [
+     "DA CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "EXP CCW",
+    "cost": "29",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Panzerfaust"
+    ],
+    "ccw": [
+     "EXP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "27",
+    "codename": "AP CCW",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Panzerfaust"
+    ],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   }
+  ],
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [],
+  "bts": "-6",
+  "isc": "Clausewitz Uhlans",
+  "name": "Uhlan",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "15",
+  "cc": "15",
+  "arm": "6",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "HMG",
+   "Feuerbach"
+  ],
+  "spec": [
+   "CH: Camouflage",
+   "G: Remote Presence",
+   "ECM"
+  ],
+  "ccw": [],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "100",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [],
+  "bts": "-6",
+  "isc": "Tikbalangs, Armoured Chasseurs of Acontecimento",
+  "name": "Tikbalang",
+  "bs": "14",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "15",
+  "cc": "17",
+  "arm": "6",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "HMG",
+   "Heavy Flamethrower"
+  ],
+  "spec": [
+   "CH: Mimetism",
+   "G: Remote Presence",
+   "ECM",
+   "Jungle Terrain"
+  ],
+  "ccw": [
+   "AP CCW"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "80",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "12",
+  "cbcode": [],
+  "bts": "-6",
+  "isc": "Seraphs",
+  "name": "Seraph",
+  "bs": "14",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "16",
+  "cc": "19",
+  "arm": "7",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "Spitfire"
+  ],
+  "spec": [
+   "G: Remote Presence",
+   "Religious Troop",
+   "ECM",
+   "Companion: Auxbot"
+  ],
+  "ccw": [
+   "EXP CCW"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "85",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280234-0195"
+  ],
+  "bts": "-3",
+  "isc": "Armbots: Bulleteers",
+  "name": "Bulleteer",
+  "bs": "12",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "ODD: Optical Disruptor",
+   "G: Remote Presence",
+   "Repeater"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Spitfire",
+    "cost": "29",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "25",
+    "codename": "HS",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [
+   "280242-0255"
+  ],
+  "bts": "-3",
+  "isc": "Armbots: Peacemakers",
+  "name": "Peacemaker",
+  "bs": "12",
+  "note": "",
+  "cube": "R",
+  "type": "REM",
+  "ph": "8",
+  "cc": "8",
+  "arm": "1",
+  "irr": "",
+  "w": "1",
+  "ava": "2",
+  "bsw": [],
+  "spec": [
+   "Mechanized Deployment",
+   "G: Remote Presence",
+   "Repeater",
+   "Companion: Auxbot"
+  ],
+  "ccw": [
+   "Electric Pulse"
+  ],
+  "childs": [
+   {
+    "code": "Spitfire",
+    "cost": "35",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Spitfire"
+    ],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "31",
+    "codename": "HS",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [
+     "Heavy Shotgun"
+    ],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-2",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": ["280263-0411"],
+  "bts": "0",
+  "isc": "Kirpal Singh, Akalis Sergeant",
+  "name": "Singh",
+  "bs": "13",
+  "note": "",
+  "cube": "X",
+  "type": "MI",
+  "ph": "12",
+  "cc": "16",
+  "arm": "2",
+  "irr": "",
+  "w": "1",
+  "ava": "1",
+  "bsw": [
+   "Combi Rifle"
+  ],
+  "spec": [
+   "Martial Arts L2",
+   "Chain of Command",
+   "AD: Combat Jump",
+   "Religious Troop",
+   "Personality"
+  ],
+  "ccw": [
+   "Assault Pistol",
+   "CCW"
+  ],
+  "childs": [
+   {
+    "code": "Default",
+    "cost": "37",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "6-4",
+  "army": "Panoceania",
+  "wip": "13",
+  "cbcode": [],
+  "bts": "-9",
+  "isc": "Toni Macayana, Tikbalangs Lieutenant",
+  "name": "Macayana",
+  "bs": "15",
+  "note": "",
+  "cube": "R",
+  "type": "TAG",
+  "ph": "15",
+  "cc": "17",
+  "arm": "6",
+  "irr": "",
+  "w": "3",
+  "ava": "1",
+  "bsw": [
+   "HMG",
+   "Heavy Flamethrower",
+   "Antipersonnel Mines"
+  ],
+  "spec": [
+   "CH: Mimetism",
+   "G: Remote Presence",
+   "ECM",
+   "Multiterrain",
+   "Climbing Plus",
+   "Personality"
+  ],
+  "ccw": [
+   "AP CCW"
+  ],
+  "childs": [
+   {
+    "code": "Lieutenant",
+    "cost": "89",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "89",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [],
+    "note": ""
+   }
+  ],
+  "imp": "",
+  "functions": []
+ },
+ {
+  "mov": "4-4",
+  "army": "Panoceania",
+  "wip": "15",
+  "cbcode": [
+   "280233-0188"
+  ],
+  "bts": "-6",
+  "isc": "Joan of Arc 2.0 (Mobility Armor)",
+  "name": "Joan of Arc 2.0",
+  "bs": "15",
+  "note": "",
+  "cube": "X",
+  "type": "HI",
+  "ph": "14",
+  "cc": "18",
+  "arm": "3",
+  "irr": "",
+  "w": "2",
+  "ava": "1",
+  "bsw": [
+   "Spitfire",
+   "Nanopulser"
+  ],
+  "spec": [
+   "Martial Arts L3",
+   "Inspiring Leadership",
+   "Religious Troop",
+   "V: No Wound Incapacitation",
+   "Personality"
+  ],
+  "ccw": [
+   "Pistol"
+  ],
+  "childs": [
+   {
+    "code": "Lieutenant",
+    "cost": "57",
+    "codename": "",
+    "swc": "1",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": [],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "EXP CCW",
+    "cost": "59",
+    "codename": "",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [
+     "EXP CCW"
+    ],
+    "note": ""
+   },
+   {
+    "code": "Default",
+    "cost": "57",
+    "codename": "AP CCW",
+    "swc": "2",
+    "cbcode": [],
+    "spec": [],
+    "bsw": [],
+    "ccw": [
+     "AP CCW"
+    ],
+    "note": ""
+   }
+  ],
+  "imp": "F",
+  "functions": []
+ },
+ {
+  "childs": [
+   {
+    "bsw": [],
+    "swc": "0",
+    "cbcode": [],
+    "code": "Default",
+    "note": "",
+    "ccw": [],
+    "codename": "",
+    "cost": "0",
+    "spec": []
+   }
+  ],
+  "ccw": [],
+  "bsw": [],
+  "ava": "0",
+  "irr": "",
+  "arm": "X",
+  "cbcode": [
+   "280258-0367"
+  ],
+  "bts": "X",
+  "army": "Panoceania",
+  "note": "",
+  "cube": "",
+  "bs": "X",
+  "cc": "X",
+  "imp": "",
+  "name": "Indigo",
+  "isc": "Indigo Spec-Ops",
+  "mov": "X-X",
+  "type": "LI",
+  "ph": "X",
+  "spec": [
+   "Spec-Op"
+  ],
+  "w": "X",
+  "wip": "X"
+ },
+{
+ "arm": "3",
+ "army": "Panoceania",
+ "ava": "2",
+ "bs": "13",
+ "bsw": [],
+ "bts": "-3",
+ "cbcode": ["280259-0380","280261-0395"],
+ "cc": "15",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [
+    "Combi Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "combi",
+   "cost": "26",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "HMG"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "HMG",
+   "codename": "",
+   "cost": "35",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Boarding Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "BS",
+   "codename": "",
+   "cost": "26",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "MULTI Rifle",
+    "Light Flamethrower"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "MULTI",
+   "codename": "",
+   "cost": "35",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Crusader Brethren",
+ "mov": "4-2",
+ "name": "Brethren",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "AD: Combat Jump / Zero-G Terrain",
+  "Religious Troop"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "13"
+},
+{
+ "arm": "2",
+ "army": "Panoceania",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Combi Rifle"
+ ],
+ "bts": "0",
+ "cbcode": ["280268-0439"],
+ "cc": "15",
+ "ccw": [
+  "Assault Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "24",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "24",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Lieutenant Stephen Rao",
+ "mov": "4-2",
+ "name": "Rao",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "Multiterrain (Aquatic, Desert or Jungle)",
+  "CH: Mimetism",
+  "Multispectral Visor L1",
+   "Personality"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "14"
+}
+,{
+ "arm": "2",
+ "army": "Panoceania",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Combi Rifle",
+  "Light Shotgun"
+ ],
+ "bts": "-3",
+ "cbcode": ["280002-0442"],
+ "cc": "13",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "24",
+   "note": "",
+   "spec": [],
+   "swc": "0.5"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Fusilier Indigo Bipandra",
+ "mov": "4-4",
+ "name": "Bipandra",
+ "note": "Special SpecOp",
+ "ph": "11",
+ "spec": [
+  "Doctor",
+  "Specialist Troop"
+ ],
+ "type": "LI",
+ "w": "1",
+ "wip": "13"
+},
+{
+ "arm": "2",
+ "army": "Panoceania",
+ "ava": "1",
+ "bs": "12",
+ "bsw": [
+  "Combi Rifle"
+ ],
+ "bts": "0",
+ "cbcode": ["280004-0446"],
+ "cc": "16",
+ "ccw": [
+  "D-Charges",
+  "Assault Pistol",
+  "CCW"
+ ],
+ "childs": [
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "",
+   "cost": "29",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Infiltrator",
+   "codename": "Inf",
+   "cost": "34",
+   "note": "",
+   "spec": [
+    "Infiltration"
+   ],
+   "swc": "0"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Indigo Brother Konstantinos",
+ "mov": "4-4",
+ "name": "Konstantinos",
+ "note": "Special Spec-Op",
+ "ph": "12",
+ "spec": [
+  "Multispectral Visor L2",
+  "CH: Mimetism",
+  "Specialist Troop",
+  "Religious Troop"
+ ],
+ "type": "LI",
+ "w": "1",
+ "wip": "13"
+},{
+ "arm": "2",
+ "army": "Panoceania",
+ "ava": "3",
+ "bs": "13",
+ "bsw": [],
+ "bts": "-6",
+ "cbcode": ["280270-0487"],
+ "cc": "14",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [
+    "Combi Rifle",
+    "Light Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "Combi",
+   "cost": "22",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Boarding Shotgun",
+    "E\/M Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "BS",
+   "codename": "",
+   "cost": "19",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "MULTI Sniper Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Sniper",
+   "codename": "",
+   "cost": "30",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Missile Launcher",
+    "Light Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "ML",
+   "codename": "",
+   "cost": "37",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Spitfire"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Spitfire",
+   "codename": "",
+   "cost": "25",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Boarding Shotgun",
+    "E\/M Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Hacker",
+   "codename": "",
+   "cost": "31",
+   "note": "",
+   "spec": [
+    "Hacker",
+    "Hacking Device"
+   ],
+   "swc": "0.5"
+  },
+  {
+   "bsw": [
+    "Combi Rifle",
+    "Light Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Paramedic",
+   "codename": "",
+   "cost": "26",
+   "note": "",
+   "spec": [
+    "Paramedic",
+    "MediKit"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Combi Rifle",
+    "Light Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "22",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Neoterra Bolts",
+ "mov": "4-2",
+ "name": "Bolt",
+ "note": "",
+ "ph": "11",
+ "spec": [
+  "Bioimmunity"
+ ],
+ "type": "MI",
+ "w": "1",
+ "wip": "12"
+}
+

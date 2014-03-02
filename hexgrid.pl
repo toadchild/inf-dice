@@ -19,7 +19,6 @@ my ($size, $fname) = @ARGV;
 my $short = $size / 2 / 2;
 my $long = $short * 2 / sqrt(3);
 
-print "Short: $short\nLong: $long\n";
 my $off = 2 * $short;
 my $radius = $long * 0.9;
 my $height = $short * 4;
