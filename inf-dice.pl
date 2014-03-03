@@ -320,7 +320,7 @@ sub print_input_attack_section{
               -label => "Ammo",
           ),
           span_popup_menu(-name => "$player.dam",
-              -values => [6 .. 20],
+              -values => ['PH-2', 'PH', 6 .. 20],
               -default => param("$player.dam") // 13,
               -label => 'DAM',
           );
@@ -416,16 +416,16 @@ sub print_player_output{
     my $w_type = param("p$other.w_type") // 'W';
     my $name = param("p$player.unit") // 'Model';
     my $other_name = param("p$other.unit") // 'Model';
-
-    my $fatal = $w + 1;
+    my $fatal = $ammo_codes->{$ammo}{fatal} // 0;
+    my $dead = $w + 1;
 
     if($shasvastii){
-        $fatal++;
+        $dead++;
     }
 
-    if($ammo_codes->{$ammo}{fatal} >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $ammo_codes->{$ammo}{str_resist})){
+    if($fatal >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $ammo_codes->{$ammo}{str_resist})){
         # This ammo is instantly fatal, and we are not immune
-        $fatal = $w - $ammo_codes->{$ammo}{fatal};
+        $dead = $w - $fatal;
     }
 
     if($ammo_codes->{$ammo}{ignore_nwi}){
@@ -443,7 +443,7 @@ sub print_player_output{
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
         my $done;
 
-        if($h + $w_taken >= $fatal){
+        if($h + $w_taken >= $dead){
             $label = sprintf " (%s)", $ammo_codes->{$ammo}{label} // 'Dead';
             $done = 1;
         }elsif($h + $w_taken == $w && !$nwi){
@@ -669,6 +669,12 @@ sub gen_attack_args{
     if($code->{fixed_dam}){
         $arm = 0;
         $dam = $code->{fixed_dam};
+    }
+
+    if($dam eq 'PH'){
+        $dam = param("$us.ph") // 0;
+    }elsif($dam eq 'PH-2'){
+        $dam = (param("$us.ph") // 2) - 2;
     }
 
     my $action = param("$us.action");
