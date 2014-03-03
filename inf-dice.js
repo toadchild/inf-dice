@@ -300,7 +300,7 @@ function set_unit(player){
     }
 }
 
-function set_faction(player){
+function set_faction(player, check_params){
     var faction_name = player + ".faction";
     var faction = document.getElementsByName(faction_name)[0].value;
 
@@ -326,7 +326,7 @@ function set_faction(player){
             selected = true;
         }
 
-        if(unit["name"] == params[player + ".unit"]){
+        if(check_params && unit["name"] == params[player + ".unit"]){
             unit_list.options[unit_list.options.length - 1].selected = true;
         }
     }
@@ -335,7 +335,7 @@ function set_faction(player){
     unit_list.options[unit_list.options.length - 1].disabled = true;
     unit_list.options[unit_list.options.length] = new Option("Custom Unit");
 
-    if("Custom Unit" == params[player + ".unit"]){
+    if(check_params && "Custom Unit" == params[player + ".unit"]){
         unit_list.options[unit_list.options.length - 1].selected = true;
     }
 
@@ -360,8 +360,8 @@ function init_on_load(){
     set_action("p1");
     set_action("p2");
 
-    set_faction("p1");
-    set_faction("p2");
+    set_faction("p1", true);
+    set_faction("p2", true);
 }
 
 function raw_output(){

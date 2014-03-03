@@ -197,7 +197,7 @@ sub print_input_section{
     print popup_menu(-name => "$player.faction",
               -values => $factions,
               -default => param("$player.faction") // '',
-              -onchange => "set_faction('$player')",
+              -onchange => "set_faction('$player', false)",
               -label => 'Faction',
           ),
           popup_menu(-name => "$player.unit",
