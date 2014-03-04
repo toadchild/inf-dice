@@ -87,6 +87,7 @@ my $immunities = {
         EXP => 'arm',
         Fire => 'arm',
         Nanotech => 'arm',
+        Swarm => 'arm',
         # TODO verify what happens when a TI model is hit with E/M2
     },
 };
