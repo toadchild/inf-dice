@@ -60,7 +60,7 @@ function other_player(player){
     }
 }
 
-function set_ammo(player){
+function set_ammo(player, check_params){
     var other = other_player(player);
 
     var action_name = player + ".action";
@@ -94,6 +94,39 @@ function set_ammo(player){
         enable_input(dam_id);
         enable_input(arm_id);
         disable_input(bts_id);
+    }
+
+    // Set B values based on selected weapon and ammo
+    var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
+    var weapon = weapon_data[weapon_name];
+    // TODO there is another ammo lookup earlier in this function
+    var ammo_name = document.getElementsByName(player + ".ammo")[0].value;
+    var b_list = document.getElementsByName(player + ".b")[0];
+
+    // Get ammo type index so we can look up the corresponding B value
+    b_list.length = 0;
+    if(weapon){
+        for(var i = 0; i < weapon["ammo"].length; i++){
+            if(ammo_name == weapon["ammo"][i]){
+                for(var b = 1; b <= weapon["b"][i]; b++){
+                    b_list.options[b_list.options.length] = new Option(b);
+
+                    if(check_params && b == params[player + ".b"]){
+                        b_list.options[b_list.options.length - 1].selected = true;
+                    }
+                }
+                break;
+            }
+        }
+    }else{
+        // Custom Weapon
+        for(var b = 1; b <= 5; b++){
+            b_list.options[b_list.options.length] = new Option(b);
+
+            if(check_params && b == params[player + ".b"]){
+                b_list.options[b_list.options.length - 1].selected = true;
+            }
+        }
     }
 }
 
@@ -253,34 +286,106 @@ function set_action(player){
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
     }
-    set_ammo(player);
+    populate_weapons(player);
 }
 
-function set_unit(player){
+function set_weapon(player, check_params){
+    // Set ammo types based on the selected weapon
+    var ammo_list = document.getElementsByName(player + ".ammo")[0];
+    var dam_list = document.getElementsByName(player + ".dam")[0];
+    var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
+    var weapon = weapon_data[weapon_name];
+
+    if(weapon){
+        // Ammo types
+        ammo_list.length = 0;
+        for(var i = 0; i < weapon["ammo"].length; i++){
+            ammo_list.options[ammo_list.options.length] = new Option(weapon["ammo"][i]);
+
+            if(check_params && weapon["ammo"][i] == params[player + ".ammo"]){
+                ammo_list.options[ammo_list.options.length - 1].selected = true;
+            }
+        }
+
+        dam_list.length = 0;
+        dam_list.options[0] = new Option(weapon["dam"]);
+    }else{
+        // Custom weapon
+        // set default values
+        for(var i = 0; i < ammos.length; i++){
+            ammo_list.options[ammo_list.options.length] = new Option(ammos[i]);
+
+            if(check_params && ammos[i] == params[player + ".ammo"]){
+                ammo_list.options[ammo_list.options.length - 1].selected = true;
+            }
+        }
+
+        dam_list.length = 0;
+        for(var i = 0; i < damages.length; i++){
+            dam_list.options[dam_list.options.length] = new Option(damages[i]);
+
+            if(check_params && dam_list.options[i].value == params[player + ".dam"]){
+                dam_list.options[i].selected = true;
+            }
+        }
+    }
+
+    set_ammo(player, check_params);
+}
+
+function populate_weapons(player, check_params){
+    var weapon_list = document.getElementsByName(player + ".weapon")[0];
+    var action = document.getElementsByName(player + ".action")[0].value;
+    var unit = get_unit_data(player);
+
+    var attack_filter = "att_" + action;
+
+    weapon_list.length = 0;
+
+    if(unit){
+        for(var i = 0; i < unit.weapons.length; i++){
+            // TODO dual weaponry (2)
+            var weapon = weapon_data[unit.weapons[i]];
+            if(weapon && weapon[attack_filter]){
+                weapon_list.options[weapon_list.options.length] = new Option(weapon["name"]);
+
+                if(check_params && weapon["name"] == params[player + ".weapon"]){
+                    weapon_list.options[weapon_list.options.length - 1].selected = true;
+                }
+            }
+        }
+    }
+
+    weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
+
+    if(check_params && "Custom Weapon" == params[player + ".weapon"]){
+        weapon_list.options[weapon_list.options.length - 1].selected = true;
+    }
+
+    set_weapon(player, check_params);
+}
+
+function get_unit_data(player){
     var faction_name = player + ".faction";
     var faction = document.getElementsByName(faction_name)[0].value;
 
     var unit_name = player + ".unit";
     var selected_unit = document.getElementsByName(unit_name)[0].value;
 
-    // If they selected custom unit
-    if(selected_unit == "Custom Unit"){
-        enable_display(player + ".attributes");
-        return;
-    }else{
-        disable_display(player + ".attributes");
-    }
-
-    var unit;
-    for(var i = 0; i < units[faction].length; i++){
-        if(units[faction][i]["name"] == selected_unit){
-            unit = units[faction][i];
-            break;
+    for(var i = 0; i < unit_data[faction].length; i++){
+        if(unit_data[faction][i]["name"] == selected_unit){
+            return unit_data[faction][i];
         }
     }
+}
+
+function set_unit(player, check_params){
+    var unit = get_unit_data(player);
 
     // set all attributes from this unit
     if(unit){
+        disable_display(player + ".attributes");
+
         document.getElementsByName(player + ".bs")[0].value = unit["bs"];
         document.getElementsByName(player + ".ph")[0].value = unit["ph"];
         document.getElementsByName(player + ".cc")[0].value = unit["cc"];
@@ -297,7 +402,12 @@ function set_unit(player){
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
+    }else{
+        // If they selected custom unit
+        enable_display(player + ".attributes");
     }
+
+    populate_weapons(player, check_params);
 }
 
 function set_faction(player, check_params){
@@ -312,8 +422,8 @@ function set_faction(player, check_params){
     var type = "";
     var selected = false;
 
-    for(var i = 0; i < units[faction].length; i++){
-        var unit = units[faction][i];
+    for(var i = 0; i < unit_data[faction].length; i++){
+        var unit = unit_data[faction][i];
         if(type != unit["type"]){
             type = unit["type"];
             unit_list.options[unit_list.options.length] = new Option("-- " + type);
@@ -339,7 +449,7 @@ function set_faction(player, check_params){
         unit_list.options[unit_list.options.length - 1].selected = true;
     }
 
-    set_unit(player);
+    set_unit(player, check_params);
 }
 
 var params = {};
@@ -367,3 +477,8 @@ function init_on_load(){
 function raw_output(){
     toggle_display("raw_output");
 }
+
+// TODO need a good way to keep this in sync with perl
+var ammos = ["Normal", "Shock", "AP", "DA", "EXP", "AP+DA", "AP+EXP", "AP+Shock", "Fire", "Viral", "T2", "Monofilament", "K1", "Nanotech", "Flash", "E/M", "E/M2", "Swarm", "Smoke", "Zero-V Smoke"];
+var damages = ['PH-2', 'PH', 10, 11, 12, 13, 14, 15];
+

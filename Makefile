@@ -5,7 +5,7 @@ LDLIBS=-lm -lpthread
 WWWDIR=/var/www/inf-dice
 BINDIR=/usr/local/bin
 
-WWW_TARGETS=hitbar.css hex.png unit_data.js
+WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js
 BIN_TARGETS=inf-dice
 
 all: ${WWW_TARGETS} ${BIN_TARGETS}
@@ -25,6 +25,9 @@ hex.png: hexgrid.pl
 
 unit_data.js: process_unit.pl ia-data/*
 	./process_unit.pl
+
+weapon_data.js: process_weapon.pl ia-data/*
+	./process_weapon.pl
 
 install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice.js inf-dice.css inf-dice.pl ${WWW_TARGETS} ${WWWDIR}

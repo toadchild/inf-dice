@@ -8,6 +8,7 @@ use Data::Dumper;
 
 my $json = JSON::PP->new;
 $json->pretty(1);
+$json->canonical(1);
 
 my %default_wtype = (
     LI => 'W',
@@ -139,7 +140,7 @@ sub get_weapons{
         }
     }
 
-    return [keys %$weapons];
+    return [sort keys %$weapons];
 }
 
 my %unit_type_order = (
@@ -180,6 +181,23 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
             next;
         }
 
+        # Patch some unit names
+        if($unit->{name} eq 'Caliban D'){
+            # Only keep one kind of Caliban
+            $unit->{name} = 'Caliban';
+        }elsif($unit->{name} =~ m/Caliban/){
+            # Only keep one kind of Caliban
+            next;
+        }elsif($unit->{name} eq 'O-YOROI'){
+            $unit->{name} = 'O-Yoroi';
+        }elsif($unit->{name} eq 'Shock'){
+            $unit->{name} = 'Druze';
+        }elsif($unit->{name} eq 'Controller'){
+            $unit->{name} = 'Assault Pack Controller';
+        }elsif($unit->{name} eq 'Highlander'){
+            $unit->{name} = 'Highlander Galwegian';
+        }
+
         my $new_unit = {};
         $new_unit->{name} = $unit->{name};
         $new_unit->{bs} = $unit->{bs};
@@ -211,5 +229,5 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
 }
 
 open $file, '>', 'unit_data.js' or die "Unable to open file";
-print $file "units = ";
+print $file "var unit_data = ";
 print $file $json->encode($unit_data);

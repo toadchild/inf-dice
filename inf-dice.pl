@@ -24,6 +24,7 @@ Content-Type: text/html; charset=utf-8
         <link href="hitbar.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="inf-dice.js"></script>
         <script type="text/javascript" src="unit_data.js"></script>
+        <script type="text/javascript" src="weapon_data.js"></script>
     </head>
     <body onload="init_on_load()">
 EOF
@@ -41,10 +42,11 @@ my $action_labels = {
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'AP+Shock', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'Flash', 'E/M', 'E/M2', 'Smoke'];
+my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'AP+Shock', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'Flash', 'E/M', 'E/M2', 'Swarm', 'Smoke', 'Zero-V Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
     Shock => {code => 'N', fatal => 1},
+    Swarm => {code => 'N', fatal => 1, save => 'bts'},
     T2 => {code => 'N', dam => 2},
     AP => {code => 'N', ap => 0.5},
     'AP+DA' => {code => 'D', ap => 0.5},
@@ -61,6 +63,7 @@ my $ammo_codes = {
     'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
     'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
     'Smoke' => {code => '-', cover => 0},
+    'Zero-V Smoke' => {code => '-', cover => 0},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -183,6 +186,28 @@ sub print_input_section{
     print "<div class='content'>\n";
     printf "<h2>Player %d</h2>\n", $player_num;
 
+    print_input_attack_section($player);
+
+    print "</div>\n";
+    print "</div>\n";
+}
+
+sub print_input_attack_section{
+    my ($player) = @_;
+
+    print "<h3>Model</h3>",
+          span_popup_menu(-name => "$player.faction",
+              -values => $factions,
+              -default => param("$player.faction") // '',
+              -onchange => "set_faction('$player')",
+              -label => 'Faction',
+          ),
+          span_popup_menu(-name => "$player.unit",
+              -default => param("$player.unit") // '',
+              -onchange => "set_unit('$player')",
+              -label => 'Unit',
+          );
+
     print "<div class='action'>
           <h3>Action</h3>",
 
@@ -194,28 +219,7 @@ sub print_input_section{
           ),
           "</div>\n";
 
-    print popup_menu(-name => "$player.faction",
-              -values => $factions,
-              -default => param("$player.faction") // '',
-              -onchange => "set_faction('$player', false)",
-              -label => 'Faction',
-          ),
-          popup_menu(-name => "$player.unit",
-              -default => param("$player.unit") // '',
-              -onchange => "set_unit('$player')",
-              -label => 'Unit',
-          );
-
-    print_input_attack_section($player);
-
-    print "</div>\n";
-    print "</div>\n";
-}
-
-sub print_input_attack_section{
-    my ($player) = @_;
-
-    print "<div id='$player.attributes'>\n",
+    print "<div id='$player.attributes' style='display: none;'>\n",
           "<h3>Model Attributes</h3>\n",
           span_popup_menu(-name => "$player.bs",
               -values => [1 .. 22],
@@ -306,21 +310,28 @@ sub print_input_attack_section{
               -labels => $ikohl_labels,
               -label => "i-Kohl",
           ),
-          "</div>\n",
-          "<h3>Weapon Attributes</h3>\n",
-          span_popup_menu(-name => "$player.b",
-              -values => $burst,
-              -default => param("$player.b") // '',
-              -label => "B",
+          "</div>\n";
+
+    print "<h3>Weapon</h3>",
+          span_popup_menu(-name => "$player.weapon",
+              -default => param("$player.weapon") // '',
+              -onchange => "set_weapon('$player')",
+              -label => 'Weapon',
           ),
+          "<br>",
           span_popup_menu(-name => "$player.ammo",
               -values => $ammo,
               -default => param("$player.ammo") // '',
               -onchange => "set_ammo('$player')",
               -label => "Ammo",
           ),
+          span_popup_menu(-name => "$player.b",
+              -values => $burst,
+              -default => param("$player.b") // '',
+              -label => "B",
+          ),
           span_popup_menu(-name => "$player.dam",
-              -values => ['PH-2', 'PH', 6 .. 20],
+              -values => ['PH-2', 'PH', 10 .. 15],
               -default => param("$player.dam") // 13,
               -label => 'DAM',
           );
@@ -474,7 +485,7 @@ sub print_hitbar_player{
     my ($output, $sort, $p) = @_;
 
     for my $h (sort {$a * $sort <=> $b * $sort} keys %{$output->{hits}{$p}}){
-        print "<td style='width: $output->{hits}{$p}{$h}%' class='p$p-hit-$h'>";
+        print "<td style='width: $output->{hits}{$p}{$h}%;' class='p$p-hit-$h'>";
         if($output->{hits}{$p}{$h} >= 3.0){
             printf "%d", $h;
         }
@@ -498,7 +509,7 @@ sub print_hitbar_output{
         print_hitbar_player($output, -1, 2);
     }
 
-    print "<td style='width: $output->{hits}{0}%' class='miss center'>";
+    print "<td style='width: $output->{hits}{0}%;' class='miss center'>";
     if($output->{hits}{0} >= 3.0){
         printf "0";
     }

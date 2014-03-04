@@ -8,14 +8,6 @@
     float:right;
 }
 
-#p1.attributes {
-    display: none;
-}
-
-#p2.attributes {
-    display: none;
-}
-
 #output {
     clear: both;
 }
