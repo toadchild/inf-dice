@@ -626,9 +626,10 @@ sub print_tail{
 
     print <<EOF
     <div id="contact">
-This tool was created by <a href="http://ghostlords.com/">Jonathan Polley</a> to help enhance your enjoyment of Infinity the Game.<br>
+This tool was created by <a href="http://ghostlords.com/">Jonathan Polley</a> to help enhance your enjoyment of Infinity the Game.
+Please direct any feedback to <a href="mailto:inf-dice\@ghostlords.com">inf-dice\@ghostlords.com</a>.<br>
 <a href="http://infinitythegame.com/">Infinity the Game</a> is &copy; Corvus Belli SLL.<br>
-Please direct any issues or feedback to <a href="mailto:inf-dice\@ghostlords.com">inf-dice\@ghostlords.com</a>.
+Unit and weapon data was graciously provided by Davide Imbriaco, creator of <a href="http://anyplace.it/ia/">Aleph Toolbox</a>.
     </div>
     <div id="time">Content took $time seconds to generate.</div>
     </body>
