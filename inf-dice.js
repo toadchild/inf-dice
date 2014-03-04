@@ -479,6 +479,5 @@ function raw_output(){
 }
 
 // TODO need a good way to keep this in sync with perl
-var ammos = ["Normal", "Shock", "AP", "DA", "EXP", "AP+DA", "AP+EXP", "AP+Shock", "Fire", "Viral", "T2", "Monofilament", "K1", "Nanotech", "Flash", "E/M", "E/M2", "Swarm", "Smoke", "Zero-V Smoke"];
 var damages = ['PH-2', 'PH', 10, 11, 12, 13, 14, 15];
 

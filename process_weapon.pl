@@ -10,6 +10,7 @@ my $json = JSON::PP->new;
 $json->pretty(1);
 $json->canonical(1);
 
+my $all_ammo = {};
 my $weapon_data = {};
 my $file;
 for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
@@ -19,10 +20,15 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
     $json_text = <$file>;
     my $source_data = $json->decode($json_text);
 
-    for my $weapon (@$source_data){
+    WEAPON: for my $weapon (@$source_data){
         # Skip unimplemented weapons or other equipment
-        if($weapon->{name} =~ m/Mines|Koala|Charges|Discover|E\/M CCW|Mauler|Pulse|Hedgehog|Observer|Jammer|Marker|Plasma|Sepsitor/){
+        if($weapon->{name} =~ m/Mines|Koala|Charges|Discover|Mauler|Pulse|Hedgehog|Observer|Jammer|Marker|Sepsitor/){
             next;
+        }
+
+        # Fix weapon
+        if($weapon->{name} eq 'Templar CCW'){
+            $weapon->{ammo} = 'AP+Shock';
         }
 
         # Multiple ammo types and burst reduction
@@ -43,6 +49,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             @ammo = $weapon->{ammo};
         }
         @ammo = map {$_ eq 'N' ? 'Normal' : $_} @ammo;
+        @ammo = map {$_ eq 'FIRE' ? 'Fire' : $_} @ammo;
 
         # integrated ammo
         if($multi){
@@ -55,6 +62,14 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
         my @b;
         for my $ammo (@ammo){
+            # skip unimplemented ammo
+            if($ammo =~ m/PLASMA|Adhesive|N\+E\/M|Stun/){
+                next WEAPON;
+            }
+
+            # sanity check ammo types
+            $all_ammo->{$ammo} = 1;
+
             my $b;
 
             if($weapon->{burst} eq '--'){
@@ -94,5 +109,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 }
 
 open $file, '>', 'weapon_data.js' or die "Unable to open file";
-print $file "var weapon_data = ";
+print $file 'var weapon_data = ';
 print $file $json->encode($weapon_data);
+print $file 'var ammos = ';
+print $file $json->encode([sort keys %$all_ammo]);
