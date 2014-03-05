@@ -135,11 +135,12 @@ th {
     text-align: center;
 }
 
-.statline {
+.statline table {
     margin-left: 2em;
 }
 
 .statline .skills {
+    margin-left: 2em;
     font-style: italic;
     font-size: 90%;
 }

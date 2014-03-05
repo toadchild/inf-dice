@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use JSON::PP;
-use Data::Dumper;
+use Clone qw(clone);
 
 my $json = JSON::PP->new;
 $json->pretty(1);
@@ -141,7 +141,7 @@ sub dodge_unit{
 }
 
 sub get_weapons{
-    my ($unit) = @_;
+    my ($unit, $specialist) = @_;
     my $weapons = {};
 
     for my $w (@{$unit->{bsw}}){
@@ -151,8 +151,17 @@ sub get_weapons{
     for my $w (@{$unit->{ccw}}){
         $weapons->{$w} = 1;
     }
-
+    
     for my $child (@{$unit->{childs}}){
+        # Keep specialists separate
+        if(!$specialist && has_msv($child)){
+            next;
+        }
+
+        if($specialist && !has_msv($child)){
+            next;
+        }
+
         for my $w (@{$child->{bsw}}){
             $weapons->{$w} = 1;
         }
@@ -221,6 +230,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         }
 
         my $new_unit = {};
+        # Stats
         $new_unit->{name} = $unit->{name};
         $new_unit->{bs} = $unit->{bs};
         $new_unit->{ph} = $unit->{ph};
@@ -229,8 +239,12 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $new_unit->{arm} = $unit->{arm};
         $new_unit->{bts} = $unit->{bts};
         $new_unit->{w_type} = uc($unit->{wtype} // $default_wtype{$unit->{type}});
-        $new_unit->{dodge_unit} = dodge_unit($unit);
         $new_unit->{w} = $unit->{w};
+        $new_unit->{type} = $unit->{type};
+        $new_unit->{skills} = $unit->{spec};
+
+        # Modifiers
+        $new_unit->{dodge_unit} = dodge_unit($unit);
         $new_unit->{nwi} = has_nwi($unit);
         $new_unit->{shasvastii} = has_shasvastii($unit);
         $new_unit->{weapons} = get_weapons($unit);
@@ -239,7 +253,6 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $new_unit->{hyperdynamics} = has_hyperdynamics($unit);
         $new_unit->{ch} = has_camo($unit);
         $new_unit->{odd} = has_odd($unit);
-        $new_unit->{type} = $unit->{type};
         $new_unit->{msv} = has_msv($unit);
 
         if(defined($faction) && $faction ne $unit->{army}){
@@ -248,6 +261,20 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $faction = $unit->{army};
 
         push @unit_list, $new_unit;
+
+        # Check for child units with special skills we care about
+        my $msv = $new_unit->{msv};
+        for my $child (@{$unit->{childs}}){
+            if(!$msv && ($msv = has_msv($child))){
+                $new_unit = clone($new_unit);
+                $new_unit->{name} .= " (MSV $msv)";
+                $new_unit->{msv} = $msv;
+                $new_unit->{weapons} = get_weapons($unit, 1);
+                push @{$new_unit->{skills}}, "Multispectral Visor L$msv";
+
+                push @unit_list, $new_unit;
+            }
+        }
     }
     $unit_data->{$faction} = [sort unit_sort @unit_list];
 }

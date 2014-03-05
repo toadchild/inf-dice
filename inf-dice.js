@@ -379,44 +379,6 @@ function get_unit_data(player){
     }
 }
 
-function append_skill(skills, flag, name){
-    if(flag){
-        if(skills.innerHTML.length > 0){
-            skills.innerHTML += ", ";
-        }
-        skills.innerHTML += name;
-    }
-}
-
-function append_leveled_skill(skills, level, name){
-    if(level){
-        append_skill(skills, 1, name + " L " + level);
-    }
-}
-
-function append_named_skill(skills, key, lookup){
-    if(key){
-        append_skill(skills, 1, lookup[key]);
-    }
-}
-
-var immunity_names = {
-    "bio": "Bioimmunity",
-    "total": "Total Immunity",
-    "shock": "Shock Immunity",
-};
-
-var ch_names = {
-    1: "CH: Mimetism",
-    2: "CH: Camouflage",
-    3: "CH: TO Camo",
-};
-
-var odd_names = {
-    1: "ODD",
-    2: "ODF",
-};
-
 function ch_mod(unit){
     if(unit["ch"] == 1){
         return -3;
@@ -469,15 +431,7 @@ function set_unit(player, check_params){
 
         // list of skills
         var skills = document.getElementById(player + ".statline_skills");
-        skills.innerHTML = "";
-        append_leveled_skill(skills, unit["ikohl"] / -3, "I-Kohl");
-        append_leveled_skill(skills, unit["hyperdynamics"] / 3, "Hyperdynamics");
-        append_leveled_skill(skills, unit["msv"], "Multispectral Visor");
-        append_skill(skills, unit["nwi"], "V: No Wound Incapacitation");
-        append_skill(skills, unit["shasvastii"], "Shasvastii");
-        append_named_skill(skills, unit["immunity"], immunity_names);
-        append_named_skill(skills, unit["ch"], ch_names);
-        append_named_skill(skills, unit["odd"], odd_names);
+        skills.innerHTML = unit["skills"].join(", ");
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");
