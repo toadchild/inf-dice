@@ -87,15 +87,25 @@ sub has_camo{
 
     for my $spec (@{$unit->{spec}}){
         if($spec =~ m/CH: Mimetism/){
-            return -3;
+            return 1;
         }elsif($spec =~ m/CH: Camo/){
-            return -3;
+            return 2;
         }elsif($spec =~ m/CH: TO Camo/){
-            return -6;
-        }elsif($spec =~ m/ODD:/){
-            return -6;
+            return 3;
+        }
+    }
+
+    return 0;
+}
+
+sub has_odd{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/ODD:/){
+            return 1;
         }elsif($spec =~ m/ODF:/){
-            return -6;
+            return 2;
         }
     }
 
@@ -216,6 +226,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $new_unit->{immunity} = has_immunity($unit);
         $new_unit->{hyperdynamics} = has_hyperdynamics($unit);
         $new_unit->{ch} = has_camo($unit);
+        $new_unit->{odd} = has_odd($unit);
         $new_unit->{type} = $unit->{type};
 
         if(defined($faction) && $faction ne $unit->{army}){

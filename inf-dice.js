@@ -379,12 +379,64 @@ function get_unit_data(player){
     }
 }
 
+function append_skill(skills, flag, name){
+    if(flag){
+        if(skills.innerHTML.length > 0){
+            skills.innerHTML += ", ";
+        }
+        skills.innerHTML += name;
+    }
+}
+
+function append_leveled_skill(skills, level, name){
+    if(level){
+        append_skill(skills, 1, name + " L " + level);
+    }
+}
+
+function append_named_skill(skills, key, lookup){
+    if(key){
+        append_skill(skills, 1, lookup[key]);
+    }
+}
+
+var immunity_names = {
+    "bio": "Bioimmunity",
+    "total": "Total Immunity",
+    "shock": "Shock Immunity",
+};
+
+var ch_names = {
+    1: "CH: Mimetism",
+    2: "CH: Camouflage",
+    3: "CH: TO Camo",
+};
+
+var odd_names = {
+    1: "ODD",
+    2: "ODF",
+};
+
+function ch_mod(unit){
+    if(unit["ch"] == 1){
+        return -3;
+    }else if(unit["ch"] == 2){
+        return -3;
+    }else if(unit["ch"] == 3){
+        return -6;
+    }else if(unit["odd"]){
+        return -6;
+    }
+    return 0;
+}
+
 function set_unit(player, check_params){
     var unit = get_unit_data(player);
 
     // set all attributes from this unit
     if(unit){
         disable_display(player + ".attributes");
+        enable_display(player + ".statline");
 
         document.getElementsByName(player + ".bs")[0].value = unit["bs"];
         document.getElementsByName(player + ".ph")[0].value = unit["ph"];
@@ -398,13 +450,36 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".immunity")[0].value = unit["immunity"];
         document.getElementsByName(player + ".hyperdynamics")[0].value = unit["hyperdynamics"];
         document.getElementsByName(player + ".dodge_unit")[0].value = unit["dodge_unit"];
-        document.getElementsByName(player + ".ch")[0].value = unit["ch"];
+        document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
+
+        // Update the mini statline display
+        document.getElementById(player + ".statline_type").innerHTML = unit["type"];
+        document.getElementById(player + ".statline_cc").innerHTML = unit["cc"];
+        document.getElementById(player + ".statline_bs").innerHTML = unit["bs"];
+        document.getElementById(player + ".statline_ph").innerHTML = unit["ph"];
+        document.getElementById(player + ".statline_wip").innerHTML = unit["wip"];
+        document.getElementById(player + ".statline_arm").innerHTML = unit["arm"];
+        document.getElementById(player + ".statline_bts").innerHTML = unit["bts"];
+        document.getElementById(player + ".statline_w").innerHTML = unit["w"];
+        document.getElementById(player + ".statline_w_type").innerHTML = unit["w_type"];
+
+        // list of skills
+        var skills = document.getElementById(player + ".statline_skills");
+        skills.innerHTML = "";
+        append_leveled_skill(skills, unit["ikohl"] / -3, "I-Kohl");
+        append_leveled_skill(skills, unit["hyperdynamics"] / 3, "Hyperdynamics");
+        append_skill(skills, unit["nwi"], "V: No Wound Incapacitation");
+        append_skill(skills, unit["shasvastii"], "Shasvastii");
+        append_named_skill(skills, unit["immunity"], immunity_names);
+        append_named_skill(skills, unit["ch"], ch_names);
+        append_named_skill(skills, unit["odd"], odd_names);
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");
+        disable_display(player + ".statline");
     }
 
     populate_weapons(player, check_params);

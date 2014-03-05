@@ -134,3 +134,26 @@ h2 {
 th {
     text-align: center;
 }
+
+.statline {
+    margin-left: 2em;
+}
+
+.statline .skills {
+    font-style: italic;
+    font-size: 90%;
+}
+
+.statline table {
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.statline th {
+    border: 1px solid black;
+    width: 2em;
+}
+
+.statline td {
+    border: 1px solid black;
+}

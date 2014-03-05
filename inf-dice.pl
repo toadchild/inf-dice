@@ -209,19 +209,17 @@ sub print_input_attack_section{
               -label => 'Unit',
           );
 
-    print "<div class='action'>
-          <h3>Action</h3>",
-
-          popup_menu(-name => "$player.action",
-              -values => $action,
-              -default => param("$player.action") // '',
-              -labels => $action_labels,
-              -onchange => "set_action('$player')",
-          ),
+    print "<div id='$player.statline' class='statline'>",
+          "<table>",
+          "<tr><th>Type</th><th>CC</th><th>BS</th><th>PH</th><th>WIP</th><th>ARM</th><th>BTS</th><th id='$player.statline_w_type'>W</th></tr>",
+          "<tr><td id='$player.statline_type'></td><td id='$player.statline_cc'></td><td id='$player.statline_bs'></td><td id='$player.statline_ph'></td><td id='$player.statline_wip'></td><td id='$player.statline_arm'></td><td id='$player.statline_bts'></td><td id='$player.statline_w'></td></tr>",
+          "</table>",
+          "<div>Skills/Equipment:</div>",
+          "<div id='$player.statline_skills' class='skills'></div>",
           "</div>\n";
 
     print "<div id='$player.attributes' style='display: none;'>\n",
-          "<h3>Model Attributes</h3>\n",
+          "<h4>Model Attributes</h4>\n",
           span_popup_menu(-name => "$player.bs",
               -values => [1 .. 22],
               -default => param("$player.bs") // 11,
@@ -254,7 +252,7 @@ sub print_input_attack_section{
               -label => "BTS",
           ),
           "<br>",
-          "<h3>Wounds</h3>",
+          "<h4>Wounds</h4>",
           span_popup_menu(-name => "$player.w",
               -values => [1 .. 4],
               -default => param("$player.w") // '',
@@ -283,7 +281,7 @@ sub print_input_attack_section{
               -label => 'Shasvastii Spawn-Embryo',
           ),
           "<br>",
-          "<h3>Special Skills and Equipment</h3>",
+          "<h4>Special Skills and Equipment</h4>",
           span_popup_menu(-name => "$player.immunity",
               -values => $immunity,
               -default => param("$player.immunity") // '',
@@ -310,6 +308,17 @@ sub print_input_attack_section{
               -default => param("$player.ikohl") // '',
               -labels => $ikohl_labels,
               -label => "i-Kohl",
+          ),
+          "</div>\n";
+
+    print "<div class='action'>
+          <h3>Action</h3>",
+
+          popup_menu(-name => "$player.action",
+              -values => $action,
+              -default => param("$player.action") // '',
+              -labels => $action_labels,
+              -onchange => "set_action('$player')",
           ),
           "</div>\n";
 
