@@ -153,6 +153,14 @@ my $hyperdynamics_labels = {
     9 => 'Level 3 (+9 PH to Dodge)',
 };
 
+my $msv = [0, 1, 2, 3];
+my $msv_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+    3 => 'Level 3',
+};
+
 my $factions = [
     'Aleph',
     'Ariadna',
@@ -309,6 +317,20 @@ sub print_input_attack_section{
               -labels => $ikohl_labels,
               -label => "i-Kohl",
           ),
+          "<br>",
+          span_popup_menu(-name => "$player.ch",
+              -values => $ch,
+              -default => param("$player.ch") // '',
+              -labels => $ch_labels,
+              -label => "Camo",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.msv",
+              -values => $msv,
+              -default => param("$player.msv") // '',
+              -labels => $msv_labels,
+              -label => "Multispectral Visor",
+          ),
           "</div>\n";
 
     print "<div class='action'>
@@ -347,7 +369,7 @@ sub print_input_attack_section{
           );
 
     print "<div class='modifiers'>
-           <h3>Skill Modifiers</h3>",
+           <h3>Shooting Modifiers</h3>",
            span_popup_menu(-name => "$player.range",
                -values => $range,
                -default => param("$player.range") // 0,
@@ -368,6 +390,11 @@ sub print_input_attack_section{
                -labels => $viz_labels,
                -label => "Visibility Penalty",
            ),
+           "<br>",
+           span_checkbox(-name => "$player.cover",
+               -checked => defined(param("$player.cover")),
+               -value => 3,
+               -label => 'Cover (+3 ARM, -3 Opponent BS)'),
            "<h3>CC Modifiers</h3>",
            span_popup_menu(-name => "$player.gang_up",
                -values => $gang_up,
@@ -380,19 +407,6 @@ sub print_input_attack_section{
                -checked => defined(param("$player.berserk")),
                -value => 3,
                -label => 'Berserk (+9 CC, Normal Rolls)'),
-           "<h3>Defensive Modifiers</h3>",
-           span_checkbox(-name => "$player.cover",
-               -checked => defined(param("$player.cover")),
-               -value => 3,
-               -label => 'Cover (+3 ARM, -3 Opponent BS)'),
-           "<br>",
-           span_popup_menu(-name => "$player.ch",
-               -values => $ch,
-               -default => param("$player.ch") // '',
-               -labels => $ch_labels,
-               -label => "Camo",
-           ),
-
            "</div>\n";
 }
 
@@ -702,17 +716,25 @@ sub gen_attack_args{
     my $action = param("$us.action");
     if($action eq 'bs' || $action eq 'throw'){
         # BS mods
-        $stat += (param("$them.ch") // 0) - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
-        $stat = max($stat, 0);
-
-        $b = (param("$us.b") // 1) + $link_b;
-        $arm += $cover;
+        my $camo = param("$them.ch") // 0;
+        my $msv = param("$us.msv") // 0;
+        if($msv >= 1 && $camo >= -3){
+            $camo = 0;
+        }elsif($msv >= 2 && $camo >= -6){
+            $camo = 0;
+        }
 
         if($action eq 'throw'){
             $stat = param("$us.ph") // 0;
         }else{
             $stat = param("$us.bs") // 0;
         }
+
+        $stat += $camo - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
+        $stat = max($stat, 0);
+
+        $b = (param("$us.b") // 1) + $link_b;
+        $arm += $cover;
     }elsif($action eq 'dtw'){
         # DTW mods
         $stat = 'T';

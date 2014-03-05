@@ -454,6 +454,7 @@ function set_unit(player, check_params){
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
+        document.getElementsByName(player + ".msv")[0].value = unit["msv"];
 
         // Update the mini statline display
         document.getElementById(player + ".statline_type").innerHTML = unit["type"];
@@ -471,6 +472,7 @@ function set_unit(player, check_params){
         skills.innerHTML = "";
         append_leveled_skill(skills, unit["ikohl"] / -3, "I-Kohl");
         append_leveled_skill(skills, unit["hyperdynamics"] / 3, "Hyperdynamics");
+        append_leveled_skill(skills, unit["msv"], "Multispectral Visor");
         append_skill(skills, unit["nwi"], "V: No Wound Incapacitation");
         append_skill(skills, unit["shasvastii"], "Shasvastii");
         append_named_skill(skills, unit["immunity"], immunity_names);

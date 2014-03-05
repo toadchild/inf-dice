@@ -112,6 +112,18 @@ sub has_odd{
     return 0;
 }
 
+sub has_msv{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Multispectral.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
 sub dodge_unit{
     my ($unit) = @_;
 
@@ -228,6 +240,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $new_unit->{ch} = has_camo($unit);
         $new_unit->{odd} = has_odd($unit);
         $new_unit->{type} = $unit->{type};
+        $new_unit->{msv} = has_msv($unit);
 
         if(defined($faction) && $faction ne $unit->{army}){
             die "Mismatched faction in $unit->name: $faction != $unit->army";
