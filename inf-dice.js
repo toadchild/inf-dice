@@ -291,6 +291,7 @@ function set_action(player){
 
 function set_weapon(player, check_params){
     // Set ammo types based on the selected weapon
+    var stat_list = document.getElementsByName(player + ".stat")[0];
     var ammo_list = document.getElementsByName(player + ".ammo")[0];
     var dam_list = document.getElementsByName(player + ".dam")[0];
     var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
@@ -307,11 +308,16 @@ function set_weapon(player, check_params){
             }
         }
 
+        // Stat used
+        stat_list.length = 0;
+        stat_list.options[stat_list.options.length] = new Option(weapon["stat"]);
+
         dam_list.length = 0;
         dam_list.options[0] = new Option(weapon["dam"]);
     }else{
         // Custom weapon
         // set default values
+        ammo_list.length = 0;
         for(var i = 0; i < ammos.length; i++){
             ammo_list.options[ammo_list.options.length] = new Option(ammos[i]);
 
@@ -326,6 +332,15 @@ function set_weapon(player, check_params){
 
             if(check_params && dam_list.options[i].value == params[player + ".dam"]){
                 dam_list.options[i].selected = true;
+            }
+        }
+
+        stat_list.length = 0;
+        for(var i = 0; i < stats.length; i++){
+            stat_list.options[stat_list.options.length] = new Option(stats[i]);
+
+            if(check_params && stats[i] == params[player + ".stat"]){
+                stat_list.options[stat_list.options.length - 1].selected = true;
             }
         }
     }
@@ -510,5 +525,5 @@ function raw_output(){
 }
 
 // TODO need a good way to keep this in sync with perl
-var damages = ['PH-2', 'PH', 10, 11, 12, 13, 14, 15];
-
+var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
+var stats = ["BS", "PH", "WIP"];

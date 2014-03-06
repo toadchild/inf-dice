@@ -30,10 +30,9 @@ Content-Type: text/html; charset=utf-8
 EOF
 }
 
-my $action = ['bs', 'throw', 'dtw', 'cc', 'dodge', 'none'];
+my $action = ['bs', 'dtw', 'cc', 'dodge', 'none'];
 my $action_labels = {
-    bs => 'Attack - Shoot (Roll against BS)',
-    throw => 'Attack - Thrown Weapon (Roll against PH)',
+    bs => 'Attack - Shoot (Roll against BS, PH, or WIP)',
     cc => 'Attack - Close Combat (Roll against CC)',
     dtw => 'Attack - Direct Template Weapon (Automaticall hits)',
     dodge => 'Dodge (Roll against PH)',
@@ -352,6 +351,10 @@ sub print_input_attack_section{
               -label => 'Weapon',
           ),
           "<br>",
+          span_popup_menu(-name => "$player.stat",
+              -default => param("$player.stat") // '',
+              -label => "Stat",
+          ),
           span_popup_menu(-name => "$player.ammo",
               -values => $ammo,
               -default => param("$player.ammo") // '',
@@ -716,7 +719,7 @@ sub gen_attack_args{
     }
 
     my $action = param("$us.action");
-    if($action eq 'bs' || $action eq 'throw'){
+    if($action eq 'bs'){
         # BS mods
         my $camo = param("$them.ch") // 0;
         my $msv = param("$us.msv") // 0;
@@ -726,13 +729,11 @@ sub gen_attack_args{
             $camo = 0;
         }
 
-        if($action eq 'throw'){
-            $stat = param("$us.ph") // 0;
-        }else{
-            $stat = param("$us.bs") // 0;
-        }
+        # look up stat to use
+        $stat = lc(param("$us.stat") // 'bs');
+        $stat = param("$us.$stat") // 0;
 
-        $stat += $camo - $cover + (param("$us.range") // 0) + (param("$us.viz") // 0) + $link_bs;
+        $stat += $camo - $cover + (param("$us.range") // 0) + (param("$us.viz")) + $link_bs;
         $stat = max($stat, 0);
 
         $b = (param("$us.b") // 1) + $link_b;

@@ -124,6 +124,36 @@ sub has_msv{
     return 0;
 }
 
+sub has_fo{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Forward Observer/){
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_hacker{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Hacking Device Plus/){
+            return 3;
+        }
+        if($spec =~ m/Defensive Hacking Device/){
+            return 1;
+        }
+        if($spec =~ m/Hacking Device/){
+            return 2;
+        }
+    }
+
+    return 0;
+}
+
 sub dodge_unit{
     my ($unit) = @_;
 
@@ -160,6 +190,11 @@ sub get_weapons{
 
         if($specialist && !has_msv($child)){
             next;
+        }
+
+        # All forward observers and HD+ have Flash Pulse inclusive
+        if(has_fo($child) || has_hacker($child) >= 3){
+            $weapons->{'Flash Pulse'} = 1;
         }
 
         for my $w (@{$child->{bsw}}){
