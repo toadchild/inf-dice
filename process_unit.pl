@@ -98,6 +98,12 @@ sub has_camo{
     return 0;
 }
 
+my $camo_names = {
+    1 => 'Mimetism',
+    2 => 'Camo',
+    3 => 'TO Camo',
+};
+
 sub has_odd{
     my ($unit) = @_;
 
@@ -118,6 +124,18 @@ sub has_msv{
     for my $spec (@{$unit->{spec}}){
         if($spec =~ m/Multispectral.*(\d)/){
             return $1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_xvisor{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/X Visor/){
+            return 1;
         }
     }
 
@@ -171,7 +189,7 @@ sub dodge_unit{
 }
 
 sub get_weapons{
-    my ($unit, $specialist) = @_;
+    my ($unit, $ability_func) = @_;
     my $weapons = {};
 
     for my $w (@{$unit->{bsw}}){
@@ -183,12 +201,13 @@ sub get_weapons{
     }
     
     for my $child (@{$unit->{childs}}){
-        # Keep specialists separate
-        if(!$specialist && has_msv($child)){
+        # Keep specialists out of normal circulation
+        if(!$ability_func && (has_msv($child) || has_camo($child) || has_xvisor($child))){
             next;
         }
 
-        if($specialist && !has_msv($child)){
+        # select only the special children otherwise
+        if($ability_func && !&$ability_func($child)){
             next;
         }
 
@@ -311,15 +330,39 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         push @unit_list, $new_unit;
 
         # Check for child units with special skills we care about
-        # TODO add Camo; TO Spec Sergeant
         my $msv = $new_unit->{msv};
         for my $child (@{$unit->{childs}}){
             if(!$msv && ($msv = has_msv($child))){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " (MSV $msv)";
                 $child_unit->{msv} = $msv;
-                $child_unit->{weapons} = get_weapons($unit, 1);
-                push @{$child_unit->{skills}}, "Multispectral Visor L$msv";
+                $child_unit->{weapons} = get_weapons($unit, \&has_msv);
+                push @{$child_unit->{skills}}, @{$child->{spec}};
+
+                push @unit_list, $child_unit;
+            }
+        }
+
+        my $ch = $new_unit->{ch};
+        for my $child (@{$unit->{childs}}){
+            if(!$ch && ($ch = has_camo($child))){
+                my $child_unit = clone($new_unit);
+                $child_unit->{name} .= " ($camo_names->{$ch})";
+                $child_unit->{ch} = $ch;
+                $child_unit->{weapons} = get_weapons($unit, \&has_camo);
+                push @{$child_unit->{skills}}, @{$child->{spec}};
+
+                push @unit_list, $child_unit;
+            }
+        }
+
+        my $xvisor = has_xvisor($new_unit);
+        for my $child (@{$unit->{childs}}){
+            if(!$xvisor && ($xvisor = has_xvisor($child))){
+                my $child_unit = clone($new_unit);
+                $child_unit->{name} .= " (X Visor)";
+                $child_unit->{weapons} = get_weapons($unit, \&has_xvisor);
+                push @{$child_unit->{skills}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
             }
