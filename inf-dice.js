@@ -302,10 +302,10 @@ function set_weapon(player, check_params){
         // Ammo types
         ammo_list.length = 0;
         for(var i = 0; i < weapon["ammo"].length; i++){
-            ammo_list.options[ammo_list.options.length] = new Option(weapon["ammo"][i]);
+            ammo_list.options[i] = new Option(weapon["ammo"][i]);
 
             if(check_params && weapon["ammo"][i] == params[player + ".ammo"]){
-                ammo_list.options[ammo_list.options.length - 1].selected = true;
+                ammo_list.options[i].selected = true;
             }
         }
 
@@ -315,7 +315,7 @@ function set_weapon(player, check_params){
         if(action == "cc"){
             stat = "CC";
         }
-        stat_list.options[stat_list.options.length] = new Option(stat);
+        stat_list.options[0] = new Option(stat);
 
         dam_list.length = 0;
         dam_list.options[0] = new Option(weapon["dam"]);
@@ -324,16 +324,16 @@ function set_weapon(player, check_params){
         // set default values
         ammo_list.length = 0;
         for(var i = 0; i < ammos.length; i++){
-            ammo_list.options[ammo_list.options.length] = new Option(ammos[i]);
+            ammo_list.options[i] = new Option(ammos[i]);
 
             if(check_params && ammos[i] == params[player + ".ammo"]){
-                ammo_list.options[ammo_list.options.length - 1].selected = true;
+                ammo_list.options[i].selected = true;
             }
         }
 
         dam_list.length = 0;
         for(var i = 0; i < damages.length; i++){
-            dam_list.options[dam_list.options.length] = new Option(damages[i]);
+            dam_list.options[i] = new Option(damages[i]);
 
             if(check_params && dam_list.options[i].value == params[player + ".dam"]){
                 dam_list.options[i].selected = true;
@@ -342,13 +342,13 @@ function set_weapon(player, check_params){
 
         stat_list.length = 0;
         if(action == "cc"){
-            stat_list.options[stat_list.options.length] = new Option("CC");
+            stat_list.options[0] = new Option("CC");
         }else{
             for(var i = 0; i < stats.length; i++){
-                stat_list.options[stat_list.options.length] = new Option(stats[i]);
+                stat_list.options[i] = new Option(stats[i]);
 
                 if(check_params && stats[i] == params[player + ".stat"]){
-                    stat_list.options[stat_list.options.length - 1].selected = true;
+                    stat_list.options[i].selected = true;
                 }
             }
         }
