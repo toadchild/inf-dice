@@ -137,6 +137,8 @@ th {
 
 .statline table {
     margin-left: 2em;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .statline .skills {
