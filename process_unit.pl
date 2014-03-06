@@ -228,6 +228,40 @@ sub unit_sort{
     return $a->{name} cmp $b->{name};
 }
 
+sub parse_unit{
+    my ($new_unit, $unit) = @_;
+
+    # Stats
+    $new_unit->{name} = $unit->{name};
+    $new_unit->{bs} = $unit->{bs} if defined $unit->{bs};
+    $new_unit->{ph} = $unit->{ph} if defined $unit->{ph};
+    $new_unit->{cc} = $unit->{cc} if defined $unit->{cc};
+    $new_unit->{wip} = $unit->{wip} if defined $unit->{wip};
+    $new_unit->{arm} = $unit->{arm} if defined $unit->{arm};
+    $new_unit->{bts} = $unit->{bts} if defined $unit->{bts};
+    $new_unit->{w} = $unit->{w} if defined $unit->{w};
+    $new_unit->{type} = $unit->{type} if defined $unit->{type} && $unit->{type} ne ' ';
+    $new_unit->{w_type} = uc($unit->{wtype} // $default_wtype{$new_unit->{type}});
+    $new_unit->{skills} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
+
+    # Modifiers
+    $new_unit->{dodge_unit} = dodge_unit($new_unit);
+    $new_unit->{nwi} = has_nwi($new_unit);
+    $new_unit->{shasvastii} = has_shasvastii($new_unit);
+    $new_unit->{ikohl} = has_ikohl($new_unit);
+    $new_unit->{immunity} = has_immunity($new_unit);
+    $new_unit->{hyperdynamics} = has_hyperdynamics($new_unit);
+    $new_unit->{ch} = has_camo($new_unit);
+    $new_unit->{odd} = has_odd($new_unit);
+    $new_unit->{msv} = has_msv($new_unit);
+
+    # get_weapons goes into the childs list; needs $unit instead of $new_unit
+    my $weapons = get_weapons($unit);
+    if(@$weapons){
+        $new_unit->{weapons} = $weapons;
+    }
+}
+
 my $unit_data = {};
 my $file;
 for my $fname (glob "ia-data/ia-data_*_units_data.json"){
@@ -267,30 +301,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         }
 
         my $new_unit = {};
-        # Stats
-        $new_unit->{name} = $unit->{name};
-        $new_unit->{bs} = $unit->{bs};
-        $new_unit->{ph} = $unit->{ph};
-        $new_unit->{cc} = $unit->{cc};
-        $new_unit->{wip} = $unit->{wip};
-        $new_unit->{arm} = $unit->{arm};
-        $new_unit->{bts} = $unit->{bts};
-        $new_unit->{w_type} = uc($unit->{wtype} // $default_wtype{$unit->{type}});
-        $new_unit->{w} = $unit->{w};
-        $new_unit->{type} = $unit->{type};
-        $new_unit->{skills} = $unit->{spec};
-
-        # Modifiers
-        $new_unit->{dodge_unit} = dodge_unit($unit);
-        $new_unit->{nwi} = has_nwi($unit);
-        $new_unit->{shasvastii} = has_shasvastii($unit);
-        $new_unit->{weapons} = get_weapons($unit);
-        $new_unit->{ikohl} = has_ikohl($unit);
-        $new_unit->{immunity} = has_immunity($unit);
-        $new_unit->{hyperdynamics} = has_hyperdynamics($unit);
-        $new_unit->{ch} = has_camo($unit);
-        $new_unit->{odd} = has_odd($unit);
-        $new_unit->{msv} = has_msv($unit);
+        parse_unit($new_unit, $unit);
 
         if(defined($faction) && $faction ne $unit->{army}){
             die "Mismatched faction in $unit->name: $faction != $unit->army";
@@ -300,17 +311,34 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         push @unit_list, $new_unit;
 
         # Check for child units with special skills we care about
+        # TODO add Camo; TO Spec Sergeant
         my $msv = $new_unit->{msv};
         for my $child (@{$unit->{childs}}){
             if(!$msv && ($msv = has_msv($child))){
-                $new_unit = clone($new_unit);
-                $new_unit->{name} .= " (MSV $msv)";
-                $new_unit->{msv} = $msv;
-                $new_unit->{weapons} = get_weapons($unit, 1);
-                push @{$new_unit->{skills}}, "Multispectral Visor L$msv";
+                my $child_unit = clone($new_unit);
+                $child_unit->{name} .= " (MSV $msv)";
+                $child_unit->{msv} = $msv;
+                $child_unit->{weapons} = get_weapons($unit, 1);
+                push @{$child_unit->{skills}}, "Multispectral Visor L$msv";
 
-                push @unit_list, $new_unit;
+                push @unit_list, $child_unit;
             }
+        }
+
+        # Check for alternate profiles
+        for my $alt (@{$unit->{altp}}){
+            my $alt_unit = clone($new_unit);
+
+            # stats replace if present, otherwise inherit
+            parse_unit($alt_unit, $alt);
+
+            my $alt_tag = $alt->{isc};
+            if($alt_tag !~ m/\(/){
+                $alt_tag = "($alt_tag)";
+            }
+            $alt_unit->{name} = "$new_unit->{name} $alt_tag";
+
+            push @unit_list, $alt_unit;
         }
     }
     $unit_data->{$faction} = [sort unit_sort @unit_list];
