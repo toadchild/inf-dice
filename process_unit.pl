@@ -256,6 +256,12 @@ sub unit_sort{
 sub parse_unit{
     my ($new_unit, $unit) = @_;
 
+    # Seed Embryos do not inherit their parent profile's weapons
+    my $no_weapon = 0;
+    if($new_unit->{shasvastii}){
+        $no_weapon = 1;
+    }
+
     # Stats
     $new_unit->{name} = $unit->{name};
     $new_unit->{bs} = $unit->{bs} if defined $unit->{bs};
@@ -284,6 +290,8 @@ sub parse_unit{
     my $weapons = get_weapons($unit);
     if(@$weapons){
         $new_unit->{weapons} = $weapons;
+    }elsif($no_weapon){
+        $new_unit->{weapons} = [];
     }
 }
 
