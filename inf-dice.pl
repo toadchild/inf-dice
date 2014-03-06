@@ -42,7 +42,7 @@ my $action_labels = {
 
 my $burst = [1, 2, 3, 4, 5];
 
-my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'AP+Shock', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'Flash', 'E/M', 'E/M2', 'Swarm', 'Smoke', 'Zero-V Smoke'];
+my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'AP+Shock', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'Adhesive', 'Flash', 'E/M', 'E/M2', 'Swarm', 'Smoke', 'Zero-V Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
     Shock => {code => 'N', fatal => 1},
@@ -64,6 +64,7 @@ my $ammo_codes = {
     'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
     'Smoke' => {code => '-', cover => 0},
     'Zero-V Smoke' => {code => '-', cover => 0},
+    'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized'},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -696,6 +697,7 @@ sub gen_attack_args{
         $save = $code->{save} // 'arm';
         $ammo = $code->{code};
     }
+
     $arm = ceil(abs(param("$them.$save") // 0) * $ap);
     $dam = param("$us.dam") // 0;
     $ignore_cover = $code->{cover} // 1;
@@ -757,10 +759,17 @@ sub gen_attack_args{
         $stat = param("$us.cc") // 0;
     }
 
+    if(!$code->{alt_save}){
+        $dam = max($dam - $arm, 0);
+    }else{
+        # Adhesive makes a PH saving throw instead of DAM - ARM check
+        $dam = 20 - max(param("$them.$code->{alt_save}") + $code->{alt_save_mod}, 0);
+    }
+
     return (
         $stat,
         $b,
-        max($dam - $arm, 0),
+        $dam,
         $ammo,
     );
 }
