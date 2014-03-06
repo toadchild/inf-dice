@@ -862,7 +862,7 @@
   "cc": "No",
   "damage": "13",
   "em_vul": "No",
-  "long_dist": "24",
+  "long_dist": "32",
   "long_mod": "-3",
   "max_dist": "48",
   "max_mod": "-6",
@@ -1417,7 +1417,7 @@
   "template": "No"
  },
  {
-  "ammo": "AP+DA",
+  "ammo": "AP+Shock",
   "burst": "--",
   "cc": "Yes",
   "damage": "PH",

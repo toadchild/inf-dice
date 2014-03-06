@@ -26,11 +26,6 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             next;
         }
 
-        # Fix weapon
-        if($weapon->{name} eq 'Templar CCW'){
-            $weapon->{ammo} = 'AP+Shock';
-        }
-
         # Multiple ammo types and burst reduction
         my $multi = 0;
         if($weapon->{name} =~ m/MULTI/){

@@ -32,3 +32,6 @@ weapon_data.js: process_weapon.pl ia-data/*
 install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice.js inf-dice.css inf-dice.pl ${WWW_TARGETS} ${WWWDIR}
 	cp inf-dice ${BINDIR}
+
+update_data:
+	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/data/
