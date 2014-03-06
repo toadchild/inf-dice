@@ -524,6 +524,5 @@ function raw_output(){
     toggle_display("raw_output");
 }
 
-// TODO need a good way to keep this in sync with perl
 var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
 var stats = ["BS", "PH", "WIP"];

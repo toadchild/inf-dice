@@ -39,9 +39,6 @@ my $action_labels = {
     none => 'No Action',
 };
 
-my $burst = [1, 2, 3, 4, 5];
-
-my $ammo = ['Normal', 'Shock', 'AP', 'DA', 'EXP', 'AP+DA', 'AP+EXP', 'AP+Shock', 'Fire', 'Viral', 'T2', 'Monofilament', 'K1', 'Nanotech', 'Adhesive', 'Flash', 'E/M', 'E/M2', 'Swarm', 'Smoke', 'Zero-V Smoke'];
 my $ammo_codes = {
     Normal => {code => 'N'},
     Shock => {code => 'N', fatal => 1},
@@ -346,29 +343,21 @@ sub print_input_attack_section{
 
     print "<h3>Weapon</h3>",
           span_popup_menu(-name => "$player.weapon",
-              -default => param("$player.weapon") // '',
               -onchange => "set_weapon('$player')",
               -label => 'Weapon',
           ),
           "<br>",
           span_popup_menu(-name => "$player.stat",
-              -default => param("$player.stat") // '',
               -label => "Stat",
           ),
           span_popup_menu(-name => "$player.ammo",
-              -values => $ammo,
-              -default => param("$player.ammo") // '',
               -onchange => "set_ammo('$player')",
               -label => "Ammo",
           ),
           span_popup_menu(-name => "$player.b",
-              -values => $burst,
-              -default => param("$player.b") // '',
               -label => "B",
           ),
           span_popup_menu(-name => "$player.dam",
-              -values => ['PH-2', 'PH', 10 .. 15],
-              -default => param("$player.dam") // 13,
               -label => 'DAM',
           );
 
