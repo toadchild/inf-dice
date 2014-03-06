@@ -379,6 +379,8 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
 
         # Check for alternate profiles
         for my $alt (@{$unit->{altp}}){
+            next if $alt->{isc} eq 'CrazyKoala';
+
             my $alt_unit = clone($new_unit);
 
             # stats replace if present, otherwise inherit
