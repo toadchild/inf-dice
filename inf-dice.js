@@ -295,6 +295,7 @@ function set_weapon(player, check_params){
     var ammo_list = document.getElementsByName(player + ".ammo")[0];
     var dam_list = document.getElementsByName(player + ".dam")[0];
     var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
+    var action = document.getElementsByName(player + ".action")[0].value;
     var weapon = weapon_data[weapon_name];
 
     if(weapon){
@@ -310,7 +311,11 @@ function set_weapon(player, check_params){
 
         // Stat used
         stat_list.length = 0;
-        stat_list.options[stat_list.options.length] = new Option(weapon["stat"]);
+        var stat = weapon["stat"];
+        if(action == "cc"){
+            stat = "CC";
+        }
+        stat_list.options[stat_list.options.length] = new Option(stat);
 
         dam_list.length = 0;
         dam_list.options[0] = new Option(weapon["dam"]);
@@ -336,11 +341,15 @@ function set_weapon(player, check_params){
         }
 
         stat_list.length = 0;
-        for(var i = 0; i < stats.length; i++){
-            stat_list.options[stat_list.options.length] = new Option(stats[i]);
+        if(action == "cc"){
+            stat_list.options[stat_list.options.length] = new Option("CC");
+        }else{
+            for(var i = 0; i < stats.length; i++){
+                stat_list.options[stat_list.options.length] = new Option(stats[i]);
 
-            if(check_params && stats[i] == params[player + ".stat"]){
-                stat_list.options[stat_list.options.length - 1].selected = true;
+                if(check_params && stats[i] == params[player + ".stat"]){
+                    stat_list.options[stat_list.options.length - 1].selected = true;
+                }
             }
         }
     }
