@@ -257,9 +257,10 @@ sub parse_unit{
     my ($new_unit, $unit) = @_;
 
     # Seed Embryos do not inherit their parent profile's weapons
-    my $no_weapon = 0;
+    my ($no_weapon, $inherit_shasvastii) = (0, 0);
     if($new_unit->{shasvastii}){
         $no_weapon = 1;
+        $inherit_shasvastii = 1;
     }
 
     # Stats
@@ -278,7 +279,7 @@ sub parse_unit{
     # Modifiers
     $new_unit->{dodge_unit} = dodge_unit($unit);
     $new_unit->{nwi} = has_nwi($unit);
-    $new_unit->{shasvastii} = has_shasvastii($unit);
+    $new_unit->{shasvastii} = has_shasvastii($unit) || $inherit_shasvastii;
     $new_unit->{ikohl} = has_ikohl($unit);
     $new_unit->{immunity} = has_immunity($unit);
     $new_unit->{hyperdynamics} = has_hyperdynamics($unit);
