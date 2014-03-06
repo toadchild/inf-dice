@@ -211,6 +211,12 @@ sub get_weapons{
             next;
         }
 
+        # only read in each child once
+        if($child->{_processed}){
+            next;
+        }
+        $child->{_processed} = 1;
+
         # All forward observers and HD+ have Flash Pulse inclusive
         if(has_fo($child) || has_hacker($child) >= 3){
             $weapons->{'Flash Pulse'} = 1;
@@ -332,6 +338,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         # Check for child units with special skills we care about
         my $msv = $new_unit->{msv};
         for my $child (@{$unit->{childs}}){
+            next if $child->{_processed};
             if(!$msv && ($msv = has_msv($child))){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " (MSV $msv)";
@@ -345,6 +352,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
 
         my $ch = $new_unit->{ch};
         for my $child (@{$unit->{childs}}){
+            next if $child->{_processed};
             if(!$ch && ($ch = has_camo($child))){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " ($camo_names->{$ch})";
@@ -358,6 +366,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
 
         my $xvisor = has_xvisor($new_unit);
         for my $child (@{$unit->{childs}}){
+            next if $child->{_processed};
             if(!$xvisor && ($xvisor = has_xvisor($child))){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " (X Visor)";
