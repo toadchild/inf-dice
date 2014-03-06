@@ -175,7 +175,7 @@ sub has_hacker{
 sub dodge_unit{
     my ($unit) = @_;
 
-    if($unit->{type} eq 'REM' || $unit->{type} eq 'TAG'){
+    if($unit->{type} && ($unit->{type} eq 'REM' || $unit->{type} eq 'TAG')){
         return -6;
     }
 
@@ -270,15 +270,15 @@ sub parse_unit{
     $new_unit->{skills} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
 
     # Modifiers
-    $new_unit->{dodge_unit} = dodge_unit($new_unit);
-    $new_unit->{nwi} = has_nwi($new_unit);
-    $new_unit->{shasvastii} = has_shasvastii($new_unit);
-    $new_unit->{ikohl} = has_ikohl($new_unit);
-    $new_unit->{immunity} = has_immunity($new_unit);
-    $new_unit->{hyperdynamics} = has_hyperdynamics($new_unit);
-    $new_unit->{ch} = has_camo($new_unit);
-    $new_unit->{odd} = has_odd($new_unit);
-    $new_unit->{msv} = has_msv($new_unit);
+    $new_unit->{dodge_unit} = dodge_unit($unit);
+    $new_unit->{nwi} = has_nwi($unit);
+    $new_unit->{shasvastii} = has_shasvastii($unit);
+    $new_unit->{ikohl} = has_ikohl($unit);
+    $new_unit->{immunity} = has_immunity($unit);
+    $new_unit->{hyperdynamics} = has_hyperdynamics($unit);
+    $new_unit->{ch} = has_camo($unit);
+    $new_unit->{odd} = has_odd($unit);
+    $new_unit->{msv} = has_msv($unit);
 
     # get_weapons goes into the childs list; needs $unit instead of $new_unit
     my $weapons = get_weapons($unit);
