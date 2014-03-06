@@ -262,6 +262,8 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
             $unit->{name} = 'Assault Pack Controller';
         }elsif($unit->{name} eq 'Highlander'){
             $unit->{name} = 'Highlander Galwegian';
+        }elsif($unit->{name} eq 'Morat'){
+            $unit->{name} = 'Vanguard';
         }
 
         my $new_unit = {};
