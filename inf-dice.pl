@@ -117,8 +117,8 @@ my $range_labels = {
 my $viz = ['0', '-3', '-6'];
 my $viz_labels = {
     0 => 'None',
-    -3 => '-3 BS',
-    -6 => '-6 BS',
+    -3 => 'Low Viz Zone (-3 BS)',
+    -6 => 'Zero Viz Zone (-6 BS)',
 };
 
 my $link = [0, 3, 5];
@@ -718,11 +718,18 @@ sub gen_attack_args{
             $camo = 0;
         }
 
+        my $viz = param("$us.viz") // 0;
+        if($msv >= 1 && $viz >= -3){
+            $viz = 0;
+        }elsif($msv >= 2 && $viz >= -6){
+            $viz = 0;
+        }
+
         # look up stat to use
         $stat = lc(param("$us.stat") // 'bs');
         $stat = param("$us.$stat") // 0;
 
-        $stat += $camo - $cover + (param("$us.range") // 0) + (param("$us.viz")) + $link_bs;
+        $stat += $camo - $cover + (param("$us.range") // 0) + $viz + $link_bs;
         $stat = max($stat, 0);
 
         $b = (param("$us.b") // 1) + $link_b;
