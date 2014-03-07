@@ -108,12 +108,19 @@ function set_ammo(player, check_params){
     if(weapon){
         for(var i = 0; i < weapon["ammo"].length; i++){
             if(ammo_name == weapon["ammo"][i]){
+                var b_selected;
                 for(var b = 1; b <= weapon["b"][i]; b++){
                     b_list.options[b_list.options.length] = new Option(b);
 
                     if(check_params && b == params[player + ".b"]){
                         b_list.options[b_list.options.length - 1].selected = true;
+                        b_selected = true;
                     }
+                }
+
+                if(!b_selected && player == "p1"){
+                    // Default to the highest burst for Player 1
+                    b_list.options[b_list.options.length - 1].selected = true;
                 }
                 break;
             }
