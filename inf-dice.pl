@@ -121,11 +121,12 @@ my $viz_labels = {
     -6 => 'Zero Viz Zone (-6 BS)',
 };
 
-my $link = [0, 3, 5];
+my $link = [0, 3, 5, -5];
 my $link_labels = {
     0 => 'None',
     3 => '3 (+1 B)',
     5 => '5 (+1 B, +3 BS)',
+    -5 => '5, Long Skill (+3 BS)',
 };
 
 my $dodge_unit = [0, -6];
@@ -671,7 +672,7 @@ sub gen_attack_args{
         $link_b = 1;
     }
 
-    if((param("$us.link") // 0) >= 5){
+    if((abs(param("$us.link") // 0)) >= 5){
         $link_bs = 3;
     }
 
