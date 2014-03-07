@@ -377,7 +377,6 @@ function populate_weapons(player, check_params){
 
     if(unit){
         for(var i = 0; i < unit.weapons.length; i++){
-            // TODO dual weaponry (2)
             var weapon = weapon_data[unit.weapons[i]];
             if(weapon && weapon[attack_filter]){
                 weapon_list.options[weapon_list.options.length] = new Option(weapon["name"]);

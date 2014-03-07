@@ -4,17 +4,21 @@ use strict;
 use warnings;
 
 use JSON::PP;
-use Data::Dumper;
+use Clone qw(clone);
 
 my $json = JSON::PP->new;
 $json->pretty(1);
 $json->canonical(1);
+local $/;
+
+open IN, '<', 'dual_weapons.dat' or die "Unable to open file";
+my $json_text = <IN>;
+my $dual_weapons = $json->decode($json_text);
 
 my $all_ammo = {};
 my $weapon_data = {};
 my $file;
 for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
-    local $/;
     my $json_text;
     open $file, '<', $fname or die "Unable to open file";
     $json_text = <$file>;
@@ -99,6 +103,18 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
         }
 
         $weapon_data->{$new_weapon->{name}} = $new_weapon;
+
+        # Increase burst for dual weapons
+        if($dual_weapons->{$new_weapon->{name}}){
+            $new_weapon = clone($new_weapon);
+
+            for(my $i = 0; $i < @{$new_weapon->{b}}; $i++){
+                $new_weapon->{b}[$i]++;
+            }
+            $new_weapon->{name} .= " (2)";
+
+            $weapon_data->{$new_weapon->{name}} = $new_weapon;
+        }
     }
 }
 

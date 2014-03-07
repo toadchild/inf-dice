@@ -23,10 +23,13 @@ hitbar.css: hitbar.pl
 hex.png: hexgrid.pl
 	./hexgrid.pl 100 hex.png
 
+dual_weapons.dat: process_unit.pl ia-data/*
+	./process_unit.pl
+
 unit_data.js: process_unit.pl ia-data/*
 	./process_unit.pl
 
-weapon_data.js: process_weapon.pl ia-data/*
+weapon_data.js: process_weapon.pl ia-data/* dual_weapons.dat
 	./process_weapon.pl
 
 install: ${WWW_TARGETS} ${BIN_TARGETS}

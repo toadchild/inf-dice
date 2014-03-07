@@ -188,6 +188,7 @@ sub dodge_unit{
     return 0;
 }
 
+my $dual_weapons = {};
 sub get_weapons{
     my ($unit, $ability_func) = @_;
     my $weapons = {};
@@ -228,6 +229,13 @@ sub get_weapons{
 
         for my $w (@{$child->{ccw}}){
             $weapons->{$w} = 1;
+        }
+    }
+
+    # Make a list of dual weapons used
+    for my $w (keys %$weapons){
+        if($w =~ m/(.*) \(2\)/){
+            $dual_weapons->{$1} = 1;
         }
     }
 
@@ -410,3 +418,6 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
 open $file, '>', 'unit_data.js' or die "Unable to open file";
 print $file "var unit_data = ";
 print $file $json->encode($unit_data);
+
+open $file, '>', 'dual_weapons.dat' or die "Unable to open file";
+print $file $json->encode($dual_weapons);
