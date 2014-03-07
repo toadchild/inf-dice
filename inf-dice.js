@@ -99,15 +99,13 @@ function set_ammo(player, check_params){
     // Set B values based on selected weapon and ammo
     var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
     var weapon = weapon_data[weapon_name];
-    // TODO there is another ammo lookup earlier in this function
-    var ammo_name = document.getElementsByName(player + ".ammo")[0].value;
     var b_list = document.getElementsByName(player + ".b")[0];
 
     // Get ammo type index so we can look up the corresponding B value
     b_list.length = 0;
     if(weapon){
         for(var i = 0; i < weapon["ammo"].length; i++){
-            if(ammo_name == weapon["ammo"][i]){
+            if(ammo == weapon["ammo"][i]){
                 var b_selected;
                 for(var b = 1; b <= weapon["b"][i]; b++){
                     b_list.options[b_list.options.length] = new Option(b);
@@ -321,6 +319,8 @@ function set_weapon(player, check_params){
         var stat = weapon["stat"];
         if(action == "cc"){
             stat = "CC";
+        }else if(action == "dtw"){
+            stat = "--";
         }
         stat_list.options[0] = new Option(stat);
 
@@ -350,6 +350,8 @@ function set_weapon(player, check_params){
         stat_list.length = 0;
         if(action == "cc"){
             stat_list.options[0] = new Option("CC");
+        }else if(action == "dtw"){
+            stat_list.options[0] = new Option("--");
         }else{
             for(var i = 0; i < stats.length; i++){
                 stat_list.options[i] = new Option(stats[i]);
