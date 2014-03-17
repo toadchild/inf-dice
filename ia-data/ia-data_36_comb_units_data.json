@@ -4232,7 +4232,7 @@
  "imp": "",
  "irr": "",
  "isc": "Shasvastii Corax Hasht",
- "mov": "4-4",
+ "mov": "4-2",
  "name": "Hasht",
  "note": "Special Spec-Op",
  "ph": "12",
@@ -4243,7 +4243,7 @@
   "V: No Wound Incapacitation",
   "Nanoscreen"
  ],
- "type": "LI",
+ "type": "MI",
  "w": "1",
  "wip": "13" ,
  "altp":[{

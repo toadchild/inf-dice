@@ -785,7 +785,7 @@
   "template": "No"
  },
  {
-  "ammo": "FIRE",
+  "ammo": "Fire",
   "burst": "1",
   "cc": "No",
   "damage": "14",
@@ -821,7 +821,7 @@
   "template": "Circular"
  },
  {
-  "ammo": "FIRE",
+  "ammo": "Fire",
   "burst": "2",
   "cc": "No",
   "damage": "14",
@@ -839,7 +839,7 @@
   "template": "Circular"
  },
  {
-  "ammo": "FIRE",
+  "ammo": "Fire",
   "burst": "2",
   "cc": "No",
   "damage": "14",
@@ -857,7 +857,7 @@
   "template": "Circular"
  },
  {
-  "ammo": "FIRE",
+  "ammo": "Fire",
   "burst": "2",
   "cc": "No",
   "damage": "13",
@@ -929,7 +929,7 @@
   "template": "No"
  },
  {
-  "ammo": "FIRE",
+  "ammo": "Fire",
   "burst": "1",
   "cc": "No",
   "damage": "13",

@@ -48,7 +48,6 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             @ammo = $weapon->{ammo};
         }
         @ammo = map {$_ eq 'N' ? 'Normal' : $_} @ammo;
-        @ammo = map {$_ eq 'FIRE' ? 'Fire' : $_} @ammo;
 
         # integrated ammo
         if($multi){
