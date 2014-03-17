@@ -20,26 +20,34 @@ my %default_wtype = (
     TAG => 'STR',
 );
 
-sub has_nwi{
-    my ($unit) = @_;
+sub has_spec{
+    my ($unit, $name) = @_;
 
     for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/No Wound Incapacitation/){
+        if($spec =~ m/$name/){
             return 1;
         }
     }
     return 0;
 }
 
-sub has_shasvastii{
-    my ($unit) = @_;
-
-    for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/Shasvastii/){
+sub has_symbiont{
+    my ($unit, $inactive) = @_;
+    if(has_spec($unit, 'Symbiont Armour')){
+        if($inactive){
             return 1;
         }
+        return 2;
     }
     return 0;
+}
+
+sub has_nwi{
+    return has_spec(@_, 'No Wound Incapacitation');
+}
+
+sub has_shasvastii{
+    return has_spec(@_, 'Shasvastii');
 }
 
 sub has_ikohl{
@@ -131,27 +139,11 @@ sub has_msv{
 }
 
 sub has_xvisor{
-    my ($unit) = @_;
-
-    for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/X Visor/){
-            return 1;
-        }
-    }
-
-    return 0;
+    return has_spec(@_, 'X Visor');
 }
 
 sub has_fo{
-    my ($unit) = @_;
-
-    for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/Forward Observer/){
-            return 1;
-        }
-    }
-
-    return 0;
+    return has_spec(@_, 'Forward Observer');
 }
 
 sub has_hacker{
@@ -172,17 +164,19 @@ sub has_hacker{
     return 0;
 }
 
+sub has_motorcycle{
+    return has_spec(@_, "Motorcycle");
+}
+
 sub dodge_unit{
-    my ($unit) = @_;
+    my ($unit, $rider) = @_;
 
     if($unit->{type} && ($unit->{type} eq 'REM' || $unit->{type} eq 'TAG')){
         return -6;
     }
 
-    for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/Motorcycle/){
-            return -6;
-        }
+    if(!$rider && has_motorcycle($unit)){
+        return -6;
     }
 
     return 0;
@@ -271,6 +265,16 @@ sub parse_unit{
         $inherit_shasvastii = 1;
     }
 
+    my $rider = 0;
+    if(has_motorcycle($new_unit)){
+        $rider = 1;
+    }
+
+    my $symbiont_inactive = 0;
+    if(has_symbiont($new_unit)){
+        $symbiont_inactive = 1;
+    }
+
     # Stats
     $new_unit->{name} = $unit->{name};
     $new_unit->{bs} = $unit->{bs} if defined $unit->{bs};
@@ -282,18 +286,19 @@ sub parse_unit{
     $new_unit->{w} = $unit->{w} if defined $unit->{w};
     $new_unit->{type} = $unit->{type} if defined $unit->{type} && $unit->{type} ne ' ';
     $new_unit->{w_type} = uc($unit->{wtype} // $default_wtype{$new_unit->{type}});
-    $new_unit->{skills} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
+    $new_unit->{spec} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
 
     # Modifiers
-    $new_unit->{dodge_unit} = dodge_unit($unit);
-    $new_unit->{nwi} = has_nwi($unit);
-    $new_unit->{shasvastii} = has_shasvastii($unit) || $inherit_shasvastii;
-    $new_unit->{ikohl} = has_ikohl($unit);
-    $new_unit->{immunity} = has_immunity($unit);
-    $new_unit->{hyperdynamics} = has_hyperdynamics($unit);
-    $new_unit->{ch} = has_camo($unit);
-    $new_unit->{odd} = has_odd($unit);
-    $new_unit->{msv} = has_msv($unit);
+    $new_unit->{dodge_unit} = dodge_unit($new_unit, $rider);
+    $new_unit->{nwi} = has_nwi($new_unit);
+    $new_unit->{symbiont} = has_symbiont($new_unit, $symbiont_inactive);
+    $new_unit->{shasvastii} = has_shasvastii($new_unit) || $inherit_shasvastii;
+    $new_unit->{ikohl} = has_ikohl($new_unit);
+    $new_unit->{immunity} = has_immunity($new_unit);
+    $new_unit->{hyperdynamics} = has_hyperdynamics($new_unit);
+    $new_unit->{ch} = has_camo($new_unit);
+    $new_unit->{odd} = has_odd($new_unit);
+    $new_unit->{msv} = has_msv($new_unit);
 
     # get_weapons goes into the childs list; needs $unit instead of $new_unit
     my $weapons = get_weapons($unit);
@@ -361,7 +366,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                 $child_unit->{name} .= " (MSV $msv)";
                 $child_unit->{msv} = $msv;
                 $child_unit->{weapons} = get_weapons($unit, \&has_msv);
-                push @{$child_unit->{skills}}, @{$child->{spec}};
+                push @{$child_unit->{spec}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
             }
@@ -375,7 +380,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                 $child_unit->{name} .= " ($camo_names->{$ch})";
                 $child_unit->{ch} = $ch;
                 $child_unit->{weapons} = get_weapons($unit, \&has_camo);
-                push @{$child_unit->{skills}}, @{$child->{spec}};
+                push @{$child_unit->{spec}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
             }
@@ -388,7 +393,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " (X Visor)";
                 $child_unit->{weapons} = get_weapons($unit, \&has_xvisor);
-                push @{$child_unit->{skills}}, @{$child->{spec}};
+                push @{$child_unit->{spec}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
             }

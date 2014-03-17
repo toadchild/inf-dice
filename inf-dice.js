@@ -445,10 +445,11 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".hyperdynamics")[0].value = unit["hyperdynamics"];
         document.getElementsByName(player + ".dodge_unit")[0].value = unit["dodge_unit"];
         document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
+        document.getElementsByName(player + ".msv")[0].value = unit["msv"];
+        document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"];
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
-        document.getElementsByName(player + ".msv")[0].value = unit["msv"];
 
         // Update the mini statline display
         document.getElementById(player + ".statline_type").innerHTML = unit["type"];
@@ -463,7 +464,7 @@ function set_unit(player, check_params){
 
         // list of skills
         var skills = document.getElementById(player + ".statline_skills");
-        skills.innerHTML = unit["skills"].join(", ");
+        skills.innerHTML = unit["spec"].join(", ");
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");

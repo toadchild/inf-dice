@@ -50,7 +50,7 @@ my $ammo_codes = {
     'AP+Shock' => {code => 'N', ap => 0.5, fatal => 1},
     DA => {code => 'D'},
     EXP => {code => 'E'},
-    Fire => {code => 'F'},
+    Fire => {code => 'F', fatal_symbiont => 9},
     Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, fatal => 9},
     K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
@@ -90,6 +90,13 @@ my $immunities = {
 };
 
 my $w_type = ['W', 'STR'];
+
+my $symbiont_armor = [0, 2, 1];
+my $symbiont_armor_labels = {
+    0 => 'None',
+    1 => 'Inactive',
+    2 => 'Active',
+};
 
 my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
@@ -287,6 +294,13 @@ sub print_input_attack_section{
               -label => 'Shasvastii Spawn-Embryo',
           ),
           "<br>",
+          span_popup_menu(-name => "$player.symbiont",
+              -values => $symbiont_armor,
+              -default => param("$player.symbiont") // '',
+              -labels => $symbiont_armor_labels,
+              -label => 'Symbiont Armor',
+          ),
+          "<br>",
           "<h4>Special Skills and Equipment</h4>",
           span_popup_menu(-name => "$player.immunity",
               -values => $immunity,
@@ -445,19 +459,30 @@ sub print_player_output{
     my $w_type = param("p$other.w_type") // 'W';
     my $name = param("p$player.unit") // 'Model';
     my $other_name = param("p$other.unit") // 'Model';
-    my $fatal = $ammo_codes->{$ammo}{fatal} // 0;
+    my $code = $ammo_codes->{$ammo};
+    my $fatal = $code->{fatal} // 0;
+    my $symbiont = param("p$other.symbiont") // 0;
     my $dead = $w + 1;
+
+    if($symbiont && $code->{fatal_symbiont}){
+        $fatal = $code->{fatal_symbiont};
+    }
+
+    if($symbiont == 2){
+        $dead++;
+        $w++;
+    }
 
     if($shasvastii){
         $dead++;
     }
 
-    if($fatal >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $ammo_codes->{$ammo}{str_resist})){
+    if($fatal >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $code->{str_resist})){
         # This ammo is instantly fatal, and we are not immune
         $dead = $w - $fatal;
     }
 
-    if($ammo_codes->{$ammo}{ignore_nwi}){
+    if($code->{ignore_nwi}){
         $nwi = 0;
     }
 
@@ -473,11 +498,13 @@ sub print_player_output{
         my $done;
 
         if($h + $w_taken >= $dead){
-            $label = sprintf " (%s)", $ammo_codes->{$ammo}{label} // 'Dead';
+            $label = sprintf " (%s)", $code->{label} // 'Dead';
             $done = 1;
+        }elsif($h + $w_taken == $w - 1 && $symbiont == 2){
+            $label = ' (Symbiont Disabled)';
         }elsif($h + $w_taken == $w && !$nwi){
             $label = ' (Unconscious)';
-        }elsif($h + $w_taken == $w + 1){
+        }elsif($h + $w_taken == $w + 1 && $shasvastii){
             $label = ' (Spawn Embryo)';
         }
 
