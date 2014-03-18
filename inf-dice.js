@@ -495,13 +495,14 @@ function set_faction(player, check_params){
         }
 
         unit_list.options[unit_list.options.length] = new Option(unit["name"]);
-        if(!selected){
+        if(!selected && (!check_params || !params[player + ".unit"])){
             unit_list.options[unit_list.options.length - 1].selected = true;
             selected = true;
         }
 
-        if(check_params && unit["name"] == params[player + ".unit"]){
+        if(!selected && unit["name"] == params[player + ".unit"]){
             unit_list.options[unit_list.options.length - 1].selected = true;
+            selected = true;
         }
     }
 
@@ -509,7 +510,7 @@ function set_faction(player, check_params){
     unit_list.options[unit_list.options.length - 1].disabled = true;
     unit_list.options[unit_list.options.length] = new Option("Custom Unit");
 
-    if(check_params && "Custom Unit" == params[player + ".unit"]){
+    if(!selected){
         unit_list.options[unit_list.options.length - 1].selected = true;
     }
 

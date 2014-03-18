@@ -38,3 +38,4 @@ install: ${WWW_TARGETS} ${BIN_TARGETS}
 
 update_data:
 	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/data/
+	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/lang/ia-lang_40_en.js

@@ -216,6 +216,7 @@ sub print_input_attack_section{
               -onchange => "set_faction('$player')",
               -label => 'Faction',
           ),
+          "<br>",
           span_popup_menu(-name => "$player.unit",
               -default => param("$player.unit") // '',
               -onchange => "set_unit('$player')",

@@ -311,9 +311,31 @@ sub parse_unit{
 
 my $unit_data = {};
 my $file;
+my $json_text;
+
+# load fixed name data from the locale file
+open $file, '<', 'ia-data/ia-lang_40_en.js' or die "Unable to open file";
+my $found_names = 0;
+while(<$file>){
+    if($found_names){
+        $json_text .= $_;
+
+        if($_ =~ m/;/){
+            last;
+        }
+    }
+
+    if($_ =~ m/names/){
+        $found_names = 1;
+        $json_text = "{\n";
+    }
+}
+$json_text =~ s/'/"/g;
+$json_text =~ s/;//;
+my $localized_data = $json->decode($json_text);
+
 for my $fname (glob "ia-data/ia-data_*_units_data.json"){
     local $/;
-    my $json_text;
     open $file, '<', $fname or die "Unable to open file";
     $json_text = "[\n";
     $json_text .= <$file>;
@@ -328,24 +350,38 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
             next;
         }
 
+        # Apply updates from localized data
+        if(exists $localized_data->{isc}{$unit->{isc}}){
+            $unit->{isc} = $localized_data->{isc}{$unit->{isc}};
+        }
+
+        if(exists $localized_data->{name}{$unit->{name}}){
+            $unit->{name} = $localized_data->{name}{$unit->{name}};
+        }
+
+        # Use the longer ISC names
+        $unit->{short_name} = $unit->{name};
+        $unit->{name} = $unit->{isc};
+
         # Patch some unit names
-        if($unit->{name} eq 'Caliban D'){
-            # Only keep one kind of Caliban
+
+        # Only keep one kind of Caliban
+        if($unit->{short_name} eq 'Caliban E'){
             $unit->{name} = 'Caliban';
         }elsif($unit->{name} =~ m/Caliban/){
-            # Only keep one kind of Caliban
             next;
-        }elsif($unit->{name} eq 'O-YOROI'){
-            $unit->{name} = 'O-Yoroi';
-        }elsif($unit->{name} eq 'Shock'){
-            $unit->{name} = 'Druze';
-        }elsif($unit->{name} eq 'Controller'){
+        }elsif($unit->{name} eq '"The Shrouded"'){
+            $unit->{name} = 'Shrouded';
+        }elsif($unit->{name} eq 'Assault Pack'){
             $unit->{name} = 'Assault Pack Controller';
-        }elsif($unit->{name} eq 'Highlander'){
-            $unit->{name} = 'Highlander Galwegian';
-        }elsif($unit->{name} eq 'Morat'){
-            $unit->{name} = 'Vanguard';
+        }elsif($unit->{name} eq 'Armoured Cavalry'){
+            $unit->{name} = 'Squalo';
+        }elsif($unit->{name} =~ m/^Tikbalangs/){
+            $unit->{name} = 'Tikbalangs';
         }
+        $unit->{name} =~ s/^Shasvastii //;
+        $unit->{name} =~ s/^Shavastii //;
+        $unit->{name} =~ s/^Hassassin //;
 
         my $new_unit = {};
         parse_unit($new_unit, $unit);
@@ -402,6 +438,10 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         # Check for alternate profiles
         for my $alt (@{$unit->{altp}}){
             next if $alt->{isc} eq 'CrazyKoala';
+
+            if($alt->{isc} eq 'Anaconda Operator'){
+                $alt->{isc} = 'Operator';
+            }
 
             my $alt_unit = clone($new_unit);
 
