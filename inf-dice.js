@@ -447,6 +447,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
         document.getElementsByName(player + ".msv")[0].value = unit["msv"];
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"];
+        document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];

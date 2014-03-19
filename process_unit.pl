@@ -454,6 +454,11 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
             }
             $alt_unit->{name} = "$new_unit->{name} $alt_tag";
 
+            # Tell the base unit how many wounds the Operator has
+            if($alt->{isc} eq 'Operator'){
+                $new_unit->{operator} = $alt_unit->{w};
+            }
+
             push @unit_list, $alt_unit;
         }
     }

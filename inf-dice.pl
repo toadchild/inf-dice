@@ -98,6 +98,13 @@ my $symbiont_armor_labels = {
     2 => 'Active',
 };
 
+my $operator = [0, 1, 2];
+my $operator_labels = {
+    0 => 'None',
+    1 => '1 W',
+    2 => '2 W',
+};
+
 my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
     0 => 'None',
@@ -302,6 +309,13 @@ sub print_input_attack_section{
               -label => 'Symbiont Armor',
           ),
           "<br>",
+          span_popup_menu(-name => "$player.operator",
+              -values => $operator,
+              -default => param("$player.operator") // '',
+              -labels => $operator_labels,
+              -label => 'Operator',
+          ),
+          "<br>",
           "<h4>Special Skills and Equipment</h4>",
           span_popup_menu(-name => "$player.immunity",
               -values => $immunity,
@@ -450,6 +464,12 @@ sub print_input{
 
 sub print_player_output{
     my ($output, $player, $other) = @_;
+
+    if(scalar keys %{$output->{hits}{$player}} == 0){
+        # empty list, nothing to print
+        return;
+    }
+
     my $label = '';
     my $w = param("p$other.w") // 1;
     my $w_taken = param("p$other.w_taken") // 0;
@@ -463,7 +483,14 @@ sub print_player_output{
     my $code = $ammo_codes->{$ammo};
     my $fatal = $code->{fatal} // 0;
     my $symbiont = param("p$other.symbiont") // 0;
+    my $operator_w = param("p$other.operator") // 0;
+
+    # thresholds or state changes
+    my $unconscious = $w;
     my $dead = $w + 1;
+    my $symb_disabled = -1;
+    my $eject = -1;
+    my $spawn = -1;
 
     if($symbiont && $code->{fatal_symbiont}){
         $fatal = $code->{fatal_symbiont};
@@ -474,22 +501,28 @@ sub print_player_output{
         $w++;
     }
 
+    if($operator_w){
+        $unconscious += $operator_w;
+        $dead += $operator_w;
+        $eject = $w;
+    }
+
     if($shasvastii){
+        $spawn = $dead;
         $dead++;
     }
 
     if($fatal >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $code->{str_resist})){
         # This ammo is instantly fatal, and we are not immune
-        $dead = $w - $fatal;
+        $dead = 1;
     }
 
     if($code->{ignore_nwi}){
         $nwi = 0;
     }
 
-    if(scalar keys %{$output->{hits}{$player}} == 0){
-        # empty list, nothing to print
-        return;
+    if($nwi){
+        $unconscious = -1;
     }
 
     print "<h3>Player $player</h3>";
@@ -501,12 +534,16 @@ sub print_player_output{
         if($h + $w_taken >= $dead){
             $label = sprintf " (%s)", $code->{label} // 'Dead';
             $done = 1;
-        }elsif($h + $w_taken == $w - 1 && $symbiont == 2){
+        }elsif($h + $w_taken == $symb_disabled){
             $label = ' (Symbiont Disabled)';
-        }elsif($h + $w_taken == $w && !$nwi){
+        }elsif($h + $w_taken == $eject){
+            $label = ' (Operator Ejected)';
+        }elsif($h + $w_taken == $unconscious){
             $label = ' (Unconscious)';
-        }elsif($h + $w_taken == $w + 1 && $shasvastii){
+        }elsif($h + $w_taken == $spawn){
             $label = ' (Spawn Embryo)';
+        }else{
+            $label = '';
         }
 
         printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> %s inflicts %d or more successes on %s%s<br>", $output->{cumul_hits}{$player}{$h}, $name, $h, $other_name, $label;
