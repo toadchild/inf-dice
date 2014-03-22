@@ -366,7 +366,6 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
             $unit->{name} = 'Tikbalangs';
         }
         $unit->{name} =~ s/^Shasvastii //;
-        $unit->{name} =~ s/^Shavastii //;
         $unit->{name} =~ s/^Hassassin //;
 
         my $new_unit = {};
@@ -424,10 +423,6 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         # Check for alternate profiles
         for my $alt (@{$unit->{altp}}){
             next if $alt->{isc} eq 'CrazyKoala';
-
-            if($alt->{isc} eq 'Anaconda Operator'){
-                $alt->{isc} = 'Operator';
-            }
 
             my $alt_unit = clone($new_unit);
 

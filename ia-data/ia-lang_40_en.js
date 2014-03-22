@@ -291,7 +291,8 @@
 			'Margot Berthnier, Mirage-5':'Margot Berthier, Mirage-5',
 			'Su-Jian Immediate Action Unit (COMBAT FORM)':'Su-Jian Immediate Action Unit',
 			'Throakitai':'Thorakitai',
-			'Moderators from Bakunin':'Moderators'
+			'Moderators from Bakunin':'Moderators',
+            "Shavastii Seed-Soldiers":"Shasvastii Seed-Soldiers"
 		},
 		'name':{
 			'Phoneix':'Phoenix',

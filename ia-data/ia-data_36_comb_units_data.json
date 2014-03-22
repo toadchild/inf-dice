@@ -663,6 +663,7 @@
   "imp": "",
   "functions": [],
   "altp":[{
+      "type":"LI",
       "isc":"Pilot",
       "mov":"4-4",
       "cc":"13",
@@ -1142,7 +1143,8 @@
   "army": "Combined Army",
   "wip": "13",
   "cbcode": [
-   "280602-0066"
+   "280602-0066",
+   "280660-0464"
   ],
   "bts": "0",
   "isc": "Daturazi Witch-Soldiers",
