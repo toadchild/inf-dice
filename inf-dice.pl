@@ -89,8 +89,6 @@ my $immunities = {
     },
 };
 
-my $w_type = ['W', 'STR'];
-
 my $symbiont_armor = [0, 2, 1];
 my $symbiont_armor_labels = {
     0 => 'None',
@@ -141,12 +139,6 @@ my $link_labels = {
     3 => '3 (+1 B)',
     5 => '5 (+1 B, +3 BS)',
     -5 => '5, Long Skill (+3 BS)',
-};
-
-my $dodge_unit = [0, -6];
-my $dodge_unit_labels = {
-    0 => 'None',
-    -6 => 'REM/TAG/Motorcycle (-6 PH to Dodge)',
 };
 
 my $gang_up = [0, 3, 6, 9];
@@ -232,62 +224,49 @@ sub print_input_attack_section{
 
     print "<div id='$player.statline' class='statline'>",
           "<table>",
-          "<tr><th>Type</th><th>CC</th><th>BS</th><th>PH</th><th>WIP</th><th>ARM</th><th>BTS</th><th id='$player.statline_w_type'>W</th></tr>",
-          "<tr><td id='$player.statline_type'></td><td id='$player.statline_cc'></td><td id='$player.statline_bs'></td><td id='$player.statline_ph'></td><td id='$player.statline_wip'></td><td id='$player.statline_arm'></td><td id='$player.statline_bts'></td><td id='$player.statline_w'></td></tr>",
+          "<tr><th>Type</th><th>CC</th><th>BS</th><th>PH</th><th>WIP</th><th>ARM</th><th>BTS</th>",
+          "<th id='$player.statline_w_type'>",
+          span_popup_menu(-name => "$player.w_type"),
+          "</th>",
+          "</tr>",
+          "<tr>",
+          "<br>",
+          "<td id='$player.statline_type'>",
+          span_popup_menu(-name => "$player.type"),
+          "</td>",
+          "<td id='$player.statline_cc'>",
+          span_popup_menu(-name => "$player.cc"),
+          "</td>",
+          "<td id='$player.statline_bs'>",
+          span_popup_menu(-name => "$player.bs"),
+          "</td>",
+          "<td id='$player.statline_ph'>",
+          span_popup_menu(-name => "$player.ph"),
+          "</td>",
+          "<td id='$player.statline_wip'>",
+          span_popup_menu(-name => "$player.wip"),
+          "</td>",
+          "<td id='$player.statline_arm'>",
+          span_popup_menu(-name => "$player.arm"),
+          "</td>",
+          "<td id='$player.statline_bts'>",
+          span_popup_menu(-name => "$player.bts"),
+          "</td>",
+          "<td id='$player.statline_w'>",
+          span_popup_menu(-name => "$player.w"),
+          "</td>",
+          "</tr>",
           "</table>",
-          "<div>Skills/Equipment:</div>",
+          "<div id='$player.skills'>Skills/Equipment:",
           "<div id='$player.statline_skills' class='skills'></div>",
-          "</div>\n";
+          "</div></div>\n";
 
     print "<div id='$player.attributes' style='display: none;'>\n",
-          "<h4>Model Attributes</h4>\n",
-          span_popup_menu(-name => "$player.bs",
-              -values => [1 .. 22],
-              -default => param("$player.bs") // 11,
-              -label => "BS",
-          ),
-          span_popup_menu(-name => "$player.ph",
-              -values => [1 .. 22],
-              -default => param("$player.ph") // 11,
-              -label => "PH",
-          ),
-          span_popup_menu(-name => "$player.cc",
-              -values => [1 .. 22],
-              -default => param("$player.cc") // 11,
-              -label => "CC",
-          ),
-          span_popup_menu(-name => "$player.wip",
-              -values => [1 .. 22],
-              -default => param("$player.wip") // 11,
-              -label => "WIP",
-          ),
-          "<br>",
-          span_popup_menu(-name => "$player.arm",
-              -values => [0 .. 10],
-              -default => param("$player.arm") // '',
-              -label => "ARM",
-          ),
-          span_popup_menu(-name => "$player.bts",
-              -values => [0, -3, -6, -9],
-              -default => param("$player.bts") // '',
-              -label => "BTS",
-          ),
-          "<br>",
           "<h4>Wounds</h4>",
-          span_popup_menu(-name => "$player.w",
-              -values => [1 .. 4],
-              -default => param("$player.w") // '',
-              -label => "Base Wounds",
-          ),
           span_popup_menu(-name => "$player.w_taken",
               -values => [0 .. 4],
               -default => param("$player.w_taken") // '',
               -label => "Wounds Taken",
-          ),
-          span_popup_menu(-name => "$player.w_type",
-              -values => $w_type,
-              -default => param("$player.w_type") // '',
-              -label => "Wound Type",
           ),
           "<br>",
           span_checkbox(-name => "$player.nwi",
@@ -324,11 +303,10 @@ sub print_input_attack_section{
               -label => "Immunity",
           ),
           "<br>",
-          span_popup_menu(-name => "$player.dodge_unit",
-              -values => $dodge_unit,
-              -default => param("$player.dodge_unit") // '',
-              -labels => $dodge_unit_labels,
-              -label => "Unit Type",
+          span_checkbox(-name => "$player.motorcycle",
+              -checked => defined(param("$player.motorcycle")),
+              -value => 1,
+              -label => 'Motorcycle',
           ),
           "<br>",
           span_popup_menu(-name => "$player.hyperdynamics",
@@ -840,8 +818,15 @@ sub gen_attack_args{
 sub gen_dodge_args{
     my ($us, $them) = @_;
 
+    my $dodge_unit = 0;
+    my $unit_type = param("$us.type") // '';
+    my $motorcycle = param("$us.motorcycle") // 0;
+    if($unit_type eq 'REM' || $unit_type eq 'TAG' || $motorcycle){
+        $dodge_unit = -6;
+    }
+
     my $stat = param("$us.ph") // 0;
-    $stat += param("$us.dodge_unit") // 0;
+    $stat += $dodge_unit;
     $stat += param("$us.gang_up") // 0;
     $stat += param("$us.hyperdynamics") // 0;
 

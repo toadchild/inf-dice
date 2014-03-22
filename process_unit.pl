@@ -168,20 +168,6 @@ sub has_motorcycle{
     return has_spec(@_, "Motorcycle");
 }
 
-sub dodge_unit{
-    my ($unit, $rider) = @_;
-
-    if($unit->{type} && ($unit->{type} eq 'REM' || $unit->{type} eq 'TAG')){
-        return -6;
-    }
-
-    if(!$rider && has_motorcycle($unit)){
-        return -6;
-    }
-
-    return 0;
-}
-
 my $dual_weapons = {};
 sub get_weapons{
     my ($unit, $ability_func) = @_;
@@ -289,7 +275,7 @@ sub parse_unit{
     $new_unit->{spec} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
 
     # Modifiers
-    $new_unit->{dodge_unit} = dodge_unit($new_unit, $rider);
+    $new_unit->{motorcycle} = !$rider && has_motorcycle($new_unit);
     $new_unit->{nwi} = has_nwi($new_unit);
     $new_unit->{symbiont} = has_symbiont($new_unit, $symbiont_inactive);
     $new_unit->{shasvastii} = has_shasvastii($new_unit) || $inherit_shasvastii;

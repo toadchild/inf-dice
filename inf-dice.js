@@ -183,7 +183,7 @@ function set_action(player){
         enable_input(player + ".range");
         enable_input(player + ".link");
         enable_input(player + ".viz");
-        disable_input(player + ".dodge_unit");
+        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -207,7 +207,7 @@ function set_action(player){
         disable_input(player + ".range");
         enable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".dodge_unit");
+        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -231,7 +231,7 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".dodge_unit");
+        disable_input(player + ".motorcycle");
 
         // cc modifiers
         enable_input(player + ".gang_up");
@@ -255,7 +255,7 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        enable_input(player + ".dodge_unit");
+        enable_input(player + ".motorcycle");
 
         // cc modifiers
         enable_input(player + ".gang_up");
@@ -279,7 +279,7 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".dodge_unit");
+        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -424,26 +424,76 @@ function ch_mod(unit){
     return 0;
 }
 
+function full_stat_dropdown(player, stat, min, max, check_params){
+    var list = document.getElementsByName(player + "." + stat)[0];
+    var selected = list.value;
+    if(check_params){
+        selected = params[player + "." + stat];
+    }
+
+    list.length = 0;
+
+    for(var s = min; s <= max; s++){
+        list.options[list.options.length] = new Option(s);
+
+        if(s == selected){
+            list.options[list.options.length - 1].selected = true;
+        }
+    }
+}
+
+function full_stat_dropdown_list(player, stat, stat_list, check_params){
+    var list = document.getElementsByName(player + "." + stat)[0];
+    var selected = list.value;
+    if(check_params){
+        selected = params[player + "." + stat];
+    }
+
+    list.length = 0;
+
+    for(var s = 0; s < stat_list.length; s++){
+        list.options[list.options.length] = new Option(stat_list[s]);
+
+        if(stat_list[s] == selected){
+            list.options[list.options.length - 1].selected = true;
+        }
+    }
+}
+
+function selected_stat_dropdown(player, stat, unit){
+    var list = document.getElementsByName(player + "." + stat)[0];
+    list.length = 0;
+
+    list.options[0] = new Option(unit[stat]);
+}
+
 function set_unit(player, check_params){
     var unit = get_unit_data(player);
 
     // set all attributes from this unit
     if(unit){
         disable_display(player + ".attributes");
-        enable_display(player + ".statline");
+        enable_display(player + ".skills");
 
-        document.getElementsByName(player + ".bs")[0].value = unit["bs"];
-        document.getElementsByName(player + ".ph")[0].value = unit["ph"];
-        document.getElementsByName(player + ".cc")[0].value = unit["cc"];
-        document.getElementsByName(player + ".wip")[0].value = unit["wip"];
-        document.getElementsByName(player + ".arm")[0].value = unit["arm"];
-        document.getElementsByName(player + ".bts")[0].value = unit["bts"];
-        document.getElementsByName(player + ".w")[0].value = unit["w"];
-        document.getElementsByName(player + ".w_type")[0].value = unit["w_type"];
+        // stat block
+        selected_stat_dropdown(player, "cc", unit);
+        selected_stat_dropdown(player, "bs", unit);
+        selected_stat_dropdown(player, "ph", unit);
+        selected_stat_dropdown(player, "wip", unit);
+        selected_stat_dropdown(player, "arm", unit);
+        selected_stat_dropdown(player, "bts", unit);
+        selected_stat_dropdown(player, "w", unit);
+        selected_stat_dropdown(player, "w_type", unit);
+        selected_stat_dropdown(player, "type", unit);
+
+        // list of skills
+        var skills = document.getElementById(player + ".statline_skills");
+        skills.innerHTML = unit["spec"].join(", ");
+
+        // abilities
         document.getElementsByName(player + ".ikohl")[0].value = unit["ikohl"];
         document.getElementsByName(player + ".immunity")[0].value = unit["immunity"];
         document.getElementsByName(player + ".hyperdynamics")[0].value = unit["hyperdynamics"];
-        document.getElementsByName(player + ".dodge_unit")[0].value = unit["dodge_unit"];
         document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
         document.getElementsByName(player + ".msv")[0].value = unit["msv"];
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"];
@@ -451,25 +501,22 @@ function set_unit(player, check_params){
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
-
-        // Update the mini statline display
-        document.getElementById(player + ".statline_type").innerHTML = unit["type"];
-        document.getElementById(player + ".statline_cc").innerHTML = unit["cc"];
-        document.getElementById(player + ".statline_bs").innerHTML = unit["bs"];
-        document.getElementById(player + ".statline_ph").innerHTML = unit["ph"];
-        document.getElementById(player + ".statline_wip").innerHTML = unit["wip"];
-        document.getElementById(player + ".statline_arm").innerHTML = unit["arm"];
-        document.getElementById(player + ".statline_bts").innerHTML = unit["bts"];
-        document.getElementById(player + ".statline_w").innerHTML = unit["w"];
-        document.getElementById(player + ".statline_w_type").innerHTML = unit["w_type"];
-
-        // list of skills
-        var skills = document.getElementById(player + ".statline_skills");
-        skills.innerHTML = unit["spec"].join(", ");
+        document.getElementsByName(player + ".motorcycle")[0].checked = unit["motorcycle"];
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");
-        disable_display(player + ".statline");
+        disable_display(player + ".skills");
+
+        // stat block
+        full_stat_dropdown(player, "cc", 1, stat_max, check_params);
+        full_stat_dropdown(player, "bs", 1, stat_max, check_params);
+        full_stat_dropdown(player, "ph", 1, stat_max, check_params);
+        full_stat_dropdown(player, "wip", 1, stat_max, check_params);
+        full_stat_dropdown(player, "arm", 1, arm_max, check_params);
+        full_stat_dropdown(player, "w", 1, w_max, 1, check_params);
+        full_stat_dropdown_list(player, "bts", bts_list, check_params);
+        full_stat_dropdown_list(player, "w_type", w_types, check_params);
+        full_stat_dropdown_list(player, "type", unit_types, check_params);
     }
 
     populate_weapons(player, check_params);
@@ -546,3 +593,9 @@ function raw_output(){
 
 var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
 var stats = ["BS", "PH", "WIP"];
+var w_types = ["W", "STR"];
+var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];
+var bts_list = [0, -3, -6, -9];
+var stat_max = 22;
+var arm_max = 10;
+var w_max = 3;
