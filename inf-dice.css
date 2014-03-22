@@ -1,10 +1,10 @@
 #p1 {
-    width: 47%;
+    width: 48%;
     float:left;
 }
 
 #p2 {
-    width: 47%;
+    width: 48%;
     float:right;
 }
 
@@ -136,7 +136,6 @@ th {
 }
 
 .statline table {
-    margin-left: 2em;
     margin-top: 3px;
     margin-bottom: 3px;
 }
