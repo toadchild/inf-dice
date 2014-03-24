@@ -114,18 +114,15 @@ function set_ammo(player, check_params){
 
     // select a default B value
     var selected_b = 1;
-    if(check_params){
-        if(params[player + ".b"]){
-            selected_b = params[player + ".b"];
-        }else if(player == "p1" && action.value != "cc"){
+    if(check_params && params[player + ".b"]){
+        selected_b = params[player + ".b"];
+    }else if(player == "p1" && action.value != "cc"){
+        if(weapon){
             // Default to the highest burst for Player 1
             selected_b = max_b;
-        }
-    }else{
-        // Inherit from their prior selection
-        selected_b = b_list.value;
-        if(selected_b > max_b){
-            selected_b = max_b;
+        }else{
+            // Custom weapon inherits their prior selection
+            selected_b = b_list.value;
         }
     }
 
