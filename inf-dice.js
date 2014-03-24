@@ -116,7 +116,7 @@ function set_ammo(player, check_params){
                     }
                 }
 
-                if(!b_selected && player == "p1"){
+                if(!b_selected && player == "p1" && action.value != "cc"){
                     // Default to the highest burst for Player 1
                     b_list.options[b_list.options.length - 1].selected = true;
                 }
@@ -194,6 +194,11 @@ function set_action(player){
         enable_input(other + ".cover");
         enable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        enable_display(player + ".sec_weapon");
+        enable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
     }else if(action.value == "dtw"){
         // stat block
         disable_input(player + ".bs");
@@ -218,6 +223,11 @@ function set_action(player){
         enable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        enable_display(player + ".sec_weapon");
+        enable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
     }else if(action.value == "cc"){
         // stat block
         disable_input(player + ".bs");
@@ -242,6 +252,11 @@ function set_action(player){
         disable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        enable_display(player + ".sec_weapon");
+        disable_display(player + ".sec_shoot");
+        enable_display(player + ".sec_cc");
     }else if(action.value == "dodge"){
         // stat block
         disable_input(player + ".bs");
@@ -266,6 +281,11 @@ function set_action(player){
         disable_input(other + ".cover");
         disable_input(other + ".ch");
         enable_input(player + ".hyperdynamics");
+
+        // ability sections
+        disable_display(player + ".sec_weapon");
+        disable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
     }else if(action.value == "none"){
         // stat block
         disable_input(player + ".bs");
@@ -290,6 +310,11 @@ function set_action(player){
         disable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        disable_display(player + ".sec_weapon");
+        disable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
     }
     populate_weapons(player);
 }
@@ -303,13 +328,27 @@ function set_weapon(player, check_params){
     var action = document.getElementsByName(player + ".action")[0].value;
     var weapon = weapon_data[weapon_name];
 
+    // default selected values
+    var selected_ammo = ammo_list.value;
+    if(check_params){
+        selected_ammo = params[player + ".ammo"];
+    }
+    var selected_damage = dam_list.value;
+    if(check_params){
+        selected_damage = params[player + ".dam"];
+    }
+    var selected_stat = stats.value;
+    if(check_params){
+        selected_stat = params[player + ".stat"];
+    }
+
     if(weapon){
         // Ammo types
         ammo_list.length = 0;
         for(var i = 0; i < weapon["ammo"].length; i++){
             ammo_list.options[i] = new Option(weapon["ammo"][i]);
 
-            if(check_params && weapon["ammo"][i] == params[player + ".ammo"]){
+            if(weapon["ammo"][i] == selected_ammo){
                 ammo_list.options[i].selected = true;
             }
         }
@@ -329,11 +368,12 @@ function set_weapon(player, check_params){
     }else{
         // Custom weapon
         // set default values
+
         ammo_list.length = 0;
         for(var i = 0; i < ammos.length; i++){
             ammo_list.options[i] = new Option(ammos[i]);
 
-            if(check_params && ammos[i] == params[player + ".ammo"]){
+            if(ammos[i] == selected_ammo){
                 ammo_list.options[i].selected = true;
             }
         }
@@ -342,7 +382,7 @@ function set_weapon(player, check_params){
         for(var i = 0; i < damages.length; i++){
             dam_list.options[i] = new Option(damages[i]);
 
-            if(check_params && dam_list.options[i].value == params[player + ".dam"]){
+            if(dam_list.options[i].value == selected_damage){
                 dam_list.options[i].selected = true;
             }
         }
@@ -350,13 +390,13 @@ function set_weapon(player, check_params){
         stat_list.length = 0;
         if(action == "cc"){
             stat_list.options[0] = new Option("CC");
-        }else if(action == "dtw"){
+        }else if(action == "dtw" || action == "dodge"){
             stat_list.options[0] = new Option("--");
         }else{
             for(var i = 0; i < stats.length; i++){
                 stat_list.options[i] = new Option(stats[i]);
 
-                if(check_params && stats[i] == params[player + ".stat"]){
+                if(stats[i] == selected_stat){
                     stat_list.options[i].selected = true;
                 }
             }
@@ -373,25 +413,40 @@ function populate_weapons(player, check_params){
 
     var attack_filter = "att_" + action;
 
+    var selected_weapon = weapon_list.value;
+    if(check_params){
+        selected_weapon = params[player + ".weapon"];
+    }
+
+    var weapons;
+    if(unit){
+        weapons = unit.weapons;
+    }else{
+        weapons = Object.keys(weapon_data);
+    }
+
     weapon_list.length = 0;
 
-    if(unit){
-        for(var i = 0; i < unit.weapons.length; i++){
-            var weapon = weapon_data[unit.weapons[i]];
-            if(weapon && weapon[attack_filter]){
-                weapon_list.options[weapon_list.options.length] = new Option(weapon["name"]);
+    for(var i = 0; i < weapons.length; i++){
+        var weapon = weapon_data[weapons[i]];
+        if(weapon && weapon[attack_filter]){
+            weapon_list.options[weapon_list.options.length] = new Option(weapon["name"]);
 
-                if(check_params && weapon["name"] == params[player + ".weapon"]){
-                    weapon_list.options[weapon_list.options.length - 1].selected = true;
-                }
+            if(weapon["name"] == selected_weapon){
+                weapon_list.options[weapon_list.options.length - 1].selected = true;
             }
         }
     }
 
-    weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
+    weapon_list.options[weapon_list.options.length] = new Option("--");
+    weapon_list.options[weapon_list.options.length - 1].disabled = true;
 
-    if(check_params && "Custom Weapon" == params[player + ".weapon"]){
-        weapon_list.options[weapon_list.options.length - 1].selected = true;
+    if(action == "bs" || action == "cc" || action == "throw"){
+        weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
+
+        if("Custom Weapon" == selected_weapon){
+            weapon_list.options[weapon_list.options.length - 1].selected = true;
+        }
     }
 
     set_weapon(player, check_params);
