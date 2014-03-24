@@ -367,6 +367,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         }
         $unit->{name} =~ s/^Shasvastii //;
         $unit->{name} =~ s/^Hassassin //;
+        $unit->{name} =~ s/^The //;
 
         my $new_unit = {};
         parse_unit($new_unit, $unit);
