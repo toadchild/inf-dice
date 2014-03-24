@@ -179,7 +179,7 @@ my $factions = [
 
 sub span_popup_menu{
     my (%args) = @_;
-    my $label = $args{-label};
+    my $label = $args{-label} // '';
     delete $args{-label};
 
     return "<span id='$args{-name}'><label>$label " .  popup_menu(%args) .  "</label></span>\n";
