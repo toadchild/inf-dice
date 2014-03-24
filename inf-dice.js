@@ -199,6 +199,7 @@ function set_action(player){
         enable_display(player + ".sec_weapon");
         enable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        enable_display(other + ".sec_cover");
     }else if(action.value == "dtw"){
         // stat block
         disable_input(player + ".bs");
@@ -228,6 +229,7 @@ function set_action(player){
         enable_display(player + ".sec_weapon");
         enable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        enable_display(other + ".sec_cover");
     }else if(action.value == "cc"){
         // stat block
         disable_input(player + ".bs");
@@ -257,6 +259,7 @@ function set_action(player){
         enable_display(player + ".sec_weapon");
         disable_display(player + ".sec_shoot");
         enable_display(player + ".sec_cc");
+        disable_display(other + ".sec_cover");
     }else if(action.value == "dodge"){
         // stat block
         disable_input(player + ".bs");
@@ -286,6 +289,7 @@ function set_action(player){
         disable_display(player + ".sec_weapon");
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        disable_display(other + ".sec_cover");
     }else if(action.value == "none"){
         // stat block
         disable_input(player + ".bs");
@@ -315,6 +319,7 @@ function set_action(player){
         disable_display(player + ".sec_weapon");
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        disable_display(other + ".sec_cover");
     }
     populate_weapons(player);
 }

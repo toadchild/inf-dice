@@ -393,11 +393,6 @@ sub print_input_attack_section{
               -labels => $viz_labels,
               -label => "Visibility Penalty",
           ),
-          "<br>",
-          span_checkbox(-name => "$player.cover",
-              -checked => defined(param("$player.cover")),
-              -value => 3,
-              -label => 'Cover (+3 ARM, -3 Opponent BS)'),
           "</div>";
 
     print "<div id='$player.sec_cc'>",
@@ -413,6 +408,14 @@ sub print_input_attack_section{
               -checked => defined(param("$player.berserk")),
               -value => 3,
               -label => 'Berserk (+9 CC, Normal Rolls)'),
+          "</div>\n";
+
+    print "<div id='$player.sec_cover'>",
+          "<h3>Cover</h3>",
+          span_checkbox(-name => "$player.cover",
+              -checked => defined(param("$player.cover")),
+              -value => 3,
+              -label => 'Cover (+3 ARM, -3 Opponent BS)'),
           "</div>\n";
 }
 
