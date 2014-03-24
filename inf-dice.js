@@ -102,35 +102,39 @@ function set_ammo(player, check_params){
     var b_list = document.getElementsByName(player + ".b")[0];
 
     // Get ammo type index so we can look up the corresponding B value
-    b_list.length = 0;
+    var max_b = 5;
     if(weapon){
         for(var i = 0; i < weapon["ammo"].length; i++){
             if(ammo == weapon["ammo"][i]){
-                var b_selected;
-                for(var b = 1; b <= weapon["b"][i]; b++){
-                    b_list.options[b_list.options.length] = new Option(b);
-
-                    if(check_params && b == params[player + ".b"]){
-                        b_list.options[b_list.options.length - 1].selected = true;
-                        b_selected = true;
-                    }
-                }
-
-                if(!b_selected && player == "p1" && action.value != "cc"){
-                    // Default to the highest burst for Player 1
-                    b_list.options[b_list.options.length - 1].selected = true;
-                }
+                max_b = weapon["b"][i];
                 break;
             }
         }
-    }else{
-        // Custom Weapon
-        for(var b = 1; b <= 5; b++){
-            b_list.options[b_list.options.length] = new Option(b);
+    }
 
-            if(check_params && b == params[player + ".b"]){
-                b_list.options[b_list.options.length - 1].selected = true;
-            }
+    // select a default B value
+    var selected_b = 1;
+    if(check_params){
+        if(params[player + ".b"]){
+            selected_b = params[player + ".b"];
+        }else if(player == "p1" && action.value != "cc"){
+            // Default to the highest burst for Player 1
+            selected_b = max_b;
+        }
+    }else{
+        // Inherit from their prior selection
+        selected_b = b_list.value;
+        if(selected_b > max_b){
+            selected_b = max_b;
+        }
+    }
+
+    b_list.length = 0;
+    for(var b = 1; b <= max_b; b++){
+        b_list.options[b_list.options.length] = new Option(b);
+
+        if(b == selected_b){
+            b_list.options[b_list.options.length - 1].selected = true;
         }
     }
 }
