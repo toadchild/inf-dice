@@ -528,6 +528,25 @@ function selected_stat_dropdown(player, stat, unit){
     list.options[0] = new Option(unit[stat]);
 }
 
+function set_w_taken(player, check_params, max_w_taken){
+    var w_taken_list = document.getElementsByName(player + ".w_taken")[0];
+
+    // wounds taken value
+    var selected_w_taken = w_taken_list.value;
+    if(check_params && params[player + ".w_taken"]){
+        selected_w_taken = params[player + ".w_taken"];
+    }
+
+    w_taken_list.length = 0;
+    for(var w_taken = 0; w_taken <= max_w_taken; w_taken++){
+        w_taken_list.options[w_taken_list.options.length] = new Option(w_taken);
+
+        if(w_taken == selected_w_taken){
+            w_taken_list.options[w_taken_list.options.length - 1].selected = true;
+        }
+    }
+}
+
 function set_unit(player, check_params){
     var unit = get_unit_data(player);
 
@@ -551,6 +570,13 @@ function set_unit(player, check_params){
         var skills = document.getElementById(player + ".statline_skills");
         skills.innerHTML = unit["spec"].join(", ");
 
+        // wounds previously taken
+        var max_w_taken = unit['w'] - 1;
+        if(unit['nwi']){
+            max_w_taken++;
+        }
+        set_w_taken(player, check_params, max_w_taken);
+
         // abilities
         document.getElementsByName(player + ".ikohl")[0].value = unit["ikohl"];
         document.getElementsByName(player + ".immunity")[0].value = unit["immunity"];
@@ -567,6 +593,9 @@ function set_unit(player, check_params){
         // If they selected custom unit
         enable_display(player + ".attributes");
         disable_display(player + ".skills");
+
+        // wounds previously taken
+        set_w_taken(player, check_params, 3);
 
         // stat block
         full_stat_dropdown(player, "cc", 1, stat_max, check_params);

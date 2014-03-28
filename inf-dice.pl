@@ -259,16 +259,15 @@ sub print_input_attack_section{
           "</table>",
           "<div id='$player.skills'>Skills/Equipment:",
           "<div id='$player.statline_skills' class='skills'></div>",
-          "</div></div>\n";
+          "</div>",
+          "<br>",
+          span_popup_menu(-name => "$player.w_taken",
+              -label => "Wounds Previously Taken",
+          ),
+          "</div>\n";
 
     print "<div id='$player.attributes' style='display: none;'>\n",
           "<h4>Wounds</h4>",
-          span_popup_menu(-name => "$player.w_taken",
-              -values => [0 .. 4],
-              -default => param("$player.w_taken") // '',
-              -label => "Wounds Taken",
-          ),
-          "<br>",
           span_checkbox(-name => "$player.nwi",
               -checked => defined(param("$player.nwi")),
               -value => 1,
