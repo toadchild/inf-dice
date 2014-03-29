@@ -576,12 +576,7 @@ sub print_hitbar_output{
 
     print "<table class='hitbar'><tr>\n";
 
-    if($mode eq 'ftf'){
-        print_hitbar_player($output, -1, 1);
-    }else{
-        print_hitbar_player($output, -1, 1);
-        print_hitbar_player($output, -1, 2);
-    }
+    print_hitbar_player($output, -1, 1);
 
     print "<td style='width: $output->{hits}{0}%;' class='miss center'>";
     if($output->{hits}{0} >= 3.0){
@@ -589,9 +584,7 @@ sub print_hitbar_output{
     }
     print "</td>\n";
 
-    if($mode eq 'ftf'){
-        print_hitbar_player($output, 1, 2);
-    }
+    print_hitbar_player($output, 1, 2);
 
     print "</tr></table>\n"
 }
@@ -669,15 +662,19 @@ sub print_simultaneous_output{
         print_player_output($output->{A}, 1, 2);
 
         print_miss_output($output->{A}, 'No success');
-
-        print_hitbar_output('normal', $output->{A});
     }
 
     if($output->{B}{hits}){
         print_player_output($output->{B}, 2, 1);
 
         print_miss_output($output->{B}, 'No success');
+    }
 
+    if($output->{A}{hits}){
+        print_hitbar_output('normal', $output->{A});
+    }
+
+    if($output->{B}{hits}){
         print_hitbar_output('normal', $output->{B});
     }
 }
