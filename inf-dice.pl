@@ -30,6 +30,31 @@ Content-Type: text/html; charset=utf-8
 EOF
 }
 
+sub print_top{
+    print <<EOF
+    <div id="head" class="databox">
+    <div class='content'>
+    <h1>Infinity Dice Calculator</h1>
+<p>
+Use the Model and Action Selection tools below to describe the scenario you
+want to learn about.  You can pick the faction, model, action, and weapons
+you are interested in for both the active and reactive player.
+</p>
+<p>
+If there are modifiers that are relevant to the
+skills you have selected, they will be shown.  Sometimes an option will be
+greyed out; that means it cannot be applied due to the particular combination
+of other options you have chosen.
+</p>
+<p>
+Once you are satisfied, press
+the button to see the probabilties for this action.
+</p>
+    </div>
+    </div>
+EOF
+}
+
 my $action = ['bs', 'dtw', 'cc', 'dodge', 'none'];
 my $action_labels = {
     bs => 'Attack - Shoot (Roll against BS, PH, or WIP)',
@@ -428,7 +453,7 @@ sub print_input_head{
     print <<EOF
     <div id="input" class="databox">
     <div class='content'>
-    <h1>Infinity Dice Calculator</h1>
+    <h2>Model and Action Selection</h2>
     <form method="get">
 EOF
 }
@@ -1041,9 +1066,11 @@ sub print_page{
 
     print_head();
 
-    print_input();
+    print_top();
 
     print_output($output);
+
+    print_input();
 
     my $end = time();
 

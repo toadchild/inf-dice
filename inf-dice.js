@@ -74,26 +74,12 @@ function set_ammo(player, check_params){
         ammo = "None";
     }
 
-    var arm_id = other + ".arm";
-    var bts_id = other + ".bts";
     var dam_id = player + ".dam";
 
     if(ammo == "Smoke" || ammo == "None"){
         disable_input(dam_id);
-        disable_input(arm_id);
-        disable_input(bts_id);
-    }else if(ammo == "Monofilament" || ammo == "K1"){
-        disable_input(dam_id);
-        disable_input(arm_id);
-        disable_input(bts_id);
-    }else if(ammo == "Viral" || ammo == "E/M" || ammo == "E/M2" || ammo == "Nanotech"){
-        enable_input(dam_id);
-        enable_input(bts_id);
-        disable_input(arm_id);
     }else{
         enable_input(dam_id);
-        enable_input(arm_id);
-        disable_input(bts_id);
     }
 
     // Set B values based on selected weapon and ammo
@@ -167,16 +153,7 @@ function set_action(player){
     var other_action = document.getElementsByName(other_action_name)[0];
 
     if(action.value == "bs" || action.value == "throw"){
-        // stat block
-        if(action.value == "bs"){
-            enable_input(player + ".bs");
-            disable_input(player + ".ph");
-        }else if(action.value == "throw"){
-            disable_input(player + ".bs");
-            enable_input(player + ".ph");
-        }
-        disable_input(player + ".cc");
-        disable_input(player + ".wip");
+        // weapon
         enable_input(player + ".b");
         enable_input(player + ".ammo");
 
@@ -202,11 +179,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         enable_display(other + ".sec_cover");
     }else if(action.value == "dtw"){
-        // stat block
-        disable_input(player + ".bs");
-        disable_input(player + ".ph");
-        disable_input(player + ".cc");
-        disable_input(player + ".wip");
+        // weapon
         enable_input(player + ".b");
         enable_input(player + ".ammo");
 
@@ -232,11 +205,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         enable_display(other + ".sec_cover");
     }else if(action.value == "cc"){
-        // stat block
-        disable_input(player + ".bs");
-        disable_input(player + ".ph");
-        enable_input(player + ".cc");
-        disable_input(player + ".wip");
+        // weapon
         disable_input(player + ".b");
         enable_input(player + ".ammo");
 
@@ -262,11 +231,7 @@ function set_action(player){
         enable_display(player + ".sec_cc");
         disable_display(other + ".sec_cover");
     }else if(action.value == "dodge"){
-        // stat block
-        disable_input(player + ".bs");
-        enable_input(player + ".ph");
-        disable_input(player + ".cc");
-        disable_input(player + ".wip");
+        // weapon
         disable_input(player + ".b");
         disable_input(player + ".ammo");
 
@@ -292,11 +257,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         disable_display(other + ".sec_cover");
     }else if(action.value == "none"){
-        // stat block
-        disable_input(player + ".bs");
-        disable_input(player + ".ph");
-        disable_input(player + ".cc");
-        disable_input(player + ".wip");
+        // weapon
         disable_input(player + ".b");
         disable_input(player + ".ammo");
 
