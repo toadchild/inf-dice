@@ -86,6 +86,10 @@ my $ammo_codes = {
     'Smoke' => {code => '-', cover => 0},
     'Zero-V Smoke' => {code => '-', cover => 0},
     'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized'},
+    # Placeholders for unimplemented ammos
+    'Plasma' => {code => 'N'},
+    'N+E/M(12)' => {code => 'N'},
+    'Stun' => {code => 'N', save => 'bts'},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];

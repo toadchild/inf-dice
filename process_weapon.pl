@@ -47,7 +47,13 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
         }else{
             @ammo = $weapon->{ammo};
         }
-        @ammo = map {$_ eq 'N' ? 'Normal' : $_} @ammo;
+
+        # Remap ammo names
+        my $ammo_maps = {
+            N => 'Normal',
+            PLASMA => 'Plasma',
+        };
+        @ammo = map {exists($ammo_maps->{$_}) ? $ammo_maps->{$_} : $_} @ammo;
 
         # integrated ammo
         if($multi){
@@ -60,11 +66,6 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
         my @b;
         for my $ammo (@ammo){
-            # skip unimplemented ammo
-            if($ammo =~ m/PLASMA|N\+E\/M|Stun/){
-                $ammo = 'Normal';
-            }
-
             # sanity check ammo types
             $all_ammo->{$ammo} = 1;
 
