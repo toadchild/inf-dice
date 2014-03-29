@@ -62,7 +62,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
         for my $ammo (@ammo){
             # skip unimplemented ammo
             if($ammo =~ m/PLASMA|N\+E\/M|Stun/){
-                next WEAPON;
+                $ammo = 'Normal';
             }
 
             # sanity check ammo types
