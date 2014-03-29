@@ -177,6 +177,11 @@ my $factions = [
     'Yu Jing',
 ];
 
+my $player_labels = {
+    1 => 'Active Player',
+    2 => 'Reactive Player',
+};
+
 sub span_popup_menu{
     my (%args) = @_;
     my $label = $args{-label} // '';
@@ -197,7 +202,7 @@ sub print_input_section{
 
     print "<div id='$player' class='inner-databox'>\n";
     print "<div class='content'>\n";
-    printf "<h2>Player %d</h2>\n", $player_num;
+    printf "<h2>$player_labels->{$player_num}</h2>\n";
 
     print_input_attack_section($player);
 
@@ -464,8 +469,8 @@ sub print_player_output{
     my $nwi = param("p$other.nwi");
     my $shasvastii = param("p$other.shasvastii");
     my $w_type = param("p$other.w_type") // 'W';
-    my $name = param("p$player.unit") // 'Model';
-    my $other_name = param("p$other.unit") // 'Model';
+    my $name = param("p$player.unit") // 'Model A';
+    my $other_name = param("p$other.unit") // 'Model B';
     my $code = $ammo_codes->{$ammo};
     my $fatal = $code->{fatal} // 0;
     my $symbiont = param("p$other.symbiont") // 0;
@@ -511,7 +516,7 @@ sub print_player_output{
         $unconscious = -1;
     }
 
-    print "<h3>Player $player</h3>";
+    print "<h3>$player_labels->{$player}</h3>";
     print "<p>\n";
 
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
@@ -591,10 +596,42 @@ sub print_hitbar_output{
     print "</tr></table>\n"
 }
 
+sub print_roll_subtitle{
+    my $name1 = param("p1.unit") // 'Model A';
+    my $name2 = param("p2.unit") // 'Model B';
+
+    my $act1 = param('p1.action');
+    my $act2 = param('p2.action');
+
+    my $weapon1 = param("p1.weapon");
+
+    if($act1 eq 'dodge'){
+        $weapon1 = 'Dodge';
+    }
+
+    if($weapon1){
+        $name1 .= " - " . $weapon1;
+    }
+
+    my $weapon2 = param("p2.weapon");
+
+    if($act2 eq 'dodge'){
+        $weapon2 = 'Dodge';
+    }
+
+    if($weapon2){
+        $name2 .= " - " . $weapon2;
+    }
+
+    print "<div class='subtitle'><span class='contestant'>$name1</span> vs. <span class='contestant'>$name2</span></div>\n";
+}
+
 sub print_ftf_output{
     my ($output) = @_;
 
     print "<h2>Face to Face Roll</h2>\n";
+    print_roll_subtitle();
+
     if($output->{hits}){
         print_player_output($output, 1, 2);
 
@@ -610,6 +647,8 @@ sub print_normal_output{
     my ($output) = @_;
 
     print "<h2>Normal Roll</h2>\n";
+    print_roll_subtitle();
+
     if($output->{hits}){
         print_player_output($output, 1, 2);
         print_player_output($output, 2, 1);
@@ -624,6 +663,7 @@ sub print_simultaneous_output{
     my ($output) = @_;
 
     print "<h2>Simultaneous Normal Rolls</h2>\n";
+    print_roll_subtitle();
 
     if($output->{A}{hits}){
         print_player_output($output->{A}, 1, 2);

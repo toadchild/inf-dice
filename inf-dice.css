@@ -8,8 +8,13 @@
     float:right;
 }
 
-#output {
-    clear: both;
+#output .subtitle {
+    text-align: center;
+    font-style: italic;
+}
+
+#output .contestant {
+    font-weight: bold;
 }
 
 #submit {
