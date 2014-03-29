@@ -447,7 +447,7 @@ function populate_weapons(player, check_params){
     weapon_list.options[weapon_list.options.length] = new Option("--");
     weapon_list.options[weapon_list.options.length - 1].disabled = true;
 
-    if(action == "bs" || action == "cc" || action == "throw"){
+    if(action == "bs" || action == "cc" || action == "throw" || action == "dtw"){
         weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
 
         if("Custom Weapon" == selected_weapon){
