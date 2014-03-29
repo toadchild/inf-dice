@@ -856,6 +856,8 @@ sub gen_attack_args{
     }elsif($action eq 'cc'){
         # CC mods
 
+        $stat = param("$us.cc") // 0;
+
         # berserk only works if they CC or Dodge in response
         my $berserk = 0;
         if(param("$us.berserk") && (param("$them.action") eq 'cc' || param("$them.action") eq 'dodge' || param("$them.action") eq 'none')){
@@ -866,8 +868,6 @@ sub gen_attack_args{
         $stat = max($stat, 0);
 
         $b = 1;
-
-        $stat = param("$us.cc") // 0;
     }
 
     if(!$code->{alt_save}){
