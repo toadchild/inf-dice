@@ -55,15 +55,6 @@ the button to see the probabilties for this action.
 EOF
 }
 
-my $action = ['bs', 'dtw', 'cc', 'dodge', 'none'];
-my $action_labels = {
-    bs => 'Attack - Shoot (Roll against BS, PH, or WIP)',
-    cc => 'Attack - Close Combat (Roll against CC)',
-    dtw => 'Attack - Direct Template Weapon (Automaticall hits)',
-    dodge => 'Dodge (Roll against PH)',
-    none => 'No Action',
-};
-
 my $ammo_codes = {
     Normal => {code => 'N'},
     Shock => {code => 'N', fatal => 1},
@@ -92,6 +83,14 @@ my $ammo_codes = {
     'Stun' => {code => 'N', save => 'bts'},
 };
 
+my $skill_codes = {
+    'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize'},
+    'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols'},
+    'hack_def' => {title => 'Defensive Hacking'},
+    'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess'},
+    'dodge' => {title => 'Dodge'},
+};
+
 my $immunity = ['', 'shock', 'bio', 'total'];
 my $immunity_labels = {
     '' => 'None',
@@ -114,6 +113,7 @@ my $immunities = {
         Fire => 'arm',
         Nanotech => 'arm',
         Swarm => 'arm',
+        'N+E/M(12)' => 'arm',
         # TODO verify what happens when a TI model is hit with E/M2
     },
 };
@@ -192,6 +192,24 @@ my $msv_labels = {
     1 => 'Level 1',
     2 => 'Level 2',
     3 => 'Level 3',
+};
+
+my $hacker = [0, 1, 2, 3];
+my $hacker_labels = {
+    0 => 'None',
+    1 => 'Defensive Hacking Device',
+    2 => 'Hacking Device',
+    3 => 'Hacking Device Plus',
+};
+
+my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
+my $evo_labels = {
+    0 => 'None',
+    ice => 'Icebreaker (Halve Opponent BTS)',
+    cap => 'Capture (1 WIP Roll to Capture a TAG)',
+    sup_1 => 'Support Hacking - 1 Ally (+3 WIP)',
+    sup_2 => 'Support Hacking - 2 Allies (+6 WIP)',
+    sup_3 => 'Support Hacking - 3 Allies (+9 WIP)',
 };
 
 my $factions = [
@@ -369,15 +387,19 @@ sub print_input_attack_section{
               -labels => $msv_labels,
               -label => "Multispectral Visor",
           ),
+          "<br>",
+          span_popup_menu(-name => "$player.hacker",
+              -values => $hacker,
+              -default => param("$player.hacker") // '',
+              -labels => $hacker_labels,
+              -label => "Hacking Device",
+          ),
           "</div>\n";
 
     print "<div class='action'>
           <h3>Action</h3>",
 
           popup_menu(-name => "$player.action",
-              -values => $action,
-              -default => param("$player.action") // '',
-              -labels => $action_labels,
               -onchange => "set_action('$player')",
           ),
           "</div>\n";
@@ -443,6 +465,16 @@ sub print_input_attack_section{
               -label => 'Berserk (+9 CC, Normal Rolls)'),
           "</div>\n";
 
+    print "<div id='$player.sec_hack'>",
+          "<h3>Hacking Modifiers</h3>",
+          span_popup_menu(-name => "$player.evo",
+              -values => $evo,
+              -default => param("$player.evo") // '',
+              -labels => $evo_labels,
+              -label => "EVO Support Program",
+          ),
+          "</div>\n";
+
     print "<div id='$player.sec_cover'>",
           "<h3>Cover</h3>",
           span_checkbox(-name => "$player.cover",
@@ -491,7 +523,7 @@ sub print_player_output{
     }
 
     my $label = '';
-    my $w = param("p$other.w") // 1;
+    my $wounds = param("p$other.w") // 1;
     my $w_taken = param("p$other.w_taken") // 0;
     my $immunity = param("p$other.immunity") // '';
     my $ammo = param("p$player.ammo") // 'Normal';
@@ -500,14 +532,21 @@ sub print_player_output{
     my $w_type = param("p$other.w_type") // 'W';
     my $name = param("p$player.unit") // 'Model A';
     my $other_name = param("p$other.unit") // 'Model B';
-    my $code = $ammo_codes->{$ammo};
-    my $fatal = $code->{fatal} // 0;
     my $symbiont = param("p$other.symbiont") // 0;
     my $operator_w = param("p$other.operator") // 0;
+    my $action = param("p$player.action") // '';
+
+    my $code = $skill_codes->{$action};
+    if(!defined $code){
+        $code = $ammo_codes->{$ammo};
+    }
+    my $fatal = $code->{fatal} // 0;
+    my $dam = $code->{dam} // 1;
+    my $threshold = $code->{threshold} // 1;
 
     # thresholds or state changes
-    my $unconscious = $w;
-    my $dead = $w + 1;
+    my $unconscious = $wounds;
+    my $dead = $wounds + 1;
     my $symb_disabled = -1;
     my $eject = -1;
     my $spawn = -1;
@@ -518,13 +557,13 @@ sub print_player_output{
 
     if($symbiont == 2){
         $dead++;
-        $w++;
+        $wounds++;
     }
 
     if($operator_w){
         $unconscious += $operator_w;
         $dead += $operator_w;
-        $eject = $w;
+        $eject = $wounds;
     }
 
     if($shasvastii){
@@ -532,13 +571,21 @@ sub print_player_output{
         $dead++;
     }
 
-    if($fatal >= $w && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $code->{str_resist})){
+    if($fatal >= $wounds && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $code->{str_resist})){
         # This ammo is instantly fatal, and we are not immune
         $dead = 1;
     }
 
     if($code->{ignore_nwi}){
         $nwi = 0;
+    }
+
+    # KOs in one shot, kills on followup
+    if($dam eq 'w'){
+        $dam = $unconscious - $w_taken;
+        if($dam == 0){
+            $dam = 1;
+        }
     }
 
     if($nwi){
@@ -551,16 +598,22 @@ sub print_player_output{
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
         my $done;
 
-        if($h + $w_taken >= $dead){
+        my $w = $h * $dam + $w_taken;
+
+        if($w < $threshold){
+            next;
+        }
+
+        if($w >= $dead){
             $label = sprintf " (%s)", $code->{label} // 'Dead';
             $done = 1;
-        }elsif($h + $w_taken == $symb_disabled){
+        }elsif($w == $symb_disabled){
             $label = ' (Symbiont Disabled)';
-        }elsif($h + $w_taken == $eject){
+        }elsif($w == $eject){
             $label = ' (Operator Ejected)';
-        }elsif($h + $w_taken == $unconscious){
+        }elsif($w == $unconscious){
             $label = ' (Unconscious)';
-        }elsif($h + $w_taken == $spawn){
+        }elsif($w == $spawn){
             $label = ' (Spawn Embryo)';
         }else{
             $label = '';
@@ -627,8 +680,8 @@ sub print_roll_subtitle{
 
     my $weapon1 = param("p1.weapon");
 
-    if($act1 eq 'dodge'){
-        $weapon1 = 'Dodge';
+    if(exists($skill_codes->{$act1})){
+        $weapon1 = $skill_codes->{$act1}{title};
     }
 
     if($weapon1){
@@ -637,8 +690,8 @@ sub print_roll_subtitle{
 
     my $weapon2 = param("p2.weapon");
 
-    if($act2 eq 'dodge'){
-        $weapon2 = 'Dodge';
+    if(exists($skill_codes->{$act2})){
+        $weapon2 = $skill_codes->{$act2}{title};
     }
 
     if($weapon2){
@@ -784,6 +837,7 @@ sub gen_attack_args{
     my $b;
     my $stat;
     my ($ammo_name, $code, $immunity);
+    my $type;
 
     if((param("$us.link") // 0) >= 3){
         $link_b = 1;
@@ -826,8 +880,11 @@ sub gen_attack_args{
     }
 
     my $action = param("$us.action");
+    my $other_action = param("$them.action");
     if($action eq 'bs'){
         # BS mods
+        $type = 'ftf';
+
         my $camo = param("$them.ch") // 0;
         my $msv = param("$us.msv") // 0;
         if($msv >= 1 && $camo >= -3){
@@ -854,18 +911,32 @@ sub gen_attack_args{
         $arm += $cover;
     }elsif($action eq 'dtw'){
         # DTW mods
+        $type = 'normal';
+
         $stat = 'T';
         $b = (param("$us.b") // 1) + $link_b;
         $arm += $cover;
+
+        # templates are FTF against Dodge
+        if($other_action eq 'dodge'){
+            $type = 'ftf';
+        }
     }elsif($action eq 'cc'){
         # CC mods
+        $type = 'ftf_cc';
 
         $stat = param("$us.cc") // 0;
 
+        # monofilament allows no CC ARM bonus
+        if($code->{no_arm_bonus}){
+            $type = 'ftf';
+        }
+
         # berserk only works if they CC or Dodge in response
         my $berserk = 0;
-        if(param("$us.berserk") && (param("$them.action") eq 'cc' || param("$them.action") eq 'dodge' || param("$them.action") eq 'none')){
+        if(param("$us.berserk") && ($other_action eq 'cc' || $other_action eq 'dodge' || $other_action eq 'none')){
             $berserk = 9;
+            $type = 'normal';
         }
 
         $stat += (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0) + $berserk;
@@ -882,10 +953,106 @@ sub gen_attack_args{
     }
 
     return (
+        $type,
         $stat,
         $b,
         $dam,
         $ammo,
+    );
+}
+
+sub gen_hack_args{
+    my ($us, $them) = @_;
+
+    my $action = param("$us.action");
+    my $other_action = param("$them.action");
+    my $evo = param("$us.evo") // '';
+    my $bts = param("$them.bts") // 0;
+
+    my $type = 'ftf';
+    my $can_hack = 0;
+    my $b = 1;
+
+    if($action eq 'hack_imm'){
+        my $unit_type = param("$them.type") // '';
+        my $faction = param("$them.faction") // '';
+
+        if($unit_type eq 'REM' || $unit_type eq 'TAG'){
+            $can_hack = 1;
+        }elsif($unit_type eq 'HI' && $faction ne 'Ariadna'){
+            # Ariadna HI are unhackable
+            $can_hack = 1;
+        }
+
+        # Immobilization does not protect against hacking attacks
+        if($other_action eq 'hack_imm' || $other_action eq 'hack_ahp'){
+            $type = 'normal';
+        }
+    }elsif($action eq 'hack_pos'){
+        my $unit_type = param("$them.type") // '';
+        my $faction = param("$us.faction") // '';
+        my $other_faction = param("$them.faction") // '';
+
+        # CA TAGs cannot be possessed by humans
+        if($unit_type eq 'TAG' && ($other_faction ne 'Combined Army' || $faction eq 'Combined Army')){
+            $can_hack = 1;
+        }
+
+        # Immobilization does not protect against hacking attacks
+        if($other_action eq 'hack_imm' || $other_action eq 'hack_ahp'){
+            $type = 'normal';
+        }
+
+        # EVO Capture program
+        if($evo eq 'cap'){
+            # rewrite global skill data to fix capture threshold
+            $skill_codes->{hack_pos}{threshold} = 1;
+        }else{
+            $b = 2;
+        }
+    }elsif($action eq 'hack_ahp'){
+        my $hacker = param("$them.hacker") // 0;
+        if($hacker > 0){
+            $can_hack = 1;
+        }
+    }elsif($action eq 'hack_def'){
+        # Defensive Hacking is only useful against hacking attacks
+        if($other_action eq 'hack_ahp' || $other_action eq 'hack_imm'){
+            $can_hack = 1;
+        }
+    }
+
+    # If you can't hack it, do nothing
+    if(!$can_hack){
+        return gen_none_args();
+    }
+
+    # Dodge does not protect against hacking
+    if($other_action eq 'dodge'){
+        $type = 'normal';
+    }
+
+    my $stat = param("$us.wip") // 0;
+
+    # EVO support bonuses
+    if($evo eq 'sup_1'){
+        $stat += 3;
+    }elsif($evo eq 'sup_2'){
+        $stat += 6;
+    }elsif($evo eq 'sup_3'){
+        $stat += 9;
+    }elsif($evo eq 'ice'){
+        $bts = -ceil(abs($bts / 2));
+    }
+
+    $stat += $bts;
+
+    return (
+        $type,
+        max($stat, 0),
+        $b,
+        0,
+        '-',
     );
 }
 
@@ -904,12 +1071,18 @@ sub gen_dodge_args{
     $stat += param("$us.gang_up") // 0;
     $stat += param("$us.hyperdynamics") // 0;
 
+    my $type = 'ftf';
+
     # -6 to dodge templates
     if(param("$them.action") eq 'dtw'){
         $stat -= 6;
+    }elsif(param("$them.action") eq 'dodge'){
+        # double-dodge is normal rolls
+        $type = 'normal';
     }
 
     return (
+        $type,
         max($stat, 0),
         1,
         0,
@@ -918,9 +1091,8 @@ sub gen_dodge_args{
 }
 
 sub gen_none_args{
-    my ($us, $them) = @_;
-
     return (
+        'none',
         0,
         1,
         0,
@@ -934,10 +1106,12 @@ sub gen_args{
     my $action = param("$us.action");
     if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'throw'){
         return gen_attack_args($us, $them);
+    }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
+        return gen_hack_args($us, $them);
     }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them);
     }else{
-        return gen_none_args($us, $them);
+        return gen_none_args();
     }
 
     return ();
@@ -946,10 +1120,6 @@ sub gen_args{
 sub execute_backend{
     my (@args) = @_;
     my $output;
-    my %dam;
-
-    $dam{1} = $ammo_codes->{param('p1.ammo') // 'Normal'}{dam} // 1;
-    $dam{2} = $ammo_codes->{param('p2.ammo') // 'Normal'}{dam} // 1;
 
     if(!open DICE, '-|', '/usr/local/bin/inf-dice', @args){
         $output->{error} = 'Unable to execute backend component.';
@@ -958,8 +1128,8 @@ sub execute_backend{
     while(<DICE>){
         $output->{raw} .= $_;
         if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
-            $output->{hits}{$1}{$2 * $dam{$1}} = $3;
-            $output->{cumul_hits}{$1}{$4 * $dam{$1}} = $5;
+            $output->{hits}{$1}{$2} = $3;
+            $output->{cumul_hits}{$1}{$4} = $5;
         }elsif(m/^No Successes: +([0-9.]+)/){
             $output->{hits}{0} = $1;
         }elsif(m/^ERROR/ || m/Assertion/){
@@ -975,8 +1145,10 @@ sub execute_backend_simultaneous{
     my ($args1, $args2) = @_;
     my ($o1, $o2, $output);
 
-    $o1 = execute_backend('BS', @$args1, gen_none_args());
-    $o2 = execute_backend('BS', gen_none_args(), @$args2);
+    my ($none, @args_none) = gen_none_args();
+
+    $o1 = execute_backend('BS', @$args1, @args_none);
+    $o2 = execute_backend('BS', @args_none, @$args2);
 
     $output->{raw} = $o1->{raw} . '<hr>' . $o2->{raw};
     $output->{type} = 'simultaneous';
@@ -999,16 +1171,13 @@ sub execute_backend_simultaneous{
 
 sub generate_output{
     my $output;
-    my (@args1, @args2);
 
     if(!defined param('p1.action') || !defined param('p2.action')){
         return;
     }
-    my $act_1 = param('p1.action');
-    my $act_2 = param('p2.action');
 
-    @args1 = gen_args('p1', 'p2');
-    @args2 = gen_args('p2', 'p1');
+    my ($act_1, @args1) = gen_args('p1', 'p2');
+    my ($act_2, @args2) = gen_args('p2', 'p1');
 
     # determine if it's FtF or Normal
     my $type;
@@ -1020,43 +1189,16 @@ sub generate_output{
         # One player is making a Normal Roll
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'normal';
-    }elsif(($act_1 eq 'dtw' && $act_2 eq 'dodge') || ($act_1 eq 'dodge' && $act_2 eq 'dtw')){
-        # Dodge vs. Template
-        # This is the only time a template can be a FtF roll
-        $output = execute_backend('BS', @args1, @args2);
-        $output->{type} = 'ftf';
-    }elsif($act_1 eq 'dtw' || $act_2 eq 'dtw' ||
-            ($act_1 ne 'bs' && $act_1 ne 'cc' && $act_1 ne 'throw' &&
-            $act_2 ne 'bs' && $act_2 ne 'cc' && $act_2 ne 'throw')){
-        # neither player is attacking
+    }elsif($act_1 eq 'normal' || $act_2 eq 'normal'){
         # Simultaneous Normal Rolls
         $output = execute_backend_simultaneous(\@args1, \@args2);
-    }elsif(($act_1 eq 'cc' && param('p1.berserk') &&
-            ($act_2 eq 'cc' || $act_2 eq 'dodge' || $act_2 eq 'none')) ||
-            ($act_2 eq 'cc' && param('p2.berserk') &&
-            ($act_1 eq 'cc' || $act_1 eq 'dodge' || $act_1 eq 'none'))){
-        # Berserk CC
-        # Pair of Normal Rolls.  No CC ARM bonus.
-        $output = execute_backend_simultaneous(\@args1, \@args2);
+    }elsif($act_1 eq 'ftf_cc' && $act_2 eq 'ftf_cc'){
+        # The CC backend allows the loser an ARM bonus when hit.
+        $output = execute_backend('CC', @args1, @args2);
+        $output->{type} = 'ftf';
     }else{
         # Face to Face Roll
-
-        # Determine if we should use BS or CC backend
-        # The only difference is that the CC backend allows
-        # the loser an ARM bonus when hit.
-        my $mode;
-        if($ammo_codes->{param('p1.ammo') // 'Normal'}{no_arm_bonus} || $ammo_codes->{param('p2.ammo') // 'Normal'}{no_arm_bonus}){
-            # Use of Monofilament CCW prevents CC ARM bonus
-            $mode = 'BS';
-        }elsif($act_1 eq 'cc' && $act_2 eq 'cc'){
-            # otherwise if both are in CC use CC backend
-            $mode = 'CC';
-        }else{
-            # BS backend is default for all other skills
-            $mode = 'BS';
-        }
-
-        $output = execute_backend($mode, @args1, @args2);
+        $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'ftf';
     }
 

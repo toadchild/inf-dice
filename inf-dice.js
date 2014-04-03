@@ -177,6 +177,7 @@ function set_action(player){
         enable_display(player + ".sec_weapon");
         enable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
         enable_display(other + ".sec_cover");
     }else if(action.value == "dtw"){
         // weapon
@@ -203,6 +204,7 @@ function set_action(player){
         enable_display(player + ".sec_weapon");
         enable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
         enable_display(other + ".sec_cover");
     }else if(action.value == "cc"){
         // weapon
@@ -229,6 +231,7 @@ function set_action(player){
         enable_display(player + ".sec_weapon");
         disable_display(player + ".sec_shoot");
         enable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
         disable_display(other + ".sec_cover");
     }else if(action.value == "dodge"){
         // weapon
@@ -255,6 +258,34 @@ function set_action(player){
         disable_display(player + ".sec_weapon");
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
+        disable_display(other + ".sec_cover");
+    }else if(action.value == "hack_imm" || action.value == "hack_ahp" || action.value == "hack_def" || action.value == "hack_pos"){
+        // weapon
+        disable_input(player + ".b");
+        disable_input(player + ".ammo");
+
+        // modifiers
+        disable_input(player + ".range");
+        disable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".motorcycle");
+
+        // cc modifiers
+        disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+        set_berserk(player, other);
+
+        // defensive abilities
+        disable_input(other + ".cover");
+        disable_input(other + ".ch");
+        disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        disable_display(player + ".sec_weapon");
+        disable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
+        enable_display(player + ".sec_hack");
         disable_display(other + ".sec_cover");
     }else if(action.value == "none"){
         // weapon
@@ -281,6 +312,7 @@ function set_action(player){
         disable_display(player + ".sec_weapon");
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
         disable_display(other + ".sec_cover");
     }
     populate_weapons(player);
@@ -546,6 +578,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".msv")[0].value = unit["msv"];
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"];
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
+        document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
@@ -570,7 +603,35 @@ function set_unit(player, check_params){
         full_stat_dropdown_list(player, "type", unit_types, check_params);
     }
 
+    populate_actions(player, check_params);
     populate_weapons(player, check_params);
+}
+
+function populate_actions(player, check_params){
+    var action_list = document.getElementsByName(player + ".action")[0];
+    var unit = get_unit_data(player);
+
+    var selected_action = action_list.value;
+    if(check_params){
+        selected_action = params[player + ".action"];
+    }
+
+    action_list.length = 0;
+    for(var a = 0; a < master_action_list.length; a++){
+        action = master_action_list[a];
+
+        if(action["filter"] && !action["filter"](unit)){
+            continue;
+        }
+
+        action_list.options[action_list.options.length] = new Option(action["label"], action["value"]);
+
+        if(action["value"] == selected_action){
+            action_list.options[action_list.options.length - 1].selected = true;
+        }
+    }
+
+    set_action(player);
 }
 
 function set_faction(player, check_params){
@@ -631,15 +692,61 @@ function parse_params(){
 function init_on_load(){
     parse_params();
 
-    set_action("p1");
-    set_action("p2");
-
     set_faction("p1", true);
     set_faction("p2", true);
 }
 
 function raw_output(){
     toggle_display("raw_output");
+}
+
+function action_weapon_filter(unit, action){
+    if(!unit){
+        return 1;
+    }
+
+    var attack_filter = "att_" + action;
+
+    for(var i = 0; i < unit.weapons.length; i++){
+        var weapon = weapon_data[unit.weapons[i]];
+        if(weapon && weapon[attack_filter]){
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+function action_bs_filter(unit){
+    return action_weapon_filter(unit, "bs");
+}
+
+function action_cc_filter(unit){
+    return action_weapon_filter(unit, "cc");
+}
+
+function action_dtw_filter(unit){
+    return action_weapon_filter(unit, "dtw");
+}
+
+function action_hack_n_filter(unit, n){
+    if(!unit){
+        return 1;
+    }
+
+    if(unit["hacker"] >= n){
+        return 1;
+    }
+
+    return 0;
+}
+
+function action_hack_1_filter(unit){
+    return action_hack_n_filter(unit, 1);
+}
+
+function action_hack_2_filter(unit){
+    return action_hack_n_filter(unit, 2);
 }
 
 var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
@@ -650,3 +757,48 @@ var bts_list = [0, -3, -6, -9];
 var stat_max = 22;
 var arm_max = 10;
 var w_max = 3;
+var master_action_list = [
+    { 
+        "label": "Attack - Shoot",
+        "value": "bs",
+        "filter": action_bs_filter,
+    },
+    { 
+        "label": "Attack - Direct Template Weapon",
+        "value": "dtw",
+        "filter": action_dtw_filter,
+    },
+    { 
+        "label": "Attack - Close Combat",
+        "value": "cc",
+        "filter": action_cc_filter,
+    },
+    { 
+        "label": "Dodge",
+        "value": "dodge",
+    },
+    { 
+        "label": "Hacking - Immobilize HI/REM/TAG",
+        "value": "hack_imm",
+        "filter": action_hack_2_filter,
+    },
+    { 
+        "label": "Hacking - Possess TAG",
+        "value": "hack_pos",
+        "filter": action_hack_2_filter,
+    },
+    { 
+        "label": "Hacking - Anti-Hacker Protocols",
+        "value": "hack_ahp",
+        "filter": action_hack_2_filter,
+    },
+    { 
+        "label": "Hacking - Defensive Hacking",
+        "value": "hack_def",
+        "filter": action_hack_1_filter,
+    },
+    { 
+        "label": "No Action",
+        "value": "none",
+    },
+];

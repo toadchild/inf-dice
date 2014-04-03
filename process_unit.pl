@@ -170,7 +170,7 @@ sub has_motorcycle{
 
 my $dual_weapons = {};
 sub get_weapons{
-    my ($unit, $ability_func) = @_;
+    my ($unit, $new_unit, $inherit_weapon, $ability_func) = @_;
     my $weapons = {};
 
     for my $w (@{$unit->{bsw}}){
@@ -179,6 +179,10 @@ sub get_weapons{
 
     for my $w (@{$unit->{ccw}}){
         $weapons->{$w} = 1;
+    }
+
+    if(!$inherit_weapon){
+        $new_unit->{hacker} = 0;
     }
     
     for my $child (@{$unit->{childs}}){
@@ -210,6 +214,10 @@ sub get_weapons{
         for my $w (@{$child->{ccw}}){
             $weapons->{$w} = 1;
         }
+
+        if(has_hacker($child)){
+            $new_unit->{hacker} = has_hacker($child);
+        }
     }
 
     # Make a list of dual weapons used
@@ -219,7 +227,12 @@ sub get_weapons{
         }
     }
 
-    return [sort keys %$weapons];
+    my @weapons = sort keys %$weapons;
+    if(@weapons){
+        $new_unit->{weapons} = [@weapons];
+    }elsif(!$inherit_weapon){
+        $new_unit->{weapons} = [];
+    }
 }
 
 my %unit_type_order = (
@@ -245,9 +258,9 @@ sub parse_unit{
     my ($new_unit, $unit) = @_;
 
     # Seed Embryos do not inherit their parent profile's weapons
-    my ($no_weapon, $inherit_shasvastii) = (0, 0);
+    my ($inherit_weapon, $inherit_shasvastii) = (1, 0);
     if($new_unit->{shasvastii}){
-        $no_weapon = 1;
+        $inherit_weapon = 0;
         $inherit_shasvastii = 1;
     }
 
@@ -285,14 +298,10 @@ sub parse_unit{
     $new_unit->{ch} = has_camo($new_unit);
     $new_unit->{odd} = has_odd($new_unit);
     $new_unit->{msv} = has_msv($new_unit);
+    $new_unit->{hacker} = has_hacker($new_unit) || $new_unit->{hacker} || 0;
 
-    # get_weapons goes into the childs list; needs $unit instead of $new_unit
-    my $weapons = get_weapons($unit);
-    if(@$weapons){
-        $new_unit->{weapons} = $weapons;
-    }elsif($no_weapon){
-        $new_unit->{weapons} = [];
-    }
+    # get_weapons goes into the childs list
+    get_weapons($unit, $new_unit, $inherit_weapon);
 }
 
 my $unit_data = {};
@@ -387,7 +396,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " (MSV $msv)";
                 $child_unit->{msv} = $msv;
-                $child_unit->{weapons} = get_weapons($unit, \&has_msv);
+                get_weapons($unit, $child_unit, 0, \&has_msv);
                 push @{$child_unit->{spec}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
@@ -401,7 +410,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " ($camo_names->{$ch})";
                 $child_unit->{ch} = $ch;
-                $child_unit->{weapons} = get_weapons($unit, \&has_camo);
+                get_weapons($unit, $child_unit, 0, \&has_camo);
                 push @{$child_unit->{spec}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
@@ -414,7 +423,7 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
             if(!$xvisor && ($xvisor = has_xvisor($child))){
                 my $child_unit = clone($new_unit);
                 $child_unit->{name} .= " (X Visor)";
-                $child_unit->{weapons} = get_weapons($unit, \&has_xvisor);
+                get_weapons($unit, $child_unit, 0, \&has_xvisor);
                 push @{$child_unit->{spec}}, @{$child->{spec}};
 
                 push @unit_list, $child_unit;
