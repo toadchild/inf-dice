@@ -1104,7 +1104,7 @@ sub gen_args{
     my ($us, $them) = @_;
 
     my $action = param("$us.action");
-    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'throw'){
+    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
         return gen_hack_args($us, $them);

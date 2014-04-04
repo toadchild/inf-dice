@@ -67,7 +67,7 @@ function set_ammo(player, check_params){
     var action = document.getElementsByName(action_name)[0];
 
     var ammo;
-    if(action.value == "bs" || action.value == "cc" || action.value == "dtw" || action.value == "throw"){
+    if(action.value == "bs" || action.value == "cc" || action.value == "dtw"){
         ammo = document.getElementsByName(player + ".ammo")[0].value;
     }else{
         // Any case where we aren't attacking
@@ -152,7 +152,7 @@ function set_action(player){
     var other_action_name = other + ".action";
     var other_action = document.getElementsByName(other_action_name)[0];
 
-    if(action.value == "bs" || action.value == "throw"){
+    if(action.value == "bs"){
         // weapon
         enable_input(player + ".b");
         enable_input(player + ".ammo");
@@ -440,7 +440,7 @@ function populate_weapons(player, check_params){
     weapon_list.options[weapon_list.options.length] = new Option("--");
     weapon_list.options[weapon_list.options.length - 1].disabled = true;
 
-    if(action == "bs" || action == "cc" || action == "throw" || action == "dtw"){
+    if(action == "bs" || action == "cc" || action == "dtw"){
         weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
 
         if("Custom Weapon" == selected_weapon){
