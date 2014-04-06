@@ -74,8 +74,8 @@ my $ammo_codes = {
     Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded'},
     'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
     'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
-    'Smoke' => {code => '-', cover => 0, no_lof => 1},
-    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1},
+    'Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0},
+    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0},
     'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized'},
     # Placeholders for unimplemented ammos
     'Plasma' => {code => 'N'},
@@ -86,9 +86,9 @@ my $ammo_codes = {
 my $skill_codes = {
     'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize', no_lof => 1},
     'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols', no_lof => 1},
-    'hack_def' => {title => 'Defensive Hacking', no_lof => 1},
+    'hack_def' => {title => 'Defensive Hacking', no_lof => 1, dam => 0},
     'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1},
-    'dodge' => {title => 'Dodge', no_lof => 1},
+    'dodge' => {title => 'Dodge', no_lof => 1, dam => 0},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -598,11 +598,11 @@ sub print_player_output{
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
         my $done;
 
-        my $w = $h * $dam + $w_taken;
-
-        if($w < $threshold){
+        if($h < $threshold){
             next;
         }
+
+        my $w = $h * $dam + $w_taken;
 
         if($w >= $dead){
             $label = sprintf " (%s)", $code->{label} // 'Dead';
