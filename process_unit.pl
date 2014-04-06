@@ -20,6 +20,58 @@ my %default_wtype = (
     TAG => 'STR',
 );
 
+my $skip_list = {
+    "Uxìa McNeill" => 1,
+    "Tohaa Diplomatic Delegates" => 1,
+};
+
+my @specialist_profiles = (
+    {
+        key => 'msv',
+        ability_func => \&has_msv,
+        name_func => \&name_msv,
+    },
+    {
+        key => 'ch',
+        ability_func => \&has_camo,
+        name_func => \&name_camo,
+    },
+    {
+        key => 'xvisor',
+        ability_func => \&has_xvisor,
+        name_func => \&name_xvisor,
+    },
+    {
+        key => 'specialist',
+        ability_func => \&has_specialist,
+        name_func => \&name_specialist,
+    },
+);
+
+sub name_msv{
+    my ($msv) = @_;
+    return " (MSV $msv)";
+}
+
+my $camo_names = {
+    1 => 'Mimetism',
+    2 => 'Camo',
+    3 => 'TO Camo',
+};
+
+sub name_camo{
+    my ($ch) = @_;
+    return " ($camo_names->{$ch})";
+}
+
+sub name_xvisor{
+    return " (X Visor)";
+}
+
+sub name_specialist{
+    return " (Specialist)";
+}
+
 sub has_spec{
     my ($unit, $name) = @_;
 
@@ -55,7 +107,9 @@ sub has_ikohl{
 
     for my $spec (@{$unit->{spec}}){
         # i-Kohl L3
-        if($spec =~ m/i-Kohl.*(\d+)/){
+        # i-Khol L2
+        # iKohl L1
+        if($spec =~ m/i(?:-)?K[oh][oh]l.*(\d+)/){
             return -3 * $1;
         }
     }
@@ -105,12 +159,6 @@ sub has_camo{
 
     return 0;
 }
-
-my $camo_names = {
-    1 => 'Mimetism',
-    2 => 'Camo',
-    3 => 'TO Camo',
-};
 
 sub has_odd{
     my ($unit) = @_;
@@ -168,6 +216,10 @@ sub has_motorcycle{
     return has_spec(@_, "Motorcycle");
 }
 
+sub has_specialist{
+    return has_spec(@_, "Specialist");
+}
+
 my $dual_weapons = {};
 sub get_weapons{
     my ($unit, $new_unit, $inherit_weapon, $ability_func) = @_;
@@ -185,10 +237,14 @@ sub get_weapons{
         $new_unit->{hacker} = 0;
     }
     
-    for my $child (@{$unit->{childs}}){
+    CHILD: for my $child (@{$unit->{childs}}){
         # Keep specialists out of normal circulation
-        if(!$ability_func && (has_msv($child) || has_camo($child) || has_xvisor($child))){
-            next;
+        if(!$ability_func){
+            for my $specialist (@specialist_profiles){
+                if($specialist->{ability_func}($child)){
+                    next CHILD;
+                }
+            }
         }
 
         # select only the special children otherwise
@@ -255,13 +311,17 @@ sub unit_sort{
 }
 
 sub parse_unit{
-    my ($new_unit, $unit) = @_;
+    my ($new_unit, $unit, $ability_func) = @_;
 
     # Seed Embryos do not inherit their parent profile's weapons
     my ($inherit_weapon, $inherit_shasvastii) = (1, 0);
     if($new_unit->{shasvastii}){
         $inherit_weapon = 0;
         $inherit_shasvastii = 1;
+    }
+
+    if($ability_func){
+        $inherit_weapon = 0;
     }
 
     my $rider = 0;
@@ -298,10 +358,11 @@ sub parse_unit{
     $new_unit->{ch} = has_camo($new_unit);
     $new_unit->{odd} = has_odd($new_unit);
     $new_unit->{msv} = has_msv($new_unit);
+    $new_unit->{xvisor} = has_xvisor($new_unit);
     $new_unit->{hacker} = has_hacker($new_unit) || $new_unit->{hacker} || 0;
 
     # get_weapons goes into the childs list
-    get_weapons($unit, $new_unit, $inherit_weapon);
+    get_weapons($unit, $new_unit, $inherit_weapon, $ability_func);
 }
 
 my $unit_data = {};
@@ -386,47 +447,30 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         }
         $faction = $unit->{army};
 
-        push @unit_list, $new_unit;
+        if(!$skip_list->{$new_unit->{name}}){
+            push @unit_list, $new_unit;
+        }
 
         # Check for child units with special skills we care about
-        my $msv = $new_unit->{msv};
-        for my $child (@{$unit->{childs}}){
-            next if $child->{_processed};
-            if(!$msv && ($msv = has_msv($child))){
-                my $child_unit = clone($new_unit);
-                $child_unit->{name} .= " (MSV $msv)";
-                $child_unit->{msv} = $msv;
-                get_weapons($unit, $child_unit, 0, \&has_msv);
-                push @{$child_unit->{spec}}, @{$child->{spec}};
+        for my $specialist (@specialist_profiles){
+            my $ability = $new_unit->{$specialist->{key}};
 
-                push @unit_list, $child_unit;
-            }
-        }
+            for my $child (@{$unit->{childs}}){
+                next if $child->{_processed};
+                if(!$ability && ($ability = $specialist->{ability_func}($child))){
+                    my $child_unit = clone($new_unit);
 
-        my $ch = $new_unit->{ch};
-        for my $child (@{$unit->{childs}}){
-            next if $child->{_processed};
-            if(!$ch && ($ch = has_camo($child))){
-                my $child_unit = clone($new_unit);
-                $child_unit->{name} .= " ($camo_names->{$ch})";
-                $child_unit->{ch} = $ch;
-                get_weapons($unit, $child_unit, 0, \&has_camo);
-                push @{$child_unit->{spec}}, @{$child->{spec}};
+                    # stats replace if present, otherwise inherit
+                    $child->{spec} = [@{$unit->{spec}}, @{$child->{spec}}];
+                    $child->{bsw} = [@{$unit->{bsw}}, @{$child->{bsw}}];
+                    $child->{ccw} = [@{$unit->{ccw}}, @{$child->{ccw}}];
+                    $child->{childs} = $unit->{childs};
+                    parse_unit($child_unit, $child, $specialist->{ability_func});
 
-                push @unit_list, $child_unit;
-            }
-        }
+                    $child_unit->{name} = $new_unit->{name} . $specialist->{name_func}($ability);
 
-        my $xvisor = has_xvisor($new_unit);
-        for my $child (@{$unit->{childs}}){
-            next if $child->{_processed};
-            if(!$xvisor && ($xvisor = has_xvisor($child))){
-                my $child_unit = clone($new_unit);
-                $child_unit->{name} .= " (X Visor)";
-                get_weapons($unit, $child_unit, 0, \&has_xvisor);
-                push @{$child_unit->{spec}}, @{$child->{spec}};
-
-                push @unit_list, $child_unit;
+                    push @unit_list, $child_unit;
+                }
             }
         }
 

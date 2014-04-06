@@ -933,13 +933,20 @@ sub gen_attack_args{
         }
 
         # berserk only works if they CC or Dodge in response
-        my $berserk = 0;
         if(param("$us.berserk") && ($other_action eq 'cc' || $other_action eq 'dodge' || $other_action eq 'none')){
-            $berserk = 9;
+            $stat += 9;
             $type = 'normal';
         }
 
-        $stat += (param("$them.ikohl") // 0) + (param("$us.gang_up") // 0) + $berserk;
+        # iKohl does not work on models with STR
+        my $ikohl = param("$them.ikohl") // 0;
+        my $w_type = param("$us.w_type") // 'W';
+        if($w_type eq 'STR'){
+            $ikohl = 0;
+        }
+        $stat += $ikohl;
+
+        $stat += (param("$us.gang_up") // 0);
         $stat = max($stat, 0);
 
         $b = 1;
