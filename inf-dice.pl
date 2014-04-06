@@ -74,8 +74,8 @@ my $ammo_codes = {
     Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded'},
     'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
     'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
-    'Smoke' => {code => '-', cover => 0},
-    'Zero-V Smoke' => {code => '-', cover => 0},
+    'Smoke' => {code => '-', cover => 0, no_lof => 1},
+    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1},
     'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized'},
     # Placeholders for unimplemented ammos
     'Plasma' => {code => 'N'},
@@ -84,11 +84,11 @@ my $ammo_codes = {
 };
 
 my $skill_codes = {
-    'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize'},
-    'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols'},
-    'hack_def' => {title => 'Defensive Hacking'},
-    'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess'},
-    'dodge' => {title => 'Dodge'},
+    'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize', no_lof => 1},
+    'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols', no_lof => 1},
+    'hack_def' => {title => 'Defensive Hacking', no_lof => 1},
+    'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1},
+    'dodge' => {title => 'Dodge', no_lof => 1},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -881,6 +881,13 @@ sub gen_attack_args{
 
     my $action = param("$us.action");
     my $other_action = param("$them.action");
+
+    # look up their skill/ammo code
+    my $other_code = $skill_codes->{$other_action};
+    if(!defined $other_code){
+        $other_code = $ammo_codes->{param("$them.ammo") // 'Normal'};
+    }
+
     if($action eq 'bs'){
         # BS mods
         $type = 'ftf';
@@ -909,6 +916,20 @@ sub gen_attack_args{
 
         $b = (param("$us.b") // 1) + $link_b;
         $arm += $cover;
+
+        # Smoke provides no defense against non-lof skills
+        if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
+            if($other_code->{no_lof}){
+                $type = 'normal';
+            }
+        }
+
+        # Regular Smoke is useless against MSV2+
+        if($ammo_name eq 'Smoke'){
+            if((param("$them.msv") // 0) >= 2){
+                $type = 'normal';
+            }
+        }
     }elsif($action eq 'dtw'){
         # DTW mods
         $type = 'normal';
