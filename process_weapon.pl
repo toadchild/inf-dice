@@ -30,6 +30,11 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             next;
         }
 
+        # Fix name of Fist attack
+        if($weapon->{name} eq 'TAG Fist'){
+            $weapon->{name} = 'Fist';
+        }
+
         # Multiple ammo types and burst reduction
         my $multi = 0;
         if($weapon->{name} =~ m/MULTI/){

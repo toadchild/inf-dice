@@ -283,9 +283,19 @@ sub get_weapons{
         }
     }
 
-    my @weapons = sort keys %$weapons;
-    if(@weapons){
-        $new_unit->{weapons} = [@weapons];
+    if(keys %$weapons){
+        # add a Fist if they have no Knife, Pistol, or CCW
+        my $has_ccw = 0;
+        for my $w (keys %$weapons){
+            if($w eq 'Knife' || $w =~ m/CCW/ || $w =~ m/Pistol/){
+                $has_ccw = 1;
+            }
+        }
+        if(!$has_ccw){
+            $weapons->{Fist} = 1;
+        }
+
+        $new_unit->{weapons} = [sort keys %$weapons];
     }elsif(!$inherit_weapon){
         $new_unit->{weapons} = [];
     }
