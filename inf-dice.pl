@@ -1010,6 +1010,8 @@ sub gen_hack_args{
         }elsif($unit_type eq 'HI' && $faction ne 'Ariadna'){
             # Ariadna HI are unhackable
             $can_hack = 1;
+        }elsif($other_action eq 'hack_def'){
+            $can_hack = 1;
         }
 
         # Immobilization does not protect against hacking attacks
@@ -1023,6 +1025,8 @@ sub gen_hack_args{
 
         # CA TAGs cannot be possessed by humans
         if($unit_type eq 'TAG' && ($other_faction ne 'Combined Army' || $faction eq 'Combined Army')){
+            $can_hack = 1;
+        }elsif($other_action eq 'hack_def'){
             $can_hack = 1;
         }
 
@@ -1045,7 +1049,7 @@ sub gen_hack_args{
         }
     }elsif($action eq 'hack_def'){
         # Defensive Hacking is only useful against hacking attacks
-        if($other_action eq 'hack_ahp' || $other_action eq 'hack_imm'){
+        if($other_action eq 'hack_ahp' || $other_action eq 'hack_imm' || $other_action eq 'hack_pos'){
             $can_hack = 1;
         }
     }
