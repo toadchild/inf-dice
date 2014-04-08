@@ -136,7 +136,7 @@ my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
     0 => 'None',
     -3 => 'Mimetism/Camo (-3 Opponent BS)',
-    -6 => 'TO Camo/ODD/ODF (-6 Opponent BS)',
+    -6 => 'TO Camo/ODD (-6 Opponent BS)',
 };
 
 my $ikohl = ['0', '-3', '-6', '-9'];
@@ -475,12 +475,17 @@ sub print_input_attack_section{
           ),
           "</div>\n";
 
-    print "<div id='$player.sec_cover'>",
-          "<h3>Cover</h3>",
+    print "<div id='$player.sec_defense'>",
+          "<h3>Defensive Modifiers</h3>",
           span_checkbox(-name => "$player.cover",
               -checked => defined(param("$player.cover")),
               -value => 3,
               -label => 'Cover (+3 ARM, -3 Opponent BS)'),
+          "<br>",
+          span_checkbox(-name => "$player.odf",
+              -checked => defined(param("$player.odf")),
+              -value => -6,
+              -label => 'ODF (-6 Opponent BS)'),
           "</div>\n";
 }
 
@@ -893,6 +898,11 @@ sub gen_attack_args{
         $type = 'ftf';
 
         my $camo = param("$them.ch") // 0;
+        my $odf = param("$them.odf") // 0;
+        if($odf < $camo){
+            $camo = $odf;
+        }
+
         my $msv = param("$us.msv") // 0;
         if($msv >= 1 && $camo >= -3){
             $camo = 0;

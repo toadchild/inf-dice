@@ -171,6 +171,7 @@ function set_action(player){
         // defensive abilities
         enable_input(other + ".cover");
         enable_input(other + ".ch");
+        enable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -178,7 +179,7 @@ function set_action(player){
         enable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
-        enable_display(other + ".sec_cover");
+        enable_display(other + ".sec_defense");
     }else if(action.value == "dtw"){
         // weapon
         enable_input(player + ".b");
@@ -198,6 +199,7 @@ function set_action(player){
         // defensive abilities
         enable_input(other + ".cover");
         disable_input(other + ".ch");
+        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -205,7 +207,7 @@ function set_action(player){
         enable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
-        enable_display(other + ".sec_cover");
+        enable_display(other + ".sec_defense");
     }else if(action.value == "cc"){
         // weapon
         disable_input(player + ".b");
@@ -225,6 +227,7 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
+        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -232,7 +235,7 @@ function set_action(player){
         disable_display(player + ".sec_shoot");
         enable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
-        disable_display(other + ".sec_cover");
+        disable_display(other + ".sec_defense");
     }else if(action.value == "dodge"){
         // weapon
         disable_input(player + ".b");
@@ -252,6 +255,7 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
+        disable_input(other + ".odf");
         enable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -259,7 +263,7 @@ function set_action(player){
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
-        disable_display(other + ".sec_cover");
+        disable_display(other + ".sec_defense");
     }else if(action.value == "hack_imm" || action.value == "hack_ahp" || action.value == "hack_def" || action.value == "hack_pos"){
         // weapon
         disable_input(player + ".b");
@@ -279,6 +283,7 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
+        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -286,7 +291,7 @@ function set_action(player){
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         enable_display(player + ".sec_hack");
-        disable_display(other + ".sec_cover");
+        disable_display(other + ".sec_defense");
     }else if(action.value == "none"){
         // weapon
         disable_input(player + ".b");
@@ -306,6 +311,7 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
+        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -313,7 +319,7 @@ function set_action(player){
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
-        disable_display(other + ".sec_cover");
+        disable_display(other + ".sec_defense");
     }
     populate_weapons(player);
 }
