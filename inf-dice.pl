@@ -1110,7 +1110,6 @@ sub gen_dodge_args{
 
     my $stat = param("$us.ph") // 0;
     $stat += $dodge_unit;
-    $stat += param("$us.gang_up") // 0;
     $stat += param("$us.hyperdynamics") // 0;
 
     my $type = 'ftf';
