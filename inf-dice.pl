@@ -148,14 +148,6 @@ my $ikohl_labels = {
     -9 => 'Level 3 (-9 Opponent CC)',
 };
 
-my $range = ['3', '0', '-3', '-6'];
-my $range_labels = {
-    3 => '+3 BS',
-    0 => '+0 BS',
-    -3 => '-3 BS',
-    -6 => '-6 BS',
-};
-
 my $viz = ['0', '-3', '-6'];
 my $viz_labels = {
     0 => 'None',
@@ -430,9 +422,6 @@ sub print_input_attack_section{
     print "<div id='$player.sec_shoot'>
           <h3>Shooting Modifiers</h3>",
           span_popup_menu(-name => "$player.range",
-              -values => $range,
-              -default => param("$player.range") // 0,
-              -labels => $range_labels,
               -label => "Range",
           ),
           "<br>",
@@ -922,7 +911,13 @@ sub gen_attack_args{
         $stat = lc(param("$us.stat") // 'bs');
         $stat = param("$us.$stat") // 0;
 
-        $stat += $camo - $cover + (param("$us.range") // 0) + $viz + $link_bs;
+        # Range comes in as 0-8/+3 OR +3
+        # Select only the final number
+        my $range = param("$us.range") // 0;
+        $range =~ m/(-?\d+)$/;
+        $range = $1;
+
+        $stat += $camo - $cover + $range + $viz + $link_bs;
         $stat = max($stat, 0);
 
         $b = (param("$us.b") // 1) + $link_b;

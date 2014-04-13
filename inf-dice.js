@@ -329,6 +329,7 @@ function set_weapon(player, check_params){
     var stat_list = document.getElementsByName(player + ".stat")[0];
     var ammo_list = document.getElementsByName(player + ".ammo")[0];
     var dam_list = document.getElementsByName(player + ".dam")[0];
+    var range_list = document.getElementsByName(player + ".range")[0];
     var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
     var action = document.getElementsByName(player + ".action")[0].value;
     var weapon = weapon_data[weapon_name];
@@ -346,66 +347,100 @@ function set_weapon(player, check_params){
     if(check_params){
         selected_stat = params[player + ".stat"];
     }
+    var selected_range = range_list.value;
+    if(check_params){
+        selected_range = params[player + ".range"];
+    }
+
+    var my_ammo = ammos;
+    var my_stat = stats;
+    var my_dam = damages;
+    var my_range = ranges;
 
     if(weapon){
-        // Ammo types
-        ammo_list.length = 0;
-        for(var i = 0; i < weapon["ammo"].length; i++){
-            ammo_list.options[i] = new Option(weapon["ammo"][i]);
+        my_ammo = weapon["ammo"];
+        my_stat = [weapon["stat"]];
+        my_dam = [weapon["dam"]];
+        my_range = weapon["ranges"];
+    }
 
-            if(weapon["ammo"][i] == selected_ammo){
-                ammo_list.options[i].selected = true;
-            }
+    // Ammo types
+    ammo_list.length = 0;
+    for(var i = 0; i < my_ammo.length; i++){
+        ammo_list.options[i] = new Option(my_ammo[i]);
+
+        if(my_ammo[i] == selected_ammo){
+            ammo_list.options[i].selected = true;
         }
+    }
 
-        // Stat used
-        stat_list.length = 0;
-        var stat = weapon["stat"];
-        if(action == "cc"){
-            stat = "CC";
-        }else if(action == "dtw"){
-            stat = "--";
-        }
-        stat_list.options[0] = new Option(stat);
-
-        dam_list.length = 0;
-        dam_list.options[0] = new Option(weapon["dam"]);
+    // Stat used
+    stat_list.length = 0;
+    if(action == "cc"){
+        stat_list.options[0] = new Option("CC");
+    }else if(action == "dtw" || action == "dodge"){
+        stat_list.options[0] = new Option("--");
     }else{
-        // Custom weapon
-        // set default values
+        for(var i = 0; i < my_stat.length; i++){
+            stat_list.options[i] = new Option(my_stat[i]);
 
-        ammo_list.length = 0;
-        for(var i = 0; i < ammos.length; i++){
-            ammo_list.options[i] = new Option(ammos[i]);
+            if(my_stat[i] == selected_stat){
+                stat_list.options[i].selected = true;
+            }
+        }
+    }
 
-            if(ammos[i] == selected_ammo){
-                ammo_list.options[i].selected = true;
+    // Damage
+    dam_list.length = 0;
+    for(var i = 0; i < my_dam.length; i++){
+        dam_list.options[i] = new Option(my_dam[i]);
+
+        if(dam_list.options[i].value == selected_damage){
+            dam_list.options[i].selected = true;
+        }
+    }
+
+    // Range bands
+    range_list.length = 0;
+    if(action == "bs"){
+        var value_match = 1;
+        for(var i = 0; i < my_range.length; i++){
+            range_list.options[i] = new Option(my_range[i]);
+
+            if(range_list.options[i].value == selected_range){
+                range_list.options[i].selected = true;
+                value_match = 0;
             }
         }
 
-        dam_list.length = 0;
-        for(var i = 0; i < damages.length; i++){
-            dam_list.options[i] = new Option(damages[i]);
-
-            if(dam_list.options[i].value == selected_damage){
-                dam_list.options[i].selected = true;
+        // Match on modifier value if they don't match the range spec
+        if(value_match){
+            var slash_index = selected_range.lastIndexOf("/");
+            var range_mod;
+            if(slash_index == -1){
+                range_mod = parseInt(selected_range, 10);
+            }else{
+                range_mod = parseInt(selected_range.substring(slash_index + 1), 10);
             }
-        }
 
-        stat_list.length = 0;
-        if(action == "cc"){
-            stat_list.options[0] = new Option("CC");
-        }else if(action == "dtw" || action == "dodge"){
-            stat_list.options[0] = new Option("--");
-        }else{
-            for(var i = 0; i < stats.length; i++){
-                stat_list.options[i] = new Option(stats[i]);
-
-                if(stats[i] == selected_stat){
-                    stat_list.options[i].selected = true;
+            for(var i = 0; i < my_range.length; i++){
+                slash_index = my_range[i].lastIndexOf("/");
+                var cur_mod;
+                if(slash_index == -1){
+                    // Both are bare values
+                    cur_mod = parseInt(my_range[i], 10);
+                }else{
+                    // Extract mod value
+                    cur_mod = parseInt(my_range[i].substring(slash_index + 1), 10);
+                }
+                if(cur_mod == range_mod){
+                    range_list.options[i].selected = true;
+                    break;
                 }
             }
         }
+    }else{
+        range_list[0] = new Option("--");
     }
 
     set_ammo(player, check_params);
@@ -760,6 +795,7 @@ var stats = ["BS", "PH", "WIP"];
 var w_types = ["W", "STR"];
 var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];
 var bts_list = [0, -3, -6, -9];
+var ranges = ["+3", "0", "-3", "-6"];
 var stat_max = 22;
 var arm_max = 10;
 var w_max = 3;

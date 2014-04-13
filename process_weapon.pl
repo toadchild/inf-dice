@@ -110,6 +110,28 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
         if($weapon->{short_dist} ne '--'){
             $new_weapon->{att_bs} = 1;
             $new_weapon->{stat} = uc($weapon->{attr} // 'BS');
+
+            my @brackets = ('short', 'medium', 'long', 'max');
+            my @ranges;
+
+            my $low = 0;
+            for my $bracket (@brackets){
+                my $high = $weapon->{$bracket . '_dist'};
+                my $mod = $weapon->{$bracket . '_mod'};
+
+                if($high eq '--'){
+                    last;
+                }
+
+                if($mod > 0){
+                    $mod = '+' . $mod;
+                }
+
+                push @ranges, "$low-$high/$mod";
+                $low = $high;
+            }
+
+            $new_weapon->{ranges} = [@ranges];
         }
 
         $weapon_data->{$new_weapon->{name}} = $new_weapon;
