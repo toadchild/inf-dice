@@ -80,6 +80,7 @@ my $ammo_codes = {
     # Placeholders for unimplemented ammos
     'Plasma' => {code => 'N'},
     'N+E/M(12)' => {code => 'N'},
+    'AP+E/M(12)' => {code => 'N', ap => 0.5},
     'Stun' => {code => 'N', save => 'bts'},
 };
 

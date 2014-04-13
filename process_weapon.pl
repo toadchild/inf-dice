@@ -10,10 +10,15 @@ my $json = JSON::PP->new;
 $json->pretty(1);
 $json->canonical(1);
 local $/;
+my $json_text;
 
 open IN, '<', 'dual_weapons.dat' or die "Unable to open file";
-my $json_text = <IN>;
+$json_text = <IN>;
 my $dual_weapons = $json->decode($json_text);
+
+open IN, '<', 'dual_ccw.dat' or die "Unable to open file";
+$json_text = <IN>;
+my $dual_ccw = $json->decode($json_text);
 
 my $all_ammo = {};
 my $weapon_data = {};
@@ -121,6 +126,27 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             $weapon_data->{$new_weapon->{name}} = $new_weapon;
         }
     }
+}
+
+for my $weapon (@$dual_ccw){
+    $weapon =~ m/([\w\/]+) CCW \+ ([\w\/]+) CCW/;
+    my @ammo = ($1, $2);
+    my $ammo = join('+', @ammo);
+
+    # E/M Ammo has a special name
+    $ammo =~ s/E\/M/E\/M(12)/;
+
+    $all_ammo->{$ammo} = 1;
+
+    my $new_weapon = {
+        ammo => [$ammo],
+        att_cc => 1,
+        b => [1],
+        dam => 'PH',
+        name => $weapon,
+    };
+
+    $weapon_data->{$new_weapon->{name}} = $new_weapon;
 }
 
 open $file, '>', 'weapon_data.js' or die "Unable to open file";

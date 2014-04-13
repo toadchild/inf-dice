@@ -83,6 +83,10 @@ sub has_spec{
     return 0;
 }
 
+sub has_cc2w{
+    return has_spec(@_, 'CC with 2 Weapons');
+}
+
 sub has_symbiont{
     my ($unit, $inactive) = @_;
     if(has_spec($unit, 'Symbiont Armour')){
@@ -219,6 +223,7 @@ sub has_specialist{
 }
 
 my $dual_weapons = {};
+my $dual_ccw = {};
 sub get_weapons{
     my ($unit, $new_unit, $inherit_weapon, $ability_func) = @_;
     my $weapons = {};
@@ -279,6 +284,19 @@ sub get_weapons{
         if($w =~ m/(.*) \(2\)/){
             $dual_weapons->{$1} = 1;
         }
+    }
+
+    # If they have CC with two weapons, add a combined CCW
+    if(has_cc2w($new_unit)){
+        my @ccws;
+        for my $w (keys %$weapons){
+            if($w =~ m/ CCW/){
+                push @ccws, $w;
+            }
+        }
+        my $new_ccw = join(' + ', sort(@ccws));
+        $dual_ccw->{$new_ccw} = 1;
+        $weapons->{$new_ccw} = 1;
     }
 
     if(keys %$weapons){
@@ -514,3 +532,6 @@ print $file $json->encode($unit_data);
 
 open $file, '>', 'dual_weapons.dat' or die "Unable to open file";
 print $file $json->encode($dual_weapons);
+
+open $file, '>', 'dual_ccw.dat' or die "Unable to open file";
+print $file $json->encode([keys $dual_ccw]);

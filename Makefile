@@ -11,7 +11,7 @@ BIN_TARGETS=inf-dice
 all: ${WWW_TARGETS} ${BIN_TARGETS}
 
 clean:
-	rm -f ${WWW_TARGETS} ${BIN_TARGETS} dual_weapons.dat
+	rm -f ${WWW_TARGETS} ${BIN_TARGETS} dual_weapons.dat dual_ccw.dat
 
 inf-dice: inf-dice.o
 
@@ -26,10 +26,13 @@ hex.png: hexgrid.pl
 dual_weapons.dat: process_unit.pl ia-data/*
 	./process_unit.pl
 
+dual_ccw.dat: process_unit.pl ia-data/*
+	./process_unit.pl
+
 unit_data.js: process_unit.pl ia-data/*
 	./process_unit.pl
 
-weapon_data.js: process_weapon.pl ia-data/* dual_weapons.dat
+weapon_data.js: process_weapon.pl ia-data/* dual_weapons.dat dual_ccw.dat
 	./process_weapon.pl
 
 install: ${WWW_TARGETS} ${BIN_TARGETS}
