@@ -83,6 +83,10 @@ sub has_spec{
     return 0;
 }
 
+sub has_aibeacon{
+    return has_spec(@_, 'AI Beacon');
+}
+
 sub has_cc2w{
     return has_spec(@_, 'CC with 2 Weapons');
 }
@@ -300,15 +304,17 @@ sub get_weapons{
     }
 
     if(keys %$weapons){
-        # add a Fist if they have no Knife, Pistol, or CCW
-        my $has_ccw = 0;
-        for my $w (keys %$weapons){
-            if($w eq 'Knife' || $w =~ m/CCW/ || $w =~ m/Pistol/){
-                $has_ccw = 1;
+        if(!has_aibeacon($new_unit) && $inherit_weapon){
+            # add a Fist if they have no Knife, Pistol, or CCW
+            my $has_ccw = 0;
+            for my $w (keys %$weapons){
+                if($w eq 'Knife' || $w =~ m/CCW/ || $w =~ m/Pistol/){
+                    $has_ccw = 1;
+                }
             }
-        }
-        if(!$has_ccw){
-            $weapons->{Fist} = 1;
+            if(!$has_ccw){
+                $weapons->{Fist} = 1;
+            }
         }
 
         $new_unit->{weapons} = [sort keys %$weapons];
