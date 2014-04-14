@@ -414,7 +414,7 @@ function set_weapon(player, check_params){
         }
 
         // Match on modifier value if they don't match the range spec
-        if(value_match){
+        if(value_match && selected_range){
             var slash_index = selected_range.lastIndexOf("/");
             var range_mod;
             if(slash_index == -1){
