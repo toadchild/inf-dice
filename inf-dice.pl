@@ -509,6 +509,9 @@ sub print_input{
     print_input_tail();
 }
 
+
+# Prints the output block showing the chance that the model took wounds
+# Returns the maximum number of wounds inflicted for rollup purposes
 sub print_player_output{
     my ($output, $player, $other) = @_;
 
@@ -551,6 +554,8 @@ sub print_player_output{
     }
 
     if($symbiont == 2){
+        $symb_disabled = $wounds;
+        $unconscious++;
         $dead++;
         $wounds++;
     }
@@ -590,6 +595,7 @@ sub print_player_output{
     print "<h3>$player_labels->{$player}</h3>";
     print "<p>\n";
 
+    my $max_h = 0;
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
         my $done;
 
@@ -597,6 +603,7 @@ sub print_player_output{
             next;
         }
 
+        $max_h = $h;
         my $w = $h * $dam + $w_taken;
 
         if($w >= $dead){
@@ -623,6 +630,8 @@ sub print_player_output{
     }
 
     print "</p>\n";
+
+    return $max_h;
 }
 
 sub print_miss_output{
@@ -633,27 +642,34 @@ sub print_miss_output{
 }
 
 sub print_hitbar_player{
-    my ($output, $sort, $p) = @_;
+    my ($output, $sort, $p, $cutoff) = @_;
 
     for my $h (sort {$a * $sort <=> $b * $sort} keys %{$output->{hits}{$p}}){
-        print "<td style='width: $output->{hits}{$p}{$h}%;' class='p$p-hit-$h'>";
-        if($output->{hits}{$p}{$h} >= 3.0){
-            printf "%d", $h;
+        my $width = $output->{hits}{$p}{$h};
+        my $label = $h;
+        if($h == $cutoff){
+            $width = $output->{cumul_hits}{$p}{$h};
+            if($width > $output->{hits}{$p}{$h}){
+                $label .= '+';
+            }
+        }elsif($h > $cutoff){
+            next;
+        }
+
+        print "<td style='width: $width%;' class='p$p-hit-$h'>";
+        if($width >= 3.0){
+            print $label;
         }
         print "</td>\n";
     }
 }
 
 sub print_hitbar_output{
-    my ($mode, $output) = @_;
-
-    # mode is normal or ftf
-    # ftf has p1 (decreasing) - miss - p2 (increasing)
-    # normal has p1 (decreasing) - p2 (decreasing) - miss
+    my ($output, $max_1, $max_2) = @_;
 
     print "<table class='hitbar'><tr>\n";
 
-    print_hitbar_player($output, -1, 1);
+    print_hitbar_player($output, -1, 1, $max_1);
 
     print "<td style='width: $output->{hits}{0}%;' class='miss center'>";
     if($output->{hits}{0} >= 3.0){
@@ -661,7 +677,7 @@ sub print_hitbar_output{
     }
     print "</td>\n";
 
-    print_hitbar_player($output, 1, 2);
+    print_hitbar_player($output, 1, 2, $max_2);
 
     print "</tr></table>\n"
 }
@@ -703,13 +719,13 @@ sub print_ftf_output{
     print_roll_subtitle();
 
     if($output->{hits}){
-        print_player_output($output, 1, 2);
+        my $max_1 = print_player_output($output, 1, 2);
 
         print_miss_output($output, 'Neither player succeeds');
 
-        print_player_output($output, 2, 1);
+        my $max_2 = print_player_output($output, 2, 1);
 
-        print_hitbar_output('ftf', $output);
+        print_hitbar_output($output, $max_1, $max_2);
     }
 }
 
@@ -720,12 +736,12 @@ sub print_normal_output{
     print_roll_subtitle();
 
     if($output->{hits}){
-        print_player_output($output, 1, 2);
-        print_player_output($output, 2, 1);
+        my $max_1 = print_player_output($output, 1, 2);
+        my $max_2 = print_player_output($output, 2, 1);
 
         print_miss_output($output, 'No success');
 
-        print_hitbar_output('normal', $output);
+        print_hitbar_output($output, $max_1, $max_2);
     }
 }
 
@@ -735,24 +751,26 @@ sub print_simultaneous_output{
     print "<h2>Simultaneous Normal Rolls</h2>\n";
     print_roll_subtitle();
 
+    my ($max_1, $max_2);
+
     if($output->{A}{hits}){
-        print_player_output($output->{A}, 1, 2);
+        $max_1 = print_player_output($output->{A}, 1, 2);
 
         print_miss_output($output->{A}, 'No success');
     }
 
     if($output->{B}{hits}){
-        print_player_output($output->{B}, 2, 1);
+        $max_2 = print_player_output($output->{B}, 2, 1);
 
         print_miss_output($output->{B}, 'No success');
     }
 
     if($output->{A}{hits}){
-        print_hitbar_output('normal', $output->{A});
+        print_hitbar_output($output->{A}, $max_1, 0);
     }
 
     if($output->{B}{hits}){
-        print_hitbar_output('normal', $output->{B});
+        print_hitbar_output($output->{B}, 0, $max_2);
     }
 }
 
@@ -763,7 +781,7 @@ sub print_none_output{
     if($output->{hits}){
         print_miss_output($output->{B}, 'Nothing happens');
 
-        print_hitbar_output('ftf', $output);
+        print_hitbar_output($output, 0, 0);
     }
 }
 

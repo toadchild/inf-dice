@@ -27,7 +27,7 @@ my $colors = {
     },
 };
 
-my $steps = 15;
+my $steps = 5;
 
 sub initial_color{
     my ($p) = @_;
@@ -84,8 +84,19 @@ for my $p (@$players){
         printf "    background-color: #%02x%02x%02x;\n", $r, $g, $b;
         print "}\n\n";
 
-        $r += $step_r;
-        $g += $step_g;
-        $b += $step_b;
+        if($i < $steps){
+            $r += $step_r;
+            $g += $step_g;
+            $b += $step_b;
+        }
+    }
+
+    # Do another few steps at the same level in case they made a crazy
+    # custom unit
+    for my $i ($steps + 1 .. 2 * $steps){
+        print ".$p-hit-$i {\n";
+        print "    color: $colors->{$p}{text};\n";
+        printf "    background-color: #%02x%02x%02x;\n", $r, $g, $b;
+        print "}\n\n";
     }
 }
