@@ -71,12 +71,12 @@ my $ammo_codes = {
     K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
     Nanotech => {code => 'N', save => 'bts'},
-    Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded'},
-    'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled'},
-    'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled'},
-    'Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0},
-    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0},
-    'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized'},
+    Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s'},
+    'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
+    'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
+    'Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke'},
+    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke'},
+    'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s'},
     # Placeholders for unimplemented ammos
     'Plasma' => {code => 'N'},
     'N+E/M(12)' => {code => 'N'},
@@ -85,11 +85,11 @@ my $ammo_codes = {
 };
 
 my $skill_codes = {
-    'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize', no_lof => 1},
-    'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols', no_lof => 1},
-    'hack_def' => {title => 'Defensive Hacking', no_lof => 1, dam => 0},
-    'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1},
-    'dodge' => {title => 'Dodge', no_lof => 1, dam => 0},
+    'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize', no_lof => 1, format => '%s Hacks %3$s%4$s'},
+    'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols', no_lof => 1, format => '%s Hacks %3$s%4$s'},
+    'hack_def' => {title => 'Defensive Hacking', no_lof => 1, dam => 0, format => '%s Hacks Defensively against %3$s'},
+    'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1, format => '%s Hacks %3$s%4$s'},
+    'dodge' => {title => 'Dodge', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -542,6 +542,9 @@ sub print_player_output{
     my $dam = $code->{dam} // 1;
     my $threshold = $code->{threshold} // 1;
 
+    # pretty printing
+    my $format = $code->{format} // '%s inflicts %d or more wounds on %s%s';
+
     # thresholds or state changes
     my $unconscious = $wounds;
     my $dead = $wounds + 1;
@@ -621,7 +624,8 @@ sub print_player_output{
             $label = '';
         }
 
-        printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> %s inflicts %d or more successes on %s%s<br>", $output->{cumul_hits}{$player}{$h}, $name, $h, $other_name, $label;
+        printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> ", $output->{cumul_hits}{$player}{$h};
+        printf "$format<br>\n", $name, $h, $other_name, $label;
 
         # Stop once we print a line about them being dead
         if($done){
