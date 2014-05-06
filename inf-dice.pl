@@ -1289,7 +1289,7 @@ sub execute_backend_simultaneous{
     my ($args1, $args2) = @_;
     my ($o1, $o2, $output);
 
-    my ($none, $none, @args_none) = gen_none_args();
+    my ($none1, $none2, @args_none) = gen_none_args();
 
     $o1 = execute_backend('BS', @$args1, @args_none);
     $o2 = execute_backend('BS', @args_none, @$args2);
