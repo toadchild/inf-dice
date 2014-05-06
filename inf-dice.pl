@@ -811,15 +811,42 @@ sub print_output{
         print_none_output($output);
     }
 
+    # Only show if we did calculations in the backend
     if($output->{raw}){
-        print "<button onclick='raw_output()'>
-            Toggle raw output
-            </button>
-            <div id='raw_output' style='display: none;'>
+        print "<button onclick='mod_output()'>Show Modifiers</button>\n";
+        print "<button onclick='raw_output()'>Show Raw Stats</button>\n";
+
+        print "<div id='raw_output' style='display: none;'>
             <pre>
 $output->{raw}
             </pre>
             </div>\n";
+
+        print "<div id='mod_output' style='display: none;'>\n";
+
+        if(@{$output->{mods}{1}}){
+            print "<p>";
+            print "<h3>Active Model</h3>\n";
+            print "<ul>\n";
+            for my $m (@{$output->{mods}{1}}){
+                print "<li>$m\n";
+            }
+            print "</ul>\n";
+            print "</p>";
+        }
+
+        if(@{$output->{mods}{2}}){
+            print "<p>";
+            print "<h3>Reactive Model</h3>\n";
+            print "<ul>\n";
+            for my $m (@{$output->{mods}{2}}){
+                print "<li>$m\n";
+            }
+            print "</ul>\n";
+            print "</p>\n";
+        }
+
+        print "</div>\n";
     }
 
     print "</div>\n";
@@ -852,9 +879,10 @@ sub gen_attack_args{
     my ($link_bs, $link_b) = (0, 0);
     my ($arm, $ap, $ammo, $cover, $ignore_cover, $save, $dam);
     my $b;
-    my $stat;
+    my ($stat_name, $stat);
     my ($ammo_name, $code, $immunity);
     my $type;
+    my @mod_strings;
 
     if((param("$us.link") // 0) >= 3){
         $link_b = 1;
@@ -909,40 +937,79 @@ sub gen_attack_args{
         # BS mods
         $type = 'ftf';
 
+        # look up stat to use
+        $stat_name = lc(param("$us.stat") // 'bs');
+        $stat = param("$us.$stat_name") // 0;
+        $stat_name = uc($stat_name);
+
+        push @mod_strings, "Base $stat_name of $stat";
+
         my $camo = param("$them.ch") // 0;
         my $odf = param("$them.odf") // 0;
         if($odf < $camo){
             $camo = $odf;
         }
+        $camo *= $ignore_cover;
+
+        if($cover){
+            push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
+            $stat -= $cover;
+        }
+
+        if($link_bs){
+            push @mod_strings, sprintf('Link Team grants %+d %s', $link_bs, $stat_name);
+            $stat += $link_bs;
+        }
 
         my $msv = param("$us.msv") // 0;
-        if($msv >= 1 && $camo >= -3){
+        if($msv >= 1 && $camo == -3){
+            push @mod_strings, "MSV ignores CH modifier";
             $camo = 0;
-        }elsif($msv >= 2 && $camo >= -6){
+        }elsif($msv >= 2 && $camo < 0){
+            push @mod_strings, "MSV ignores CH/ODD/ODF modifier";
             $camo = 0;
+        }elsif($camo < 0){
+            push @mod_strings, sprintf('CH/ODD/ODF grants %+d %s', $camo, $stat_name);
+            $stat += $camo;
         }
 
         my $viz = param("$us.viz") // 0;
-        if($msv >= 1 && $viz >= -3){
+        if($msv >= 1 && $viz == -3){
+            push @mod_strings, "MSV ignores Visibility modifier";
             $viz = 0;
-        }elsif($msv >= 2 && $viz >= -6){
+        }elsif($msv >= 2 && $viz < 0){
+            push @mod_strings, "MSV ignores Visibility modifier";
             $viz = 0;
+        }elsif($viz < 0){
+            push @mod_strings, sprintf('Visibility grants %+d %s', $viz, $stat_name);
+            $stat += $viz;
         }
 
-        # look up stat to use
-        $stat = lc(param("$us.stat") // 'bs');
-        $stat = param("$us.$stat") // 0;
+        # Regular Smoke is useless against MSV2+
+        if($msv >= 2){
+            if((param("$them.ammo") // '') eq 'Smoke'){
+                push @mod_strings, "MSV ignores Smoke";
+                $type = 'normal';
+            }
+        }
 
         # Range comes in as 0-8/+3 OR +3
         # Select only the final number
         my $range = param("$us.range") // 0;
         $range =~ m/(-?\d+)$/;
         $range = $1;
+        push @mod_strings, sprintf('Range grants %+d %s', $range,  $stat_name);
+        $stat += $range;
 
-        $stat += $camo - $cover + $range + $viz + $link_bs;
         $stat = max($stat, 0);
+        push @mod_strings, "Net $stat_name is $stat";
 
-        $b = (param("$us.b") // 1) + $link_b;
+        $b = (param("$us.b") // 1);
+        if($link_b){
+            push @mod_strings, sprintf('Link Team grants %+d B', $link_b);
+            $b += $link_b;
+        }
+
         $arm += $cover;
 
         # Smoke provides no defense against non-lof skills
@@ -951,19 +1018,18 @@ sub gen_attack_args{
                 $type = 'normal';
             }
         }
-
-        # Regular Smoke is useless against MSV2+
-        if($ammo_name eq 'Smoke'){
-            if((param("$them.msv") // 0) >= 2){
-                $type = 'normal';
-            }
-        }
     }elsif($action eq 'dtw'){
         # DTW mods
         $type = 'normal';
 
         $stat = 'T';
-        $b = (param("$us.b") // 1) + $link_b;
+
+        $b = (param("$us.b") // 1);
+        if($link_b){
+            push @mod_strings, sprintf('Link Team grants %+d B', $link_b);
+            $b += $link_b;
+        }
+
         $arm += $cover;
 
         # templates are FTF against Dodge
@@ -975,6 +1041,7 @@ sub gen_attack_args{
         $type = 'ftf_cc';
 
         $stat = param("$us.cc") // 0;
+        push @mod_strings, "Base CC of $stat";
 
         # monofilament allows no CC ARM bonus
         if($code->{no_arm_bonus}){
@@ -985,18 +1052,30 @@ sub gen_attack_args{
         if(param("$us.berserk") && ($other_action eq 'cc' || $other_action eq 'dodge' || $other_action eq 'none')){
             $stat += 9;
             $type = 'normal';
+            push @mod_strings, 'Berserk grants +9 CC';
         }
 
         # iKohl does not work on models with STR
         my $ikohl = param("$them.ikohl") // 0;
         my $w_type = param("$us.w_type") // 'W';
-        if($w_type eq 'STR'){
-            $ikohl = 0;
+        if($ikohl){
+            if($w_type eq 'STR'){
+                $ikohl = 0;
+                push @mod_strings, 'STR negates i-Kohl';
+            }else{
+                push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
+                $stat += $ikohl;
+            }
         }
-        $stat += $ikohl;
 
-        $stat += (param("$us.gang_up") // 0);
+        my $gang_up = param("$us.gang_up") // 0;
+        if($gang_up){
+            push @mod_strings, sprintf('Gang-up grants %+d CC', $gang_up);
+            $stat += $gang_up;
+        }
+
         $stat = max($stat, 0);
+        push @mod_strings, "Net CC is $stat";
 
         $b = 1;
     }
@@ -1010,6 +1089,7 @@ sub gen_attack_args{
 
     return (
         $type,
+        \@mod_strings,
         $stat,
         $b,
         $dam,
@@ -1109,6 +1189,7 @@ sub gen_hack_args{
 
     return (
         $type,
+        [],
         max($stat, 0),
         $b,
         0,
@@ -1142,6 +1223,7 @@ sub gen_dodge_args{
 
     return (
         $type,
+        [],
         max($stat, 0),
         1,
         0,
@@ -1152,6 +1234,7 @@ sub gen_dodge_args{
 sub gen_none_args{
     return (
         'none',
+        [],
         0,
         1,
         0,
@@ -1183,8 +1266,10 @@ sub execute_backend{
     if(!open DICE, '-|', '/usr/local/bin/inf-dice', @args){
         $output->{error} = 'Unable to execute backend component.';
     }
-    $output->{raw} = '';
     while(<DICE>){
+        $_ =~ s/&/&amp;/g;
+        $_ =~ s/</&lt;/g;
+
         $output->{raw} .= $_;
         if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
             $output->{hits}{$1}{$2} = $3;
@@ -1204,7 +1289,7 @@ sub execute_backend_simultaneous{
     my ($args1, $args2) = @_;
     my ($o1, $o2, $output);
 
-    my ($none, @args_none) = gen_none_args();
+    my ($none, $none, @args_none) = gen_none_args();
 
     $o1 = execute_backend('BS', @$args1, @args_none);
     $o2 = execute_backend('BS', @args_none, @$args2);
@@ -1235,8 +1320,8 @@ sub generate_output{
         return;
     }
 
-    my ($act_1, @args1) = gen_args('p1', 'p2');
-    my ($act_2, @args2) = gen_args('p2', 'p1');
+    my ($act_1, $mod_strings_1, @args1) = gen_args('p1', 'p2');
+    my ($act_2, $mod_strings_2, @args2) = gen_args('p2', 'p1');
 
     # determine if it's FtF or Normal
     my $type;
@@ -1260,6 +1345,9 @@ sub generate_output{
         $output = execute_backend('BS', @args1, @args2);
         $output->{type} = 'ftf';
     }
+
+    $output->{mods}{1} = $mod_strings_1;
+    $output->{mods}{2} = $mod_strings_2;
 
     return $output;
 }

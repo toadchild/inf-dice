@@ -739,6 +739,12 @@ function init_on_load(){
 
 function raw_output(){
     toggle_display("raw_output");
+    disable_display("mod_output");
+}
+
+function mod_output(){
+    toggle_display("mod_output");
+    disable_display("raw_output");
 }
 
 function action_weapon_filter(unit, action){
