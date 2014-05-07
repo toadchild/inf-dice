@@ -1108,6 +1108,7 @@ sub gen_hack_args{
     my $type = 'ftf';
     my $can_hack = 0;
     my $b = 1;
+    my @mod_strings;
 
     if($action eq 'hack_imm'){
         my $unit_type = param("$them.type") // '';
@@ -1173,24 +1174,38 @@ sub gen_hack_args{
     }
 
     my $stat = param("$us.wip") // 0;
+    push @mod_strings, "Base WIP of $stat";
 
     # EVO support bonuses
+    my $evo_mod = 0;
     if($evo eq 'sup_1'){
-        $stat += 3;
+        $evo_mod = 3;
     }elsif($evo eq 'sup_2'){
-        $stat += 6;
+        $evo_mod = 6;
     }elsif($evo eq 'sup_3'){
-        $stat += 9;
-    }elsif($evo eq 'ice'){
+        $evo_mod = 9;
+    }elsif($evo eq 'ice' && $bts){
         $bts = -ceil(abs($bts / 2));
+        push @mod_strings, sprintf('EVO Icebreaker reduces BTS to %d', $bts);
     }
 
-    $stat += $bts;
+    if($evo_mod){
+        push @mod_strings, sprintf('EVO Support grants %+d WIP', $evo_mod);
+        $stat += $evo_mod;
+    }
+
+    if($bts){
+        push @mod_strings, sprintf('BTS grants %+d WIP', $bts);
+        $stat += $bts;
+    }
+
+    $stat = max($stat, 0);
+    push @mod_strings, "Net WIP is $stat";
 
     return (
         $type,
-        [],
-        max($stat, 0),
+        \@mod_strings,
+        $stat,
         $b,
         0,
         '-',
@@ -1199,6 +1214,7 @@ sub gen_hack_args{
 
 sub gen_dodge_args{
     my ($us, $them) = @_;
+    my @mod_strings;
 
     my $dodge_unit = 0;
     my $unit_type = param("$us.type") // '';
@@ -1208,23 +1224,37 @@ sub gen_dodge_args{
     }
 
     my $stat = param("$us.ph") // 0;
-    $stat += $dodge_unit;
-    $stat += param("$us.hyperdynamics") // 0;
+    push @mod_strings, "Base PH of $stat";
+
+    if($dodge_unit){
+        push @mod_strings, sprintf('Unit type grants %+d PH', $dodge_unit);
+        $stat += $dodge_unit;
+    }
+
+    my $hyperdynamics = param("$us.hyperdynamics") // 0;
+    if($hyperdynamics){
+        push @mod_strings, sprintf('Hyperdynamics grants %+d PH', $hyperdynamics);
+        $stat += $hyperdynamics;
+    }
 
     my $type = 'ftf';
 
     # -6 to dodge templates
     if(param("$them.action") eq 'dtw'){
+        push @mod_strings, 'Direct Template Weapon grants -6 PH';
         $stat -= 6;
     }elsif(param("$them.action") eq 'dodge'){
         # double-dodge is normal rolls
         $type = 'normal';
     }
 
+    $stat = max($stat, 0);
+    push @mod_strings, "Net PH is $stat";
+
     return (
         $type,
-        [],
-        max($stat, 0),
+        \@mod_strings,
+        $stat,
         1,
         0,
         '-',
