@@ -1058,10 +1058,14 @@ sub gen_attack_args{
         # iKohl does not work on models with STR
         my $ikohl = param("$them.ikohl") // 0;
         my $w_type = param("$us.w_type") // 'W';
+        # i-Kohl also only works if the other party is executing CC
         if($ikohl){
             if($w_type eq 'STR'){
                 $ikohl = 0;
-                push @mod_strings, 'STR negates i-Kohl';
+                push @mod_strings, 'STR ignores i-Kohl';
+            }elsif($other_action ne 'cc'){
+                $ikohl = 0;
+                push @mod_strings, 'i-Kohl negated by executing a non-CC skill';
             }else{
                 push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
                 $stat += $ikohl;
