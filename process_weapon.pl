@@ -31,7 +31,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
     WEAPON: for my $weapon (@$source_data){
         # Skip unimplemented weapons or other equipment
-        if($weapon->{name} =~ m/Mines|Koala|Charges|Discover|Mauler|Electric Pulse|Hedgehog|Observer|Jammer|Marker|Sepsitor/){
+        if($weapon->{name} =~ m/Mines|Koala|Charges|Discover|Mauler|Electric Pulse|Hedgehog|Observer|Jammer|Sepsitor/){
             next;
         }
 
@@ -106,6 +106,10 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
         $new_weapon->{att_cc} = $weapon->{cc} eq 'Yes' ? 1 : 0;
         $new_weapon->{att_dtw} = $weapon->{cc} eq 'No' && $weapon->{short_dist} eq '--' ? 1 : 0;
+
+        if($weapon->{name} eq 'Marker' || $weapon->{name} =~ m/Grenade|GL/){
+            $new_weapon->{att_spec} = 1;
+        }
 
         if($weapon->{short_dist} ne '--'){
             $new_weapon->{att_bs} = 1;

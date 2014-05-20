@@ -67,7 +67,7 @@ function set_ammo(player, check_params){
     var action = document.getElementsByName(action_name)[0];
 
     var ammo;
-    if(action.value == "bs" || action.value == "cc" || action.value == "dtw"){
+    if(action.value == "bs" || action.value == "cc" || action.value == "dtw" || action.value == "spec"){
         ammo = document.getElementsByName(player + ".ammo")[0].value;
     }else{
         // Any case where we aren't attacking
@@ -172,6 +172,34 @@ function set_action(player){
         enable_input(other + ".cover");
         enable_input(other + ".ch");
         enable_input(other + ".odf");
+        disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        enable_display(player + ".sec_weapon");
+        enable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
+        enable_display(other + ".sec_defense");
+    }else if(action.value == "spec"){
+        // weapon
+        enable_input(player + ".b");
+        enable_input(player + ".ammo");
+
+        // modifiers
+        enable_input(player + ".range");
+        disable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".motorcycle");
+
+        // cc modifiers
+        disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+        set_berserk(player, other);
+
+        // defensive abilities
+        enable_input(other + ".cover");
+        disable_input(other + ".ch");
+        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -402,7 +430,7 @@ function set_weapon(player, check_params){
 
     // Range bands
     range_list.length = 0;
-    if(action == "bs"){
+    if(action == "bs" || action == "spec"){
         var value_match = 1;
         for(var i = 0; i < my_range.length; i++){
             range_list.options[i] = new Option(my_range[i]);
@@ -481,7 +509,7 @@ function populate_weapons(player, check_params){
     weapon_list.options[weapon_list.options.length] = new Option("--");
     weapon_list.options[weapon_list.options.length - 1].disabled = true;
 
-    if(action == "bs" || action == "cc" || action == "dtw"){
+    if(action == "bs" || action == "cc" || action == "dtw" || action == "spec"){
         weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
 
         if("Custom Weapon" == selected_weapon){
@@ -776,6 +804,10 @@ function action_dtw_filter(unit){
     return action_weapon_filter(unit, "dtw");
 }
 
+function action_spec_filter(unit){
+    return action_weapon_filter(unit, "spec");
+}
+
 function action_hack_n_filter(unit, n){
     if(!unit){
         return 1;
@@ -815,6 +847,11 @@ var master_action_list = [
         "label": "Attack - Direct Template Weapon",
         "value": "dtw",
         "filter": action_dtw_filter,
+    },
+    { 
+        "label": "Attack - Speculative Shot",
+        "value": "spec",
+        "filter": action_spec_filter,
     },
     { 
         "label": "Attack - Close Combat",

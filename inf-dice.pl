@@ -82,6 +82,7 @@ my $ammo_codes = {
     'N+E/M(12)' => {code => 'N'},
     'AP+E/M(12)' => {code => 'N', ap => 0.5},
     'Stun' => {code => 'N', save => 'bts'},
+    'Dep. Repeater' => {code => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater'},
 };
 
 my $skill_codes = {
@@ -1018,6 +1019,11 @@ sub gen_attack_args{
                 $type = 'normal';
             }
         }
+
+        # Some weapons aren't attacks
+        if($code->{not_attack}){
+            $type = 'normal';
+        }
     }elsif($action eq 'dtw'){
         # DTW mods
         $type = 'normal';
@@ -1035,6 +1041,46 @@ sub gen_attack_args{
         # templates are FTF against Dodge
         if($other_action eq 'dodge'){
             $type = 'ftf';
+        }
+    }elsif($action eq 'spec'){
+        # Speculative Shot
+        $type = 'ftf';
+
+        # look up stat to use
+        $stat_name = lc(param("$us.stat") // 'bs');
+        $stat = param("$us.$stat_name") // 0;
+        $stat_name = uc($stat_name);
+
+        push @mod_strings, "Base $stat_name of $stat";
+
+        push @mod_strings, sprintf('Speculative Shot grants -6 %s',  $stat_name);
+        $stat -= 6;
+
+        # Range comes in as 0-8/+3 OR +3
+        # Select only the final number
+        my $range = param("$us.range") // 0;
+        $range =~ m/(-?\d+)$/;
+        $range = $1;
+        push @mod_strings, sprintf('Range grants %+d %s', $range,  $stat_name);
+        $stat += $range;
+
+        $stat = max($stat, 0);
+        push @mod_strings, "Net $stat_name is $stat";
+
+        $b = (param("$us.b") // 1);
+
+        $arm += $cover;
+
+        # Smoke provides no defense against non-lof skills
+        if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
+            if($other_code->{no_lof}){
+                $type = 'normal';
+            }
+        }
+
+        # Some weapons aren't attacks
+        if($code->{not_attack}){
+            $type = 'normal';
         }
     }elsif($action eq 'cc'){
         # CC mods
@@ -1280,7 +1326,7 @@ sub gen_args{
     my ($us, $them) = @_;
 
     my $action = param("$us.action");
-    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw'){
+    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'spec'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
         return gen_hack_args($us, $them);
