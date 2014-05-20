@@ -637,7 +637,7 @@ function set_unit(player, check_params){
         full_stat_dropdown(player, "bs", 1, stat_max, check_params);
         full_stat_dropdown(player, "ph", 1, stat_max, check_params);
         full_stat_dropdown(player, "wip", 1, stat_max, check_params);
-        full_stat_dropdown(player, "arm", 1, arm_max, check_params);
+        full_stat_dropdown(player, "arm", 0, arm_max, check_params);
         full_stat_dropdown(player, "w", 1, w_max, 1, check_params);
         full_stat_dropdown_list(player, "bts", bts_list, check_params);
         full_stat_dropdown_list(player, "w_type", w_types, check_params);
