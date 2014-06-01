@@ -396,6 +396,12 @@ sub print_input_attack_section{
           popup_menu(-name => "$player.action",
               -onchange => "set_action('$player')",
           ),
+          "<br>",
+          span_checkbox(-name => "$player.first_strike",
+              -checked => defined(param("$player.first_strike")),
+              -value => 1,
+              -label => "First Strike",
+          ),
           "</div>\n";
 
     print "<div id='$player.sec_weapon'>",
@@ -534,6 +540,7 @@ sub print_player_output{
     my $symbiont = param("p$other.symbiont") // 0;
     my $operator_w = param("p$other.operator") // 0;
     my $action = param("p$player.action") // '';
+    my $disabled_h;
 
     my $code = $skill_codes->{$action};
     if(!defined $code){
@@ -613,16 +620,28 @@ sub print_player_output{
         if($w >= $dead){
             $label = sprintf " (%s)", $code->{label} // 'Dead';
             $done = 1;
+            if(!$disabled_h){
+                $disabled_h = $h;
+            }
         }elsif($w == $symb_disabled){
             $label = ' (Symbiont Disabled)';
         }elsif($w == $eject){
             $label = ' (Operator Ejected)';
+            if(!$disabled_h){
+                $disabled_h = $h;
+            }
         }elsif($w == $unconscious){
             $label = ' (Unconscious)';
+            if(!$disabled_h){
+                $disabled_h = $h;
+            }
         }elsif($w == $spawn){
             $label = ' (Spawn Embryo)';
+            if(!$disabled_h){
+                $disabled_h = $h;
+            }
         }else{
-            $label = '';
+            $label = ' (' . ($wounds - $w) . " $w_type)";
         }
 
         printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> ", $output->{cumul_hits}{$player}{$h};
@@ -636,14 +655,22 @@ sub print_player_output{
 
     print "</p>\n";
 
-    return $max_h;
+    return ($max_h, $disabled_h);
 }
 
 sub print_miss_output{
     my ($output, $text) = @_;
 
     print "<h3>Failures</h3>\n";
-    printf "<p><span class='miss hit_chance'>%.2f%%</span> $text</p>\n", $output->{hits}{0};
+    if($output->{disabled}{1}){
+        printf "<span class='splat hit_chance'>%.2f%%</span> ", $output->{disabled}{1};
+        print "Disabled by first strike<br>\n";
+    }
+    if($output->{disabled}{2}){
+        printf "<span class='splat hit_chance'>%.2f%%</span> ", $output->{disabled}{2};
+        print "Disabled by first strike<br>\n";
+    }
+    printf "<span class='miss hit_chance'>%.2f%%</span> $text<br>\n", $output->{hits}{0};
 }
 
 sub print_hitbar_player{
@@ -676,11 +703,33 @@ sub print_hitbar_output{
 
     print_hitbar_player($output, -1, 1, $max_1);
 
-    print "<td style='width: $output->{hits}{0}%;' class='miss center'>";
-    if($output->{hits}{0} >= 3.0){
-        printf "0";
+    if($output->{disabled}{2}){
+        print "<td style='width: $output->{disabled}{2}%;' class='splat'>";
+        if($output->{disabled}{2} >= 25.0){
+            print "Disabled";
+        }elsif($output->{disabled}{2} >= 3.0){
+            print "D";
+        }
+        print "</td>\n";
     }
-    print "</td>\n";
+
+    if($output->{hits}{0}){
+        print "<td style='width: $output->{hits}{0}%;' class='miss'>";
+        if($output->{hits}{0} >= 3.0){
+            print "0";
+        }
+        print "</td>\n";
+    }
+
+    if($output->{disabled}{1}){
+        print "<td style='width: $output->{disabled}{1}%;' class='splat'>";
+        if($output->{disabled}{1} >= 25.0){
+            print "Disabled";
+        }elsif($output->{disabled}{1} >= 3.0){
+            print "D";
+        }
+        print "</td>\n";
+    }
 
     print_hitbar_player($output, 1, 2, $max_2);
 
@@ -724,11 +773,11 @@ sub print_ftf_output{
     print_roll_subtitle();
 
     if($output->{hits}){
-        my $max_1 = print_player_output($output, 1, 2);
+        my ($max_1, $dis_1) = print_player_output($output, 1, 2);
 
         print_miss_output($output, 'Neither player succeeds');
 
-        my $max_2 = print_player_output($output, 2, 1);
+        my ($max_2, $dis_2) = print_player_output($output, 2, 1);
 
         print_hitbar_output($output, $max_1, $max_2);
     }
@@ -741,8 +790,8 @@ sub print_normal_output{
     print_roll_subtitle();
 
     if($output->{hits}){
-        my $max_1 = print_player_output($output, 1, 2);
-        my $max_2 = print_player_output($output, 2, 1);
+        my ($max_1, $dis_1) = print_player_output($output, 1, 2);
+        my ($max_2, $dis_2) = print_player_output($output, 2, 1);
 
         print_miss_output($output, 'No success');
 
@@ -756,16 +805,16 @@ sub print_simultaneous_output{
     print "<h2>Simultaneous Normal Rolls</h2>\n";
     print_roll_subtitle();
 
-    my ($max_1, $max_2);
+    my ($max_1, $max_2, $dis_1, $dis_2);
 
     if($output->{A}{hits}){
-        $max_1 = print_player_output($output->{A}, 1, 2);
+        ($max_1, $dis_1) = print_player_output($output->{A}, 1, 2);
 
         print_miss_output($output->{A}, 'No success');
     }
 
     if($output->{B}{hits}){
-        $max_2 = print_player_output($output->{B}, 2, 1);
+        ($max_2, $dis_2) = print_player_output($output->{B}, 2, 1);
 
         print_miss_output($output->{B}, 'No success');
     }
@@ -776,6 +825,64 @@ sub print_simultaneous_output{
 
     if($output->{B}{hits}){
         print_hitbar_output($output->{B}, 0, $max_2);
+    }
+}
+
+sub print_first_strike_output{
+    my ($output) = @_;
+
+    print "<h2>First Strike</h2>\n";
+    print_roll_subtitle();
+
+    my ($max_1, $max_2, $dis_1, $dis_2);
+
+    # determine order of attacks
+    my ($first, $second, @first_order, @second_order);
+    if($output->{first_strike} == 1){
+        $first = 'A';
+        $second = 'B';
+        @first_order = (1, 2);
+        @second_order = (2, 1);
+    }else{
+        $first = 'B';
+        $second = 'A';
+        @first_order = (2, 1);
+        @second_order = (1, 2);
+    }
+
+    if($output->{$first}{hits}){
+        ($max_1, $dis_1) = print_player_output($output->{$first}, @first_order);
+
+        # $dis_1 has the number of wounds needed to incapacitate the other player
+        my $dis_chance = $output->{$first}{cumul_hits}{$first_order[0]}{$dis_1};
+
+        # scale all their results down by this amount
+        for my $w (keys %{$output->{$second}{cumul_hits}{$second_order[0]}}){
+            $output->{$second}{cumul_hits}{$second_order[0]}{$w} *= 1 - ($dis_chance / 100.0);
+        }
+        for my $w (keys %{$output->{$second}{hits}{$second_order[0]}}){
+            $output->{$second}{hits}{$second_order[0]}{$w} *= 1 - ($dis_chance / 100.0);
+        }
+        $output->{$second}{hits}{0} *= 1 - ($dis_chance / 100.0);
+
+        # Put chance of being disabled in the hit results
+        $output->{$second}{disabled}{$second_order[0]} = $dis_chance;
+
+        print_miss_output($output->{$first}, 'No success');
+    }
+
+    if($output->{$second}{hits}){
+        ($max_2, $dis_2) = print_player_output($output->{$second}, @second_order);
+
+        print_miss_output($output->{$second}, 'No success');
+    }
+
+    if($output->{$first}{hits}){
+        print_hitbar_output($output->{$first}, $max_1, $max_1);
+    }
+
+    if($output->{$second}{hits}){
+        print_hitbar_output($output->{$second}, $max_2, $max_2);
     }
 }
 
@@ -808,6 +915,8 @@ sub print_output{
         print_normal_output($output);
     }elsif($output->{type} eq 'simultaneous'){
         print_simultaneous_output($output);
+    }elsif($output->{type} eq 'first_strike'){
+        print_first_strike_output($output);
     }elsif($output->{type} eq 'none'){
         print_none_output($output);
     }
@@ -1020,6 +1129,11 @@ sub gen_attack_args{
             }
         }
 
+        # First strike
+        if(param("$us.first_strike")){
+            $type = "first_strike";
+        }
+
         # Some weapons aren't attacks
         if($code->{not_attack}){
             $type = 'normal';
@@ -1042,6 +1156,12 @@ sub gen_attack_args{
         if($other_action eq 'dodge'){
             $type = 'ftf';
         }
+
+        # First strike
+        if(param("$us.first_strike")){
+            $type = "first_strike";
+        }
+
     }elsif($action eq 'spec'){
         # Speculative Shot
         $type = 'ftf';
@@ -1128,6 +1248,11 @@ sub gen_attack_args{
         push @mod_strings, "Net CC is $stat";
 
         $b = 1;
+
+        # First strike
+        if(param("$us.first_strike")){
+            $type = "first_strike";
+        }
     }
 
     if(!$code->{alt_save}){
@@ -1177,6 +1302,11 @@ sub gen_hack_args{
         if($other_action eq 'hack_imm' || $other_action eq 'hack_ahp'){
             $type = 'normal';
         }
+
+        # First strike
+        if(param("$us.first_strike")){
+            $type = "first_strike";
+        }
     }elsif($action eq 'hack_pos'){
         my $unit_type = param("$them.type") // '';
         my $faction = param("$us.faction") // '';
@@ -1201,10 +1331,20 @@ sub gen_hack_args{
         }else{
             $b = 2;
         }
+
+        # First strike
+        if(param("$us.first_strike")){
+            $type = "first_strike";
+        }
     }elsif($action eq 'hack_ahp'){
         my $hacker = param("$them.hacker") // 0;
         if($hacker > 0){
             $can_hack = 1;
+        }
+
+        # First strike
+        if(param("$us.first_strike")){
+            $type = "first_strike";
         }
     }elsif($action eq 'hack_def'){
         # Defensive Hacking is only useful against hacking attacks
@@ -1420,6 +1560,16 @@ sub generate_output{
         # The CC backend allows the loser an ARM bonus when hit.
         $output = execute_backend('CC', @args1, @args2);
         $output->{type} = 'ftf';
+    }elsif($act_1 eq 'first_strike' && ($act_2 ne 'first_strike')){
+        # P1 gets first strike
+        $output = execute_backend_simultaneous(\@args1, \@args2);
+        $output->{type} = 'first_strike';
+        $output->{first_strike} = 1;
+    }elsif($act_2 eq 'first_strike' && ($act_1 ne 'first_strike')){
+        # P2 gets first strike
+        $output = execute_backend_simultaneous(\@args1, \@args2);
+        $output->{type} = 'first_strike';
+        $output->{first_strike} = 2;
     }else{
         # Face to Face Roll
         $output = execute_backend('BS', @args1, @args2);

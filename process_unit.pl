@@ -368,30 +368,47 @@ sub parse_unit{
 
     # Stats
     $new_unit->{name} = $unit->{name};
-    $new_unit->{bs} = $unit->{bs} if defined $unit->{bs};
-    $new_unit->{ph} = $unit->{ph} if defined $unit->{ph};
-    $new_unit->{cc} = $unit->{cc} if defined $unit->{cc};
-    $new_unit->{wip} = $unit->{wip} if defined $unit->{wip};
-    $new_unit->{arm} = $unit->{arm} if defined $unit->{arm};
-    $new_unit->{bts} = $unit->{bts} if defined $unit->{bts};
-    $new_unit->{w} = $unit->{w} if defined $unit->{w};
+    $new_unit->{bs} = int($unit->{bs}) if defined $unit->{bs};
+    $new_unit->{ph} = int($unit->{ph}) if defined $unit->{ph};
+    $new_unit->{cc} = int($unit->{cc}) if defined $unit->{cc};
+    $new_unit->{wip} = int($unit->{wip}) if defined $unit->{wip};
+    $new_unit->{arm} = int($unit->{arm}) if defined $unit->{arm};
+    $new_unit->{bts} = int($unit->{bts}) if defined $unit->{bts};
+    $new_unit->{w} = int($unit->{w}) if defined $unit->{w};
     $new_unit->{type} = $unit->{type} if defined $unit->{type} && $unit->{type} ne ' ';
     $new_unit->{w_type} = uc($unit->{wtype} // $default_wtype{$new_unit->{type}});
     $new_unit->{spec} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
 
     # Modifiers
-    $new_unit->{motorcycle} = !$rider && has_motorcycle($new_unit);
-    $new_unit->{nwi} = has_nwi($new_unit);
-    $new_unit->{symbiont} = has_symbiont($new_unit, $symbiont_inactive);
-    $new_unit->{shasvastii} = has_shasvastii($new_unit) || $inherit_shasvastii;
-    $new_unit->{ikohl} = has_ikohl($new_unit);
-    $new_unit->{immunity} = has_immunity($new_unit);
-    $new_unit->{hyperdynamics} = has_hyperdynamics($new_unit);
-    $new_unit->{ch} = has_camo($new_unit);
-    $new_unit->{odd} = has_odd($new_unit);
-    $new_unit->{msv} = has_msv($new_unit);
-    $new_unit->{xvisor} = has_xvisor($new_unit);
-    $new_unit->{hacker} = has_hacker($new_unit) || $new_unit->{hacker} || 0;
+    $new_unit->{motorcycle} = 1 if !$rider && has_motorcycle($new_unit);
+    $new_unit->{nwi} = 1 if has_nwi($new_unit);
+    $new_unit->{symbiont} = 1 if has_symbiont($new_unit, $symbiont_inactive);
+    $new_unit->{shasvastii} = 1 if has_shasvastii($new_unit) || $inherit_shasvastii;
+    $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
+
+    # leveled skills
+    my $v;
+    if($v = has_ikohl($new_unit)){
+        $new_unit->{ikohl} = $v;
+    }
+    if($v = has_immunity($new_unit)){
+        $new_unit->{immunity} = $v;
+    }
+    if($v = has_hyperdynamics($new_unit)){
+        $new_unit->{hyperdynamics} = $v;
+    }
+    if($v = has_camo($new_unit)){
+        $new_unit->{ch} = $v;
+    }
+    if($v = has_odd($new_unit)){
+        $new_unit->{odd} = $v;
+    }
+    if($v = has_msv($new_unit)){
+        $new_unit->{msv} = $v;
+    }
+    if($v = has_hacker($new_unit) || $new_unit->{hacker}){
+        $new_unit->{hacker} = $v;
+    }
 
     # get_weapons goes into the childs list
     get_weapons($unit, $new_unit, $inherit_weapon, $ability_func);

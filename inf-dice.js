@@ -153,6 +153,9 @@ function set_action(player){
     var other_action = document.getElementsByName(other_action_name)[0];
 
     if(action.value == "bs"){
+        // action
+        enable_input(player + ".first_strike");
+
         // weapon
         enable_input(player + ".b");
         enable_input(player + ".ammo");
@@ -181,6 +184,9 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         enable_display(other + ".sec_defense");
     }else if(action.value == "spec"){
+        // action
+        enable_input(player + ".first_strike");
+
         // weapon
         enable_input(player + ".b");
         enable_input(player + ".ammo");
@@ -209,6 +215,9 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         enable_display(other + ".sec_defense");
     }else if(action.value == "dtw"){
+        // action
+        enable_input(player + ".first_strike");
+
         // weapon
         enable_input(player + ".b");
         enable_input(player + ".ammo");
@@ -237,6 +246,9 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         enable_display(other + ".sec_defense");
     }else if(action.value == "cc"){
+        // action
+        enable_input(player + ".first_strike");
+
         // weapon
         disable_input(player + ".b");
         enable_input(player + ".ammo");
@@ -265,6 +277,9 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
     }else if(action.value == "dodge"){
+        // action
+        disable_input(player + ".first_strike");
+
         // weapon
         disable_input(player + ".b");
         disable_input(player + ".ammo");
@@ -293,6 +308,13 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
     }else if(action.value == "hack_imm" || action.value == "hack_ahp" || action.value == "hack_def" || action.value == "hack_pos"){
+        // action
+        if(action.value == "hack_def"){
+            disable_input(player + ".first_strike");
+        }else{
+            enable_input(player + ".first_strike");
+        }
+
         // weapon
         disable_input(player + ".b");
         disable_input(player + ".ammo");
@@ -321,6 +343,9 @@ function set_action(player){
         enable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
     }else if(action.value == "none"){
+        // action
+        disable_input(player + ".first_strike");
+
         // weapon
         disable_input(player + ".b");
         disable_input(player + ".ammo");

@@ -25,6 +25,10 @@ my $colors = {
         color => '#000000',
         text => 'white',
     },
+    splat => {
+        color => '#aa4040',
+        text => 'black',
+    },
 };
 
 my $steps = 5;
@@ -64,6 +68,10 @@ print "    color: $colors->{miss}{text};\n";
 print "    background-color: $colors->{miss}{color};\n";
 print "}\n\n";
 
+print ".splat {\n";
+print "    color: $colors->{splat}{text};\n";
+print "    background-color: $colors->{splat}{color};\n";
+print "}\n\n";
 
 for my $p (@$players){
     my ($r, $g, $b);
