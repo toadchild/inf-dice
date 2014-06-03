@@ -665,12 +665,12 @@ function set_unit(player, check_params){
         set_w_taken(player, check_params, max_w_taken);
 
         // abilities
-        document.getElementsByName(player + ".ikohl")[0].value = unit["ikohl"];
-        document.getElementsByName(player + ".immunity")[0].value = unit["immunity"];
-        document.getElementsByName(player + ".hyperdynamics")[0].value = unit["hyperdynamics"];
+        document.getElementsByName(player + ".ikohl")[0].value = unit["ikohl"] || 0;
+        document.getElementsByName(player + ".immunity")[0].value = unit["immunity"] || '';
+        document.getElementsByName(player + ".hyperdynamics")[0].value = unit["hyperdynamics"] || 0;
         document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
-        document.getElementsByName(player + ".msv")[0].value = unit["msv"];
-        document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"];
+        document.getElementsByName(player + ".msv")[0].value = unit["msv"] || 0;
+        document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"] || 0;
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
 
