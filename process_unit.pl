@@ -262,6 +262,10 @@ sub has_nbw{
     return has_spec(@_, 'Natural Born Warrior');
 }
 
+sub has_berserk{
+    return has_spec(@_, 'Berserk');
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 sub get_weapons{
@@ -422,6 +426,7 @@ sub parse_unit{
     $new_unit->{shasvastii} = 1 if has_shasvastii($new_unit) || $inherit_shasvastii;
     $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
+    $new_unit->{berserk} = 1 if has_berserk($new_unit);
 
     # leveled skills
     my $v;

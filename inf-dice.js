@@ -127,14 +127,22 @@ function set_ammo(player, check_params){
 function set_berserk(){
     var action_1 = document.getElementsByName("p1.action")[0].value;
     var action_2 = document.getElementsByName("p2.action")[0].value;
+    var berserk_1 = document.getElementsByName("p1.has_berserk")[0].checked;
+    var berserk_2 = document.getElementsByName("p2.has_berserk")[0].checked;
+    var nbw_1 = document.getElementsByName("p1.nbw")[0].checked;
+    var nbw_2 = document.getElementsByName("p2.nbw")[0].checked;
 
-    if(action_1 == "cc" && action_1 == "cc"){
+    // NBW disabled the opponent's berserk
+    berserk_1 = berserk_1 && !nbw_2;
+    berserk_2 = berserk_2 && !nbw_1;
+
+    if(berserk_1 && action_1 == "cc" && berserk_2 && action_2 == "cc"){
         enable_input("p1.berserk");
         enable_input("p2.berserk");
-    }else if(action_1 == "cc" && (action_2 == "dodge" || action_2 == "none")){
+    }else if(berserk_1 && action_1 == "cc" && (action_2 == "dodge" || action_2 == "none" || action_2 == "cc")){
         enable_input("p1.berserk");
         disable_input("p2.berserk");
-    }else if(action_2 == "cc" && (action_1 == "dodge" || action_1 == "none")){
+    }else if(berserk_2 && action_2 == "cc" && (action_1 == "dodge" || action_1 == "none" || action_1 == "cc")){
         disable_input("p1.berserk");
         enable_input("p2.berserk");
     }else{
@@ -703,6 +711,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
         document.getElementsByName(player + ".motorcycle")[0].checked = unit["motorcycle"];
         document.getElementsByName(player + ".nbw")[0].checked = unit["nbw"];
+        document.getElementsByName(player + ".has_berserk")[0].checked = unit["berserk"];
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");

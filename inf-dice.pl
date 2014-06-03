@@ -411,7 +411,14 @@ sub print_input_attack_section{
               -checked => defined(param("$player.nbw")),
               -value => 1,
               -label => 'Natural Born Warrior',
-              -onchange => "set_cc_first_strike()",
+              -onchange => "set_cc_first_strike(); set_berserk()",
+          ),
+          "<br>",
+          span_checkbox(-name => "$player.has_berserk",
+              -checked => defined(param("$player.has_berserk")),
+              -value => 1,
+              -label => 'Berserk',
+              -onchange => "set_berserk()",
           ),
           "</div>\n";
 
@@ -1257,10 +1264,15 @@ sub gen_attack_args{
         }
 
         # berserk only works if they CC or Dodge in response
-        if(param("$us.berserk") && ($other_action eq 'cc' || $other_action eq 'dodge' || $other_action eq 'none')){
-            $stat += 9;
-            $type = 'normal';
-            push @mod_strings, 'Berserk grants +9 CC';
+        # We must have berserk and they must not have NBW
+        if(param("$us.has_berserk") && param("$us.berserk") && ($other_action eq 'cc' || $other_action eq 'dodge' || $other_action eq 'none')){
+            if(!param("$them.nbw")){
+                $stat += 9;
+                $type = 'normal';
+                push @mod_strings, 'Berserk grants +9 CC';
+            }else{
+                push @mod_strings, 'Berserk canceled by Natural Born Warrior';
+            }
         }
 
         # iKohl does not work on models with STR
@@ -1605,9 +1617,6 @@ sub generate_output{
         # One player is making a Normal Roll
         $output = execute_backend(@args1, @args2);
         $output->{type} = 'normal';
-    }elsif($act_1 eq 'normal' || $act_2 eq 'normal'){
-        # Simultaneous Normal Rolls
-        $output = execute_backend_simultaneous(\@args1, \@args2);
     }elsif($act_1 eq 'first_strike' && ($act_2 ne 'first_strike')){
         # P1 gets first strike
         $output = execute_backend_simultaneous(\@args1, \@args2);
@@ -1618,6 +1627,9 @@ sub generate_output{
         $output = execute_backend_simultaneous(\@args1, \@args2);
         $output->{type} = 'first_strike';
         $output->{first_strike} = 2;
+    }elsif($act_1 eq 'normal' || $act_2 eq 'normal'){
+        # Simultaneous Normal Rolls
+        $output = execute_backend_simultaneous(\@args1, \@args2);
     }else{
         # Face to Face Roll
         $output = execute_backend(@args1, @args2);
