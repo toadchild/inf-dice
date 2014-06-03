@@ -404,12 +404,14 @@ sub print_input_attack_section{
               -default => param("$player.ma") // '',
               -labels => $ma_labels,
               -label => "Martial Arts",
+              -onchange => "set_cc_first_strike()",
           ),
           "<br>",
           span_checkbox(-name => "$player.nbw",
               -checked => defined(param("$player.nbw")),
               -value => 1,
               -label => 'Natural Born Warrior',
+              -onchange => "set_cc_first_strike()",
           ),
           "</div>\n";
 
@@ -1293,9 +1295,11 @@ sub gen_attack_args{
 
         $b = 1;
 
-        # First strike
-        if(param("$us.first_strike")){
-            $type = "first_strike";
+        # First strike requires MA 3+, but is canceled by the opponent having MA 4+ or NBW
+        if($other_action eq 'cc' || $other_action eq 'dodge'){
+            if(param("$us.first_strike") && $us_ma >= 3 && !(param("$them.nbw") || ($them_ma >= 4))){
+                $type = "first_strike";
+            }
         }
     }
 

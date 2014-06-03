@@ -124,24 +124,51 @@ function set_ammo(player, check_params){
 
 // helper function for set_action
 // berserk works in CC vs. CC, Dodge, or None
-function set_berserk(player, other){
-    var action_name = player + ".action";
-    var action = document.getElementsByName(action_name)[0].value;
-    var other_action_name = other + ".action";
-    var other_action = document.getElementsByName(other_action_name)[0].value;
+function set_berserk(){
+    var action_1 = document.getElementsByName("p1.action")[0].value;
+    var action_2 = document.getElementsByName("p2.action")[0].value;
 
-    if(action == "cc" && other_action == "cc"){
-        enable_input(player + ".berserk");
-        enable_input(other + ".berserk");
-    }else if(action == "cc" && (other_action == "dodge" || other_action == "none")){
-        enable_input(player + ".berserk");
-        disable_input(other + ".berserk");
-    }else if(other_action == "cc" && (action == "dodge" || action == "none")){
-        disable_input(player + ".berserk");
-        enable_input(other + ".berserk");
+    if(action_1 == "cc" && action_1 == "cc"){
+        enable_input("p1.berserk");
+        enable_input("p2.berserk");
+    }else if(action_1 == "cc" && (action_2 == "dodge" || action_2 == "none")){
+        enable_input("p1.berserk");
+        disable_input("p2.berserk");
+    }else if(action_2 == "cc" && (action_1 == "dodge" || action_1 == "none")){
+        disable_input("p1.berserk");
+        enable_input("p2.berserk");
     }else{
-        disable_input(player + ".berserk");
-        disable_input(other + ".berserk");
+        disable_input("p1.berserk");
+        disable_input("p2.berserk");
+    }
+}
+
+function set_cc_first_strike(){
+    var action_1 = document.getElementsByName("p1.action")[0].value;
+    var action_2 = document.getElementsByName("p2.action")[0].value;
+
+    // First strike requires MA 3+, but is canceled by the opponent having MA 4+ or NBW
+    var ma_1 = document.getElementsByName("p1.ma")[0].value;
+    var ma_2 = document.getElementsByName("p2.ma")[0].value;
+    var nbw_1 = document.getElementsByName("p1.nbw")[0].checked;
+    var nbw_2 = document.getElementsByName("p2.nbw")[0].checked;
+
+    if(action_1 == "cc"){
+        if((action_2 == "cc" || action_2 == "dodge") &&
+                (ma_1 >= 3 && !(nbw_2 || ma_2 >= 4))){
+            enable_input("p1.first_strike");
+        }else{
+            disable_input("p1.first_strike");
+        }
+    }
+
+    if(action_2 == "cc"){
+        if((action_1 == "cc" || action_1 == "dodge") &&
+                (ma_2 >= 3 && !(nbw_1 || ma_1 >= 4))){
+            enable_input("p2.first_strike");
+        }else{
+            disable_input("p2.first_strike");
+        }
     }
 }
 
@@ -169,7 +196,6 @@ function set_action(player){
         // cc modifiers
         disable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         enable_input(other + ".cover");
@@ -200,7 +226,6 @@ function set_action(player){
         // cc modifiers
         disable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         enable_input(other + ".cover");
@@ -231,7 +256,6 @@ function set_action(player){
         // cc modifiers
         disable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         enable_input(other + ".cover");
@@ -262,7 +286,6 @@ function set_action(player){
         // cc modifiers
         enable_input(player + ".gang_up");
         enable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
@@ -293,7 +316,6 @@ function set_action(player){
         // cc modifiers
         enable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
@@ -328,7 +350,6 @@ function set_action(player){
         // cc modifiers
         disable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
@@ -359,7 +380,6 @@ function set_action(player){
         // cc modifiers
         disable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
-        set_berserk(player, other);
 
         // defensive abilities
         disable_input(other + ".cover");
@@ -374,6 +394,10 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
     }
+
+    set_berserk();
+    set_cc_first_strike();
+
     populate_weapons(player);
 }
 
