@@ -663,7 +663,7 @@ sub print_player_output{
             if(!$disabled_h){
                 $disabled_h = $h;
             }
-        }elsif($eject >= 0 && $w > $eject){
+        }elsif($operator_w && $w > $eject){
             $label = ' (Operator ' . ($wounds + $operator_w - $w) . ' W)';
         }else{
             $label = ' (' . ($wounds - $w) . " $w_type)";
