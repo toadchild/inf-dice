@@ -12,6 +12,7 @@
 #define STAT_MAX 40
 #define ROLL_MAX 20
 #define DAM_MAX 20
+#define ARM_BONUS_MAX 3
 
 // Other assumptions require that NUM_THREADS equals ROLL_MAX
 #define NUM_THREADS ROLL_MAX
@@ -718,10 +719,7 @@ static void print_player(const struct player *p, int p_num){
 }
 
 static void usage(const char *program){
-    printf("Usage: %s <MODE> <STAT 1> <B 1> <DAM 1> <AMMO 1> <STAT 2> <B 2> <DAM 2> <AMMO 2>\n", program);
-    printf("Modes:\n");
-    printf("    BS - Used for most cases\n");
-    printf("    CC - If both models are in CC. ARM bonus is granted.\n");
+    printf("Usage: %s <STAT 1> <B 1> <DAM 1> <AMMO 1> <ARM_BONUS 1< <STAT 2> <B 2> <DAM 2> <AMMO 2> <ARM_BONUS 2>\n", program);
     exit(0);
 }
 
@@ -800,22 +798,34 @@ static void parse_dam(const char *str, struct player *p){
     }
 }
 
+static void parse_arm_bonus(const char *str, struct player *p){
+    p->arm_bonus = strtol(str, NULL, 10);
+
+    if(p->arm_bonus < 0 || p->arm_bonus > ARM_BONUS_MAX){
+        printf("ERROR: P%d ARM_BONUS %d must be in the range of 0 to %d\n", p->player_num, p->arm_bonus, ARM_BONUS_MAX);
+        exit(1);
+    }
+}
+
 static void parse_args(int argc, const char *argv[], struct player *p1, struct player *p2){
     int i;
 
-    if(argc != 10){
+    if(argc != 11){
         usage(argv[0]);
     }
 
-    i = 2;
+    i = 1;
     parse_stat(argv[i++], p1);
     parse_b(argv[i++], p1);
     parse_dam(argv[i++], p1);
     parse_ammo(argv[i++], p1);
+    parse_arm_bonus(argv[i++], p1);
+
     parse_stat(argv[i++], p2);
     parse_b(argv[i++], p2);
     parse_dam(argv[i++], p2);
     parse_ammo(argv[i++], p2);
+    parse_arm_bonus(argv[i++], p2);
 
     // Quick and dirty CPU limiter
     if(p1->burst + p2->burst > 9){
@@ -842,16 +852,7 @@ int main(int argc, const char *argv[]){
         usage(argv[0]);
     }
 
-    if(strcmp(argv[1], "BS") == 0){
-        parse_args(argc, argv, &p1, &p2);
-    }else if(strcmp(argv[1], "CC") == 0){
-        parse_args(argc, argv, &p1, &p2);
-
-        p1.arm_bonus = 3;
-        p2.arm_bonus = 3;
-    }else{
-        usage(argv[0]);
-    }
+    parse_args(argc, argv, &p1, &p2);
 
     print_player(&p1, 1);
     print_player(&p2, 2);

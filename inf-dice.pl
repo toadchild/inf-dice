@@ -196,6 +196,16 @@ my $hacker_labels = {
     3 => 'Hacking Device Plus',
 };
 
+my $ma = [0, 1, 2, 3, 4, 5];
+my $ma_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+    3 => 'Level 3',
+    4 => 'Level 4',
+    5 => 'Level 5',
+};
+
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
 my $evo_labels = {
     0 => 'None',
@@ -387,6 +397,19 @@ sub print_input_attack_section{
               -default => param("$player.hacker") // '',
               -labels => $hacker_labels,
               -label => "Hacking Device",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.ma",
+              -values => $ma,
+              -default => param("$player.ma") // '',
+              -labels => $ma_labels,
+              -label => "Martial Arts",
+          ),
+          "<br>",
+          span_checkbox(-name => "$player.nbw",
+              -checked => defined(param("$player.nbw")),
+              -value => 1,
+              -label => 'Natural Born Warrior',
           ),
           "</div>\n";
 
@@ -995,6 +1018,7 @@ sub gen_attack_args{
     my ($ammo_name, $code, $immunity);
     my $type;
     my @mod_strings;
+    my $arm_bonus = 0;
 
     if((param("$us.link") // 0) >= 3){
         $link_b = 1;
@@ -1206,14 +1230,25 @@ sub gen_attack_args{
         }
     }elsif($action eq 'cc'){
         # CC mods
-        $type = 'ftf_cc';
+        $type = 'ftf';
+        $arm_bonus = 3;
 
         $stat = param("$us.cc") // 0;
         push @mod_strings, "Base CC of $stat";
 
         # monofilament allows no CC ARM bonus
         if($code->{no_arm_bonus}){
-            $type = 'ftf';
+            $arm_bonus = 0;
+        }
+
+        # CC ARM bonus only counts if both models are in CC
+        if($other_action ne 'cc'){
+            $arm_bonus = 0;
+        }
+
+        # No CC ARM bonus if they have Martial Arts unless we have NBW
+        if(param("$them.ma") && !param("$us.nbw")){
+            $arm_bonus = 0;
         }
 
         # berserk only works if they CC or Dodge in response
@@ -1271,6 +1306,7 @@ sub gen_attack_args{
         $b,
         $dam,
         $ammo,
+        $arm_bonus,
     );
 }
 
@@ -1401,6 +1437,7 @@ sub gen_hack_args{
         $b,
         0,
         '-',
+        0,
     );
 }
 
@@ -1450,6 +1487,7 @@ sub gen_dodge_args{
         1,
         0,
         '-',
+        0,
     );
 }
 
@@ -1461,6 +1499,7 @@ sub gen_none_args{
         1,
         0,
         '-',
+        0,
     );
 }
 
@@ -1513,8 +1552,8 @@ sub execute_backend_simultaneous{
 
     my ($none1, $none2, @args_none) = gen_none_args();
 
-    $o1 = execute_backend('BS', @$args1, @args_none);
-    $o2 = execute_backend('BS', @args_none, @$args2);
+    $o1 = execute_backend(@$args1, @args_none);
+    $o2 = execute_backend(@args_none, @$args2);
 
     $output->{raw} = $o1->{raw} . '<hr>' . $o2->{raw};
     $output->{type} = 'simultaneous';
@@ -1553,15 +1592,11 @@ sub generate_output{
         $output->{hits}{0} = 100;
     }elsif($act_1 eq 'none' || $act_2 eq 'none'){
         # One player is making a Normal Roll
-        $output = execute_backend('BS', @args1, @args2);
+        $output = execute_backend(@args1, @args2);
         $output->{type} = 'normal';
     }elsif($act_1 eq 'normal' || $act_2 eq 'normal'){
         # Simultaneous Normal Rolls
         $output = execute_backend_simultaneous(\@args1, \@args2);
-    }elsif($act_1 eq 'ftf_cc' && $act_2 eq 'ftf_cc'){
-        # The CC backend allows the loser an ARM bonus when hit.
-        $output = execute_backend('CC', @args1, @args2);
-        $output->{type} = 'ftf';
     }elsif($act_1 eq 'first_strike' && ($act_2 ne 'first_strike')){
         # P1 gets first strike
         $output = execute_backend_simultaneous(\@args1, \@args2);
@@ -1574,7 +1609,7 @@ sub generate_output{
         $output->{first_strike} = 2;
     }else{
         # Face to Face Roll
-        $output = execute_backend('BS', @args1, @args2);
+        $output = execute_backend(@args1, @args2);
         $output->{type} = 'ftf';
     }
 

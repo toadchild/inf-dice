@@ -46,6 +46,16 @@ my @specialist_profiles = (
         ability_func => \&has_specialist,
         name_func => \&name_specialist,
     },
+    {
+        key => 'ma',
+        ability_func => \&has_ma,
+        name_func => \&name_ma,
+    },
+    {
+        key => 'nbw',
+        ability_func => \&has_nbw,
+        name_func => \&name_nbw,
+    },
 );
 
 sub name_msv{
@@ -70,6 +80,15 @@ sub name_xvisor{
 
 sub name_specialist{
     return " (Specialist)";
+}
+
+sub name_ma{
+    my ($ma) = @_;
+    return " (MA $ma)";
+}
+
+sub name_nbw{
+    return " (Natural Born Warrior)";
 }
 
 sub has_spec{
@@ -224,6 +243,22 @@ sub has_motorcycle{
 
 sub has_specialist{
     return has_spec(@_, "Specialist");
+}
+
+sub has_ma{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Martial.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_nbw{
+    return has_spec(@_, 'Natural Born Warrior');
 }
 
 my $dual_weapons = {};
@@ -385,6 +420,7 @@ sub parse_unit{
     $new_unit->{symbiont} = 1 if has_symbiont($new_unit, $symbiont_inactive);
     $new_unit->{shasvastii} = 1 if has_shasvastii($new_unit) || $inherit_shasvastii;
     $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
+    $new_unit->{nbw} = 1 if has_nbw($new_unit);
 
     # leveled skills
     my $v;
@@ -408,6 +444,9 @@ sub parse_unit{
     }
     if($v = has_hacker($new_unit) || $new_unit->{hacker}){
         $new_unit->{hacker} = $v;
+    }
+    if($v = has_ma($new_unit)){
+        $new_unit->{ma} = $v;
     }
 
     # get_weapons goes into the childs list

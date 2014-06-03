@@ -673,10 +673,12 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"] || 0;
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
+        document.getElementsByName(player + ".ma")[0].value = unit["ma"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
         document.getElementsByName(player + ".motorcycle")[0].checked = unit["motorcycle"];
+        document.getElementsByName(player + ".nbw")[0].checked = unit["nbw"];
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");
