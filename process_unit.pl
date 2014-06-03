@@ -23,6 +23,7 @@ my %default_wtype = (
 my $skip_list = {
     "Uxìa McNeill" => 1,
     "Tohaa Diplomatic Delegates" => 1,
+    "Rasyat Diplomatic Division" => 1,
 };
 
 my @specialist_profiles = (
