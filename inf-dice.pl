@@ -1236,6 +1236,9 @@ sub gen_attack_args{
         $stat = param("$us.cc") // 0;
         push @mod_strings, "Base CC of $stat";
 
+        my $us_ma = param("$us.ma") // 0;
+        my $them_ma = param("$them.ma") // 0;
+
         # monofilament allows no CC ARM bonus
         if($code->{no_arm_bonus}){
             $arm_bonus = 0;
@@ -1246,8 +1249,8 @@ sub gen_attack_args{
             $arm_bonus = 0;
         }
 
-        # No CC ARM bonus if they have Martial Arts unless we have NBW
-        if(param("$them.ma") && !param("$us.nbw")){
+        # No CC ARM bonus if they have Martial Arts unless we have NBW or MA4+
+        if($them_ma && !(param("$us.nbw") || ($us_ma >= 4))){
             $arm_bonus = 0;
         }
 
@@ -1277,8 +1280,12 @@ sub gen_attack_args{
 
         my $gang_up = param("$us.gang_up") // 0;
         if($gang_up){
-            push @mod_strings, sprintf('Gang-up grants %+d CC', $gang_up);
-            $stat += $gang_up;
+            if($them_ma >= 5 && !param("$us.nbw")){
+                push @mod_strings, "Gang-up canceled by MA 5";
+            }else{
+                push @mod_strings, sprintf('Gang-up grants %+d CC', $gang_up);
+                $stat += $gang_up;
+            }
         }
 
         $stat = max($stat, 0);
