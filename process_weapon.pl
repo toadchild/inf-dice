@@ -20,6 +20,10 @@ open IN, '<', 'dual_ccw.dat' or die "Unable to open file";
 $json_text = <IN>;
 my $dual_ccw = $json->decode($json_text);
 
+open IN, '<', 'poison_ccw.dat' or die "Unable to open file";
+$json_text = <IN>;
+my $poison_ccw = $json->decode($json_text);
+
 my $all_ammo = {};
 my $weapon_data = {};
 my $file;
@@ -161,6 +165,28 @@ for my $weapon (@$dual_ccw){
 
     # E/M Ammo has a special name
     $ammo =~ s/E\/M/E\/M(12)/;
+
+    $all_ammo->{$ammo} = 1;
+
+    my $new_weapon = {
+        ammo => [$ammo],
+        att_cc => 1,
+        b => [1],
+        dam => 'PH',
+        name => $weapon,
+    };
+
+    $weapon_data->{$new_weapon->{name}} = $new_weapon;
+}
+
+for my $weapon (@$poison_ccw){
+    $weapon =~ m/Poison ([\w\/]+)? ?CCW/;
+    my $ammo = $1;
+    if($ammo){
+        $ammo .= "+Shock";
+    }else{
+        $ammo = "Shock";
+    }
 
     $all_ammo->{$ammo} = 1;
 

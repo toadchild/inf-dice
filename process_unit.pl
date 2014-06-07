@@ -111,6 +111,10 @@ sub has_cc2w{
     return has_spec(@_, 'CC with 2 Weapons');
 }
 
+sub has_poison{
+    return has_spec(@_, 'Poison');
+}
+
 sub has_symbiont{
     my ($unit, $inactive) = @_;
     if(has_spec($unit, 'Symbiont Armour')){
@@ -268,6 +272,7 @@ sub has_berserk{
 
 my $dual_weapons = {};
 my $dual_ccw = {};
+my $poison_ccw = {};
 sub get_weapons{
     my ($unit, $new_unit, $inherit_weapon, $ability_func) = @_;
     my $weapons = {};
@@ -341,6 +346,21 @@ sub get_weapons{
         my $new_ccw = join(' + ', sort(@ccws));
         $dual_ccw->{$new_ccw} = 1;
         $weapons->{$new_ccw} = 1;
+    }
+
+    # If they have Poison, their CCW gets Shock in addition to its other types
+    if(has_poison($new_unit)){
+        my @ccws;
+        for my $w (keys %$weapons){
+            if($w =~ m/CCW/){
+                push @ccws, $w;
+            }
+        }
+        for my $w (@ccws){
+            delete $weapons->{$w};
+            $poison_ccw->{"Poison $w"} = 1;
+            $weapons->{"Poison $w"} = 1;
+        }
     }
 
     if(keys %$weapons){
@@ -533,6 +553,10 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $unit->{name} =~ s/^Hassassin //;
         $unit->{name} =~ s/^The //;
 
+        if($unit->{name} =~ m/Chaksa/){
+            $unit->{spec} = [grep($_ ne 'Poison', @{$unit->{spec}})];
+        }
+
         my $new_unit = {};
         parse_unit($new_unit, $unit);
 
@@ -603,3 +627,6 @@ print $file $json->encode($dual_weapons);
 
 open $file, '>', 'dual_ccw.dat' or die "Unable to open file";
 print $file $json->encode([keys $dual_ccw]);
+
+open $file, '>', 'poison_ccw.dat' or die "Unable to open file";
+print $file $json->encode([keys $poison_ccw]);

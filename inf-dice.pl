@@ -65,6 +65,7 @@ my $ammo_codes = {
     'AP+EXP' => {code => 'E', ap => 0.5},
     'AP+Shock' => {code => 'N', ap => 0.5, fatal => 1},
     DA => {code => 'D'},
+    'DA+Shock' => {code => 'D', fatal => 1},
     EXP => {code => 'E'},
     Fire => {code => 'F', fatal_symbiont => 9},
     Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, fatal => 9},
