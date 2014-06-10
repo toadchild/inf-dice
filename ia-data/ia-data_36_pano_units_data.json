@@ -2262,6 +2262,7 @@
   "army": "Panoceania",
   "wip": "13",
   "cbcode": [
+   "280272-0472",
    "280226-0143",
    "280264-0415"
   ],
@@ -3984,7 +3985,9 @@
     "Missile Launcher",
     "Light Shotgun"
    ],
-   "cbcode": [],
+   "cbcode": [
+       "280271-0466"
+   ],
    "ccw": [],
    "code": "ML",
    "codename": "",
