@@ -40,6 +40,9 @@ install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice.js inf-dice.css inf-dice.pl ${WWW_TARGETS} ${WWWDIR}
 	cp inf-dice ${BINDIR}
 
+diff:
+	for i in ${WWW_TARGETS}; do diff -u $$i ${WWWDIR}; done
+
 update_data:
 	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/data/
 	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/lang/ia-lang_40_en.js
