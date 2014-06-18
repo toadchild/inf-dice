@@ -72,18 +72,18 @@ my $ammo_codes = {
     K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
     Nanotech => {code => 'N', save => 'bts'},
-    Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s'},
-    'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
-    'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
-    'Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke'},
-    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke'},
-    'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s'},
+    Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
+    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
+    'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'Dep. Repeater' => {code => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
     # Placeholders for unimplemented ammos
     'Plasma' => {code => 'N'},
     'N+E/M(12)' => {code => 'N'},
     'AP+E/M(12)' => {code => 'N', ap => 0.5},
-    'Stun' => {code => 'N', save => 'bts'},
-    'Dep. Repeater' => {code => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater'},
+    'Stun' => {code => 'N', save => 'bts', nonlethal => 1},
 };
 
 my $skill_codes = {
@@ -215,6 +215,14 @@ my $evo_labels = {
     sup_1 => 'Support Hacking - 1 Ally (+3 WIP)',
     sup_2 => 'Support Hacking - 2 Allies (+6 WIP)',
     sup_3 => 'Support Hacking - 3 Allies (+9 WIP)',
+};
+
+my $marksmanship = [0, 1, 2, 3];
+my $marksmanship_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+    3 => 'Level 3',
 };
 
 my $factions = [
@@ -400,6 +408,13 @@ sub print_input_attack_section{
               -label => "Hacking Device",
           ),
           "<br>",
+          span_popup_menu(-name => "$player.marksmanship",
+              -values => $marksmanship,
+              -default => param("$player.marksmanship") // '',
+              -labels => $marksmanship_labels,
+              -label => "Marksmanship",
+          ),
+          "<br>",
           span_popup_menu(-name => "$player.ma",
               -values => $ma,
               -default => param("$player.ma") // '',
@@ -573,6 +588,7 @@ sub print_player_output{
     my $symbiont = param("p$other.symbiont") // 0;
     my $operator_w = param("p$other.operator") // 0;
     my $action = param("p$player.action") // '';
+    my $marksmanship = param("p$player.marksmanship") // 0;
     my $disabled_h;
 
     my $code = $skill_codes->{$action};
@@ -582,6 +598,13 @@ sub print_player_output{
     my $fatal = $code->{fatal} // 0;
     my $dam = $code->{dam} // 1;
     my $threshold = $code->{threshold} // 1;
+
+    # Marksmanship grants Shock in addition to existing ammo types
+    if($marksmanship > 0){
+        if($action eq 'bs' && !$code->{nonlethal} && !$code->{fatal}){
+            $fatal = 1;
+        }
+    }
 
     # pretty printing
     my $format = $code->{format} // '%s inflicts %d or more wounds on %s%s';
@@ -1090,6 +1113,8 @@ sub gen_attack_args{
 
         push @mod_strings, "Base $stat_name of $stat";
 
+        my $marksmanship = param("$us.marksmanship") // 0;
+
         my $camo = param("$them.ch") // 0;
         my $odf = param("$them.odf") // 0;
         if($odf < $camo){
@@ -1098,8 +1123,12 @@ sub gen_attack_args{
         $camo *= $ignore_cover;
 
         if($cover){
-            push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
-            $stat -= $cover;
+            if($marksmanship < 2){
+                push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
+                $stat -= $cover;
+            }else{
+                push @mod_strings, sprintf('Marksmanship negates Cover modifier to %s', $stat_name);
+            }
         }
 
         if($link_bs){
@@ -1156,7 +1185,14 @@ sub gen_attack_args{
             $b += $link_b;
         }
 
-        $arm += $cover;
+        if($cover){
+            if($marksmanship < 3){
+                push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
+                $arm += $cover;
+            }else{
+                push @mod_strings, sprintf('Marksmanship negates Cover modifier to ARM');
+            }
+        }
 
         # Smoke provides no defense against non-lof skills
         if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){

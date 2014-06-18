@@ -3763,4 +3763,103 @@
  "type": "LI",
  "w": "1",
  "wip": "13"
+},
+{
+    "mov": "4-4",
+    "army": "Ariadna",
+    "wip": "13",
+    "bts": "0",
+    "isc": "Kazak Spetsnazs",
+    "name": "Spetsnaz",
+    "cbcode": ["280166-0471"],
+    "bs": "12",
+    "note": "",
+    "cube": "",
+    "type": "LI",
+    "ph": "12",
+    "cc": "20",
+    "arm": "2",
+    "irr": "",
+    "w": "1",
+    "ava": "2",
+    "imp": "",
+    "bsw": [],
+    "spec": [
+        "Marksmanship L2",
+        "Martial Arts L2"
+    ],
+    "ccw": [
+        "Knife",
+        "Pistol"
+    ],
+    "childs": [
+        {
+            "code": "Default",
+            "cost": "38",
+            "codename": "HMG",
+   "cbcode": [],
+            "swc": "1.5",
+            "spec": [
+                "CH: Ambushed Camouflage"
+            ],
+            "bsw": [
+                "HMG"
+            ],
+            "ccw": [
+                "CCW"
+            ]
+        },
+        {
+            "code": "Sniper",
+            "cost": "34",
+            "codename": "",
+   "cbcode": [],
+            "swc": "1.5",
+            "spec": [
+                "CH: Ambushed Camouflage"
+            ],
+            "bsw": [
+                "Sniper Rifle"
+            ],
+            "ccw": [
+                "CCW"
+            ]
+        },
+        {
+            "code": "Parachutist Boarding Shotgun",
+            "cost": "33",
+            "codename": "AD+BS",
+   "cbcode": [],
+            "swc": "0",
+            "spec": [
+                "CH: Mimetism",
+                "AD: Parachutist"
+            ],
+            "bsw": [
+                "Boarding Shotgun",
+                "Grenades"
+            ],
+            "ccw": [
+                "AP CCW"
+            ]
+        },
+        {
+            "code": "Parachutist Rifle",
+            "cost": "31",
+            "codename": "AD",
+   "cbcode": [],
+            "swc": "0",
+            "spec": [
+                "CH: Mimetism",
+                "AD: Parachutist"
+            ],
+            "bsw": [
+                "Rifle",
+                "Grenades"
+            ],
+            "ccw": [
+                "AP CCW"
+            ]
+        }
+    ]
 }

@@ -1546,7 +1546,7 @@
   "w": "1",
   "ava": "2",
   "bsw": [
-   "Combi Rifle"
+   
   ],
   "spec": [
    "Hacker",
@@ -1564,7 +1564,18 @@
     "swc": "0.5",
     "cbcode": [],
     "spec": [],
-    "bsw": [],
+    "bsw": ["Combi Rifle"],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "BS",
+    "cost": "26",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [],
+    "bsw": ["Boarding Shotgun"],
     "ccw": [],
     "note": ""
    },
@@ -1577,7 +1588,42 @@
     "spec": [
      "Lieutenant"
     ],
-    "bsw": [],
+    "bsw": ["Combi Rifle"],
+    "ccw": [],
+    "note": ""
+   } ,{
+    "code": "H+FP",
+    "cost": "28",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": ["Fast Panda (1)"],
+    "bsw": ["Combi Rifle"],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "BS+FP",
+    "cost": "28",
+    "codename": "",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": ["Fast Panda (1)"],
+    "bsw": ["Boarding Shotgun"],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "Lieutenant+FP",
+    "cost": "28",
+    "codename": "Lt+FP",
+    "swc": "0.5",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant",
+     "Fast Panda (1)"
+    ],
+    "bsw": ["Combi Rifle"],
     "ccw": [],
     "note": ""
    }
@@ -2994,7 +3040,7 @@
   "name": "Zondcat",
   "bs": "8",
   "note": "",
-  "cube": "S",
+  "cube": "R",
   "type": "REM",
   "ph": "8",
   "cc": "8",
@@ -3091,7 +3137,7 @@
   "name": "Pupnik",
   "bs": "4",
   "note": "",
-  "cube": "S",
+  "cube": "R",
   "type": "WB",
   "ph": "13",
   "cc": "17",
@@ -3266,7 +3312,7 @@
   "name": "Moriarty",
   "bs": "8",
   "note": "",
-  "cube": "S",
+  "cube": "R",
   "type": "REM",
   "ph": "8",
   "cc": "8",

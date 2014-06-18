@@ -1618,7 +1618,7 @@
   "name": "Proxy Mk.1",
   "bs": "13",
   "note": "",
-  "cube": "J",
+  "cube": "R",
   "type": "LI",
   "ph": "11",
   "cc": "13",
@@ -1698,7 +1698,7 @@
   "name": "Proxy Mk.2",
   "bs": "13",
   "note": "",
-  "cube": "J",
+  "cube": "R",
   "type": "SK",
   "ph": "13",
   "cc": "13",
@@ -1765,7 +1765,7 @@
   "name": "Proxy Mk.3",
   "bs": "13",
   "note": "",
-  "cube": "J",
+  "cube": "R",
   "type": "HI",
   "ph": "14",
   "cc": "13",
@@ -2382,7 +2382,7 @@
    "swc": "0"
   }
  ],
- "cube": "G",
+ "cube": "R",
  "imp": "",
  "irr": "",
  "isc": "Spotbot",
@@ -2636,7 +2636,7 @@
   }
  ],
  "cube": "2",
- "imp": "I",
+ "imp": "X",
  "irr": "",
  "isc": "Ajax",
  "mov": "4-4",
@@ -2686,7 +2686,7 @@
   }
  ],
  "cube": "2",
- "imp": "I",
+ "imp": "X",
  "irr": "",
  "isc": "Penthesilea",
  "mov": "8-6",

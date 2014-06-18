@@ -26,6 +26,10 @@ my $skip_list = {
     "Rasyat Diplomatic Division" => 1,
 };
 
+my $alternate_names = {
+    "Kazak Spetsnazs (Mimetism)" => "Kazak Spetsnazs (Parachutist)",
+};
+
 my @specialist_profiles = (
     {
         key => 'msv',
@@ -270,6 +274,18 @@ sub has_berserk{
     return has_spec(@_, 'Berserk');
 }
 
+sub has_marksmanship{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Marksmanship.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
@@ -474,6 +490,9 @@ sub parse_unit{
     if($v = has_ma($new_unit)){
         $new_unit->{ma} = $v;
     }
+    if($v = has_marksmanship($new_unit)){
+        $new_unit->{marksmanship} = $v;
+    }
 
     # get_weapons goes into the childs list
     get_weapons($unit, $new_unit, $inherit_weapon, $ability_func);
@@ -553,10 +572,6 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         $unit->{name} =~ s/^Hassassin //;
         $unit->{name} =~ s/^The //;
 
-        if($unit->{name} =~ m/Chaksa/){
-            $unit->{spec} = [grep($_ ne 'Poison', @{$unit->{spec}})];
-        }
-
         my $new_unit = {};
         parse_unit($new_unit, $unit);
 
@@ -586,6 +601,9 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                     parse_unit($child_unit, $child, $specialist->{ability_func});
 
                     $child_unit->{name} = $new_unit->{name} . $specialist->{name_func}($ability);
+                    if($alternate_names->{$child_unit->{name}}){
+                        $child_unit->{name} = $alternate_names->{$child_unit->{name}};
+                    }
 
                     push @unit_list, $child_unit;
                 }

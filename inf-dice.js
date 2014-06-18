@@ -706,6 +706,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
         document.getElementsByName(player + ".ma")[0].value = unit["ma"] || 0;
+        document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
