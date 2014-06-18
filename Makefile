@@ -41,7 +41,7 @@ install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice ${BINDIR}
 
 diff:
-	for i in ${WWW_TARGETS}; do diff -u $$i ${WWWDIR}; done
+	for i in ${WWW_TARGETS}; do diff -u ${WWWDIR} $$i; done
 
 update_data:
 	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/data/
