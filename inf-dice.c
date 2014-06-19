@@ -719,7 +719,7 @@ static void print_player(const struct player *p, int p_num){
 }
 
 static void usage(const char *program){
-    printf("Usage: %s <STAT 1> <B 1> <DAM 1> <AMMO 1> <ARM_BONUS 1< <STAT 2> <B 2> <DAM 2> <AMMO 2> <ARM_BONUS 2>\n", program);
+    printf("Usage: %s <STAT 1> <B 1> <DAM 1> <AMMO 1> <ARM_BONUS 1> <STAT 2> <B 2> <DAM 2> <AMMO 2> <ARM_BONUS 2>\n", program);
     exit(0);
 }
 
