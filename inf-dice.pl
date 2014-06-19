@@ -217,12 +217,11 @@ my $evo_labels = {
     sup_3 => 'Support Hacking - 3 Allies (+9 WIP)',
 };
 
-my $marksmanship = [0, 1, 2, 3];
+my $marksmanship = [0, 1, 2];
 my $marksmanship_labels = {
     0 => 'None',
     1 => 'Level 1',
     2 => 'Level 2',
-    3 => 'Level 3',
 };
 
 my $factions = [
@@ -1186,12 +1185,8 @@ sub gen_attack_args{
         }
 
         if($cover){
-            if($marksmanship < 3){
-                push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
-                $arm += $cover;
-            }else{
-                push @mod_strings, sprintf('Marksmanship negates Cover modifier to ARM');
-            }
+            push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
+            $arm += $cover;
         }
 
         # Smoke provides no defense against non-lof skills
