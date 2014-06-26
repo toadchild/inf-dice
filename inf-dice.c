@@ -758,10 +758,18 @@ static void parse_stat(const char *str, struct player *p){
         p->crit_val = ROLL_MAX + 1;
         p->template = 1;
     }else{
+        int no_crit = 0;
         // Normal weapon that needs a roll
         // Crits if it hits the target number
 
         p->stat = strtol(str, &end, 10);
+
+        // If the stat ends in *, no crits are permitted
+        if(*end == '*'){
+            no_crit = 1;
+            end++;
+        }
+
         if(*str && *end){
             printf("ERROR: P%d Stat %s cannot be read\n", p->player_num, str);
             exit(1);
@@ -772,7 +780,9 @@ static void parse_stat(const char *str, struct player *p){
             exit(1);
         }
 
-        if(p->stat > ROLL_MAX){
+        if(no_crit){
+            p->crit_val = ROLL_MAX + 1;
+        }else if(p->stat > ROLL_MAX){
             p->crit_val = ROLL_MAX - (p->stat - ROLL_MAX);
         }else{
             p->crit_val = p->stat;

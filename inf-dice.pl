@@ -449,6 +449,12 @@ sub print_input_attack_section{
               -value => 1,
               -label => "First Strike",
           ),
+          "<br>",
+          span_checkbox(-name => "$player.intuitive",
+              -checked => defined(param("$player.intuitive")),
+              -value => 1,
+              -label => "Intuitive Attack",
+          ),
           "</div>\n";
 
     print "<div id='$player.sec_weapon'>",
@@ -1209,7 +1215,11 @@ sub gen_attack_args{
         # DTW mods
         $type = 'normal';
 
-        $stat = 'T';
+        if(param("$us.intuitive")){
+            $stat = (param("$us.wip") // 0) . "*";
+        }else{
+            $stat = 'T';
+        }
 
         $b = (param("$us.b") // 1);
         if($link_b){

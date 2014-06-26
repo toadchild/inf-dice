@@ -190,6 +190,7 @@ function set_action(player){
     if(action.value == "bs"){
         // action
         enable_input(player + ".first_strike");
+        disable_display(player + ".intuitive");
 
         // weapon
         enable_input(player + ".b");
@@ -220,6 +221,7 @@ function set_action(player){
     }else if(action.value == "spec"){
         // action
         enable_input(player + ".first_strike");
+        disable_display(player + ".intuitive");
 
         // weapon
         enable_input(player + ".b");
@@ -250,6 +252,7 @@ function set_action(player){
     }else if(action.value == "dtw"){
         // action
         enable_input(player + ".first_strike");
+        enable_display(player + ".intuitive");
 
         // weapon
         enable_input(player + ".b");
@@ -280,6 +283,7 @@ function set_action(player){
     }else if(action.value == "cc"){
         // action
         enable_input(player + ".first_strike");
+        disable_display(player + ".intuitive");
 
         // weapon
         disable_input(player + ".b");
@@ -310,6 +314,7 @@ function set_action(player){
     }else if(action.value == "dodge"){
         // action
         disable_input(player + ".first_strike");
+        disable_display(player + ".intuitive");
 
         // weapon
         disable_input(player + ".b");
@@ -344,6 +349,7 @@ function set_action(player){
         }else{
             enable_input(player + ".first_strike");
         }
+        disable_display(player + ".intuitive");
 
         // weapon
         disable_input(player + ".b");
@@ -374,6 +380,7 @@ function set_action(player){
     }else if(action.value == "none"){
         // action
         disable_input(player + ".first_strike");
+        disable_display(player + ".intuitive");
 
         // weapon
         disable_input(player + ".b");

@@ -11,7 +11,7 @@ BIN_TARGETS=inf-dice
 all: ${WWW_TARGETS} ${BIN_TARGETS}
 
 clean:
-	rm -f ${WWW_TARGETS} ${BIN_TARGETS} dual_weapons.dat dual_ccw.dat
+	rm -f ${WWW_TARGETS} ${BIN_TARGETS} dual_weapons.dat dual_ccw.dat inf-dice.o
 
 inf-dice: inf-dice.o
 
