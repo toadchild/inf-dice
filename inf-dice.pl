@@ -1096,7 +1096,11 @@ sub gen_attack_args{
     $arm = ceil(abs(param("$them.$save") // 0) * $ap);
     $dam = param("$us.dam") // 0;
 
-    my $foxhole = (param("$them.foxhole") // 0);
+    my $sapper = (param("$them.sapper") // 0);
+    my $foxhole = 0;
+    if($sapper){
+        $foxhole = (param("$them.foxhole") // 0);
+    }
 
     $cover = (param("$them.cover") // 0);
     # Foxhole grants Cover
