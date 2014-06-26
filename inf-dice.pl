@@ -435,6 +435,13 @@ sub print_input_attack_section{
               -label => 'Berserk',
               -onchange => "set_berserk()",
           ),
+          "<br>",
+          span_checkbox(-name => "$player.sapper",
+              -checked => defined(param("$player.sapper")),
+              -value => 1,
+              -label => 'Sapper',
+              -onchange => "set_sapper_foxhole()",
+          ),
           "</div>\n";
 
     print "<div class='action'>
@@ -531,6 +538,11 @@ sub print_input_attack_section{
               -checked => defined(param("$player.cover")),
               -value => 3,
               -label => 'Cover (+3 ARM, -3 Opponent BS)'),
+          "<br>",
+          span_checkbox(-name => "$player.foxhole",
+              -checked => defined(param("$player.foxhole")),
+              -value => 1,
+              -label => 'Foxhole (Cover, Mimetism, Courage)'),
           "<br>",
           span_checkbox(-name => "$player.odf",
               -checked => defined(param("$player.odf")),
@@ -1083,8 +1095,16 @@ sub gen_attack_args{
 
     $arm = ceil(abs(param("$them.$save") // 0) * $ap);
     $dam = param("$us.dam") // 0;
+
+    my $foxhole = (param("$them.foxhole") // 0);
+
+    $cover = (param("$them.cover") // 0);
+    # Foxhole grants Cover
+    if($foxhole){
+        $cover = 3;
+    }
     $ignore_cover = $code->{cover} // 1;
-    $cover = (param("$them.cover") // 0) * $ignore_cover;
+    $cover *= $ignore_cover;
 
     # Monofilament and K1 have fixed damage
     if($code->{fixed_dam}){
@@ -1125,6 +1145,11 @@ sub gen_attack_args{
         if($odf < $camo){
             $camo = $odf;
         }
+        # Foxhole grants Mimetism
+        if($foxhole && $camo == 0){
+            $camo = -3;
+        }
+
         $camo *= $ignore_cover;
 
         if($cover){

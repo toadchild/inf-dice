@@ -180,6 +180,26 @@ function set_cc_first_strike(){
     }
 }
 
+function set_sapper_foxhole(){
+    var action_1 = document.getElementsByName("p1.action")[0].value;
+    var action_2 = document.getElementsByName("p2.action")[0].value;
+
+    var sapper_1 = document.getElementsByName("p1.sapper")[0].checked;
+    var sapper_2 = document.getElementsByName("p2.sapper")[0].checked;
+
+    if(sapper_1 && (action_2 == "bs" || action_2 == "dtw" || action_2 == "spec")){
+        enable_input("p1.foxhole");
+    }else{
+        disable_input("p1.foxhole");
+    }
+
+    if(sapper_2 && (action_1 == "bs" || action_1 == "dtw" || action_1 == "spec")){
+        enable_input("p2.foxhole");
+    }else{
+        disable_input("p2.foxhole");
+    }
+}
+
 function set_action(player){
     var other = other_player(player);
     var action_name = player + ".action";
@@ -416,6 +436,7 @@ function set_action(player){
 
     set_berserk();
     set_cc_first_strike();
+    set_sapper_foxhole();
 
     populate_weapons(player);
 }
@@ -724,6 +745,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".motorcycle")[0].checked = unit["motorcycle"];
         document.getElementsByName(player + ".nbw")[0].checked = unit["nbw"];
         document.getElementsByName(player + ".has_berserk")[0].checked = unit["berserk"];
+        document.getElementsByName(player + ".sapper")[0].checked = unit["sapper"];
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");

@@ -61,6 +61,11 @@ my @specialist_profiles = (
         ability_func => \&has_nbw,
         name_func => \&name_nbw,
     },
+    {
+        key => 'sapper',
+        ability_func => \&has_sapper,
+        name_func => \&name_sapper,
+    },
 );
 
 sub name_msv{
@@ -94,6 +99,10 @@ sub name_ma{
 
 sub name_nbw{
     return " (Natural Born Warrior)";
+}
+
+sub name_sapper{
+    return " (Sapper)";
 }
 
 sub has_spec{
@@ -286,6 +295,10 @@ sub has_marksmanship{
     return 0;
 }
 
+sub has_sapper{
+    return has_spec(@_, 'Sapper');
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
@@ -463,6 +476,7 @@ sub parse_unit{
     $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
     $new_unit->{berserk} = 1 if has_berserk($new_unit);
+    $new_unit->{sapper} = 1 if has_sapper($new_unit);
 
     # leveled skills
     my $v;
