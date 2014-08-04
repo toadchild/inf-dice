@@ -471,7 +471,6 @@ sub parse_unit{
     # Modifiers
     $new_unit->{motorcycle} = 1 if !$rider && has_motorcycle($new_unit);
     $new_unit->{nwi} = 1 if has_nwi($new_unit);
-    $new_unit->{symbiont} = 1 if has_symbiont($new_unit, $symbiont_inactive);
     $new_unit->{shasvastii} = 1 if has_shasvastii($new_unit) || $inherit_shasvastii;
     $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
@@ -506,6 +505,9 @@ sub parse_unit{
     }
     if($v = has_marksmanship($new_unit)){
         $new_unit->{marksmanship} = $v;
+    }
+    if($v = has_symbiont($new_unit, $symbiont_inactive)){
+        $new_unit->{symbiont} = $v;
     }
 
     # get_weapons goes into the childs list
