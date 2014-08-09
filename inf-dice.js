@@ -441,6 +441,10 @@ function set_action(player){
     populate_weapons(player);
 }
 
+function set_xvisor(player){
+    set_weapon(player, false);
+}
+
 function set_weapon(player, check_params){
     // Set ammo types based on the selected weapon
     var stat_list = document.getElementsByName(player + ".stat")[0];
@@ -449,6 +453,7 @@ function set_weapon(player, check_params){
     var range_list = document.getElementsByName(player + ".range")[0];
     var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
     var action = document.getElementsByName(player + ".action")[0].value;
+    var xvisor = document.getElementsByName(player + ".xvisor")[0].value;
     var weapon = weapon_data[weapon_name];
 
     // default selected values
@@ -478,6 +483,7 @@ function set_weapon(player, check_params){
         my_ammo = weapon["ammo"];
         my_stat = [weapon["stat"]];
         my_dam = [weapon["dam"]];
+
         my_range = weapon["ranges"];
     }
 
@@ -522,7 +528,21 @@ function set_weapon(player, check_params){
     if(action == "bs" || action == "spec"){
         var value_match = 1;
         for(var i = 0; i < my_range.length; i++){
-            range_list.options[i] = new Option(my_range[i]);
+            // X Visor sets Long range to 0 and Maximum to -3
+            // X-2 Visor sets both Long and Maximum to 0
+            if((xvisor == 1 && i == 2) || (xvisor == 2 && i >= 2)){
+                var r = my_range[i];
+                var slash_index = r.lastIndexOf("/");
+                r = r.substring(0, slash_index) + "/0";
+                range_list.options[i] = new Option(r);
+            }else if(xvisor == 1 && i == 3){
+                var r = my_range[i];
+                var slash_index = r.lastIndexOf("/");
+                r = r.substring(0, slash_index) + "/-3";
+                range_list.options[i] = new Option(r);
+            }else{
+                range_list.options[i] = new Option(my_range[i]);
+            }
 
             if(range_list.options[i].value == selected_range){
                 range_list.options[i].selected = true;
@@ -739,6 +759,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
         document.getElementsByName(player + ".ma")[0].value = unit["ma"] || 0;
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
+        document.getElementsByName(player + ".xvisor")[0].value = unit["xvisor"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];

@@ -230,7 +230,13 @@ sub has_msv{
 }
 
 sub has_xvisor{
-    return has_spec(@_, 'X Visor');
+    if(has_spec(@_, 'X Visor')){
+        return 1;
+    }
+    if(has_spec(@_, 'X-2 Visor')){
+        return 2;
+    }
+    return 0;
 }
 
 sub has_fo{
@@ -472,7 +478,6 @@ sub parse_unit{
     $new_unit->{motorcycle} = 1 if !$rider && has_motorcycle($new_unit);
     $new_unit->{nwi} = 1 if has_nwi($new_unit);
     $new_unit->{shasvastii} = 1 if has_shasvastii($new_unit) || $inherit_shasvastii;
-    $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
     $new_unit->{berserk} = 1 if has_berserk($new_unit);
     $new_unit->{sapper} = 1 if has_sapper($new_unit);
@@ -508,6 +513,9 @@ sub parse_unit{
     }
     if($v = has_symbiont($new_unit, $symbiont_inactive)){
         $new_unit->{symbiont} = $v;
+    }
+    if($v = has_xvisor($new_unit)){
+        $new_unit->{xvisor} = $v;
     }
 
     # get_weapons goes into the childs list

@@ -224,6 +224,13 @@ my $marksmanship_labels = {
     2 => 'Level 2',
 };
 
+my $xvisor = [0, 1, 2];
+my $xvisor_labels = {
+    0 => 'None',
+    1 => 'X Visor',
+    2 => 'X-2 Visor',
+};
+
 my $factions = [
     'Aleph',
     'Ariadna',
@@ -420,6 +427,14 @@ sub print_input_attack_section{
               -labels => $ma_labels,
               -label => "Martial Arts",
               -onchange => "set_cc_first_strike()",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.xvisor",
+              -values => $xvisor,
+              -default => param("$player.xvisor") // '',
+              -labels => $xvisor_labels,
+              -label => 'X Visor',
+              -onchange => "set_xvisor('$player')",
           ),
           "<br>",
           span_checkbox(-name => "$player.nbw",
