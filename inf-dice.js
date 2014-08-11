@@ -239,6 +239,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
         enable_display(other + ".sec_defense");
+        enable_display(player + ".sec_other");
     }else if(action.value == "spec"){
         // action
         enable_display(player + ".first_strike");
@@ -271,6 +272,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
         enable_display(other + ".sec_defense");
+        enable_display(player + ".sec_other");
     }else if(action.value == "dtw"){
         // action
         enable_display(player + ".first_strike");
@@ -303,6 +305,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
         enable_display(other + ".sec_defense");
+        disable_display(player + ".sec_other");
     }else if(action.value == "cc"){
         // action
         enable_display(player + ".first_strike");
@@ -334,6 +337,7 @@ function set_action(player){
         enable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
+        enable_display(player + ".sec_other");
     }else if(action.value == "dodge"){
         // action
         disable_display(player + ".first_strike");
@@ -365,6 +369,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
+        enable_display(player + ".sec_other");
     }else if(action.value == "hack_imm" || action.value == "hack_ahp" || action.value == "hack_def" || action.value == "hack_pos"){
         // action
         if(action.value == "hack_def"){
@@ -401,6 +406,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         enable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
+        enable_display(player + ".sec_other");
     }else if(action.value == "none"){
         // action
         disable_display(player + ".first_strike");
@@ -432,6 +438,7 @@ function set_action(player){
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
+        disable_display(player + ".sec_other");
     }
 
     set_berserk();

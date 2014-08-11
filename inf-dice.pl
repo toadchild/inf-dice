@@ -231,6 +231,8 @@ my $xvisor_labels = {
     2 => 'X-2 Visor',
 };
 
+my $misc_mod = ['+12', '+11', '+10', '+9', '+8', '+7', '+6', '+5', '+4', '+3', '+2', '+1', 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12];
+
 my $factions = [
     'Aleph',
     'Ariadna',
@@ -563,6 +565,14 @@ sub print_input_attack_section{
               -checked => defined(param("$player.odf")),
               -value => -6,
               -label => 'ODF (-6 Opponent BS)'),
+          "</div>\n";
+    print "<div id='$player.sec_other'>",
+          "<h3>Other Modifiers</h3>",
+          span_popup_menu(-name => "$player.misc_mod",
+              -values => $misc_mod,
+              -default => param("$player.misc_mod") // 0,
+              -label => "Additional Modifier",
+          ),
           "</div>\n";
 }
 
@@ -1225,6 +1235,12 @@ sub gen_attack_args{
         push @mod_strings, sprintf('Range grants %+d %s', $range,  $stat_name);
         $stat += $range;
 
+        my $misc_mod = param("$us.misc_mod") // 0;
+        if($misc_mod){
+            push @mod_strings, sprintf('Additional modifier grants %+d %s', $misc_mod, $stat_name);
+            $stat += $misc_mod;
+        }
+
         $stat = max($stat, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
@@ -1304,6 +1320,12 @@ sub gen_attack_args{
         $range = $1;
         push @mod_strings, sprintf('Range grants %+d %s', $range,  $stat_name);
         $stat += $range;
+
+        my $misc_mod = param("$us.misc_mod") // 0;
+        if($misc_mod){
+            push @mod_strings, sprintf('Additional modifier grants %+d %s', $misc_mod, $stat_name);
+            $stat += $misc_mod;
+        }
 
         $stat = max($stat, 0);
         push @mod_strings, "Net $stat_name is $stat";
@@ -1386,6 +1408,12 @@ sub gen_attack_args{
                 push @mod_strings, sprintf('Gang-up grants %+d CC', $gang_up);
                 $stat += $gang_up;
             }
+        }
+
+        my $misc_mod = param("$us.misc_mod") // 0;
+        if($misc_mod){
+            push @mod_strings, sprintf('Additional modifier grants %+d CC', $misc_mod);
+            $stat += $misc_mod;
         }
 
         $stat = max($stat, 0);
@@ -1536,6 +1564,12 @@ sub gen_hack_args{
         $stat += $bts;
     }
 
+    my $misc_mod = param("$us.misc_mod") // 0;
+    if($misc_mod){
+        push @mod_strings, sprintf('Additional modifier grants %+d WIP', $misc_mod);
+        $stat += $misc_mod;
+    }
+
     $stat = max($stat, 0);
     push @mod_strings, "Net WIP is $stat";
 
@@ -1584,6 +1618,12 @@ sub gen_dodge_args{
     }elsif(param("$them.action") eq 'dodge'){
         # double-dodge is normal rolls
         $type = 'normal';
+    }
+
+    my $misc_mod = param("$us.misc_mod") // 0;
+    if($misc_mod){
+        push @mod_strings, sprintf('Additional modifier grants %+d PH', $misc_mod);
+        $stat += $misc_mod;
     }
 
     $stat = max($stat, 0);
