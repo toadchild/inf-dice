@@ -537,12 +537,12 @@ function set_weapon(player, check_params){
         for(var i = 0; i < my_range.length; i++){
             // X Visor sets Long range to 0 and Maximum to -3
             // X-2 Visor sets both Long and Maximum to 0
-            if((xvisor == 1 && i == 2) || (xvisor == 2 && i >= 2)){
+            if(weapon && ((xvisor == 1 && i == 2) || (xvisor == 2 && i >= 2))){
                 var r = my_range[i];
                 var slash_index = r.lastIndexOf("/");
                 r = r.substring(0, slash_index) + "/0";
                 range_list.options[i] = new Option(r);
-            }else if(xvisor == 1 && i == 3){
+            }else if(weapon && xvisor == 1 && i == 3){
                 var r = my_range[i];
                 var slash_index = r.lastIndexOf("/");
                 r = r.substring(0, slash_index) + "/-3";
