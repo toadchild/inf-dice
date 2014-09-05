@@ -1824,7 +1824,6 @@
   "w": "2",
   "ava": "1",
   "bsw": [
-   "MULTI Rifle",
    "Nanopulser"
   ],
   "spec": [
@@ -1845,7 +1844,7 @@
     "swc": "0",
     "cbcode": [],
     "spec": [],
-    "bsw": [],
+    "bsw": ["MULTI Rifle"],
     "ccw": [],
     "note": ""
    },
@@ -1858,7 +1857,30 @@
     "spec": [
      "Lieutenant"
     ],
-    "bsw": [],
+    "bsw": ["MULTI Rifle"],
+    "ccw": [],
+    "note": ""
+   },{
+    "code": "BS",
+    "cost": "65",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [],
+    "bsw": ["Boarding Shotgun"],
+    "ccw": [],
+    "note": ""
+   },
+   {
+    "code": "BS Lt",
+    "cost": "65",
+    "codename": "",
+    "swc": "0",
+    "cbcode": [],
+    "spec": [
+     "Lieutenant"
+    ],
+    "bsw": ["Boarding Shotgun"],
     "ccw": [],
     "note": ""
    }
@@ -3908,5 +3930,178 @@
  ],
  "type": "LI",
  "w": "1",
+ "wip": "13"
+}
+,
+        {
+ "arm": "3",
+ "army": "Yu Jing",
+ "ava": "5",
+ "bs": "13",
+ "bsw": [],
+ "bts": "-3",
+ "cbcode": [
+   "280370-0482"],
+ "cc": "15",
+ "ccw": [
+  "Pistol (2)",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [
+    "Combi Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "Combi",
+   "cost": "27",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "HMG"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "HMG",
+   "codename": "",
+   "cost": "38",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Boarding Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "BS",
+   "codename": "",
+   "cost": "27",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "MULTI Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "MULTI",
+   "codename": "",
+   "cost": "37",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Missile Launcher",
+    "Light Shotgun"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "ML",
+   "codename": "",
+   "cost": "47",
+   "note": "",
+   "spec": [],
+   "swc": "2"
+  },
+  {
+   "bsw": [
+    "HMG"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "HMG+AM",
+   "codename": "",
+   "cost": "42",
+   "note": "",
+   "spec": [
+    "AutoMediKit"
+   ],
+   "swc": "2"
+  },
+  {
+   "bsw": [
+    "Combi Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "FO",
+   "codename": "",
+   "cost": "30",
+   "note": "",
+   "spec": [
+    "Forward Observer"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Combi Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Paramedic",
+   "codename": "",
+   "cost": "31",
+   "note": "",
+   "spec": [
+    "Paramedic",
+    "MediKit"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Combi Rifle"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt",
+   "codename": "",
+   "cost": "27",
+   "note": "",
+   "spec": [
+    "Lieutenant"
+   ],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "HMG"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Lt+HMG",
+   "codename": "",
+   "cost": "42",
+   "note": "",
+   "spec": [
+    "Lieutenant",
+    "AutoMediKit"
+   ],
+   "swc": "1"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Zuyong Invincibles, Terra-cotta soldiers",
+ "mov": "4-4",
+ "name": "Zuyong",
+ "note": "",
+ "ph": "12",
+ "spec": [],
+ "type": "HI",
+ "w": "2",
  "wip": "13"
 }

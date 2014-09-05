@@ -304,6 +304,87 @@
    }
   ]
  },
+         {
+  "childs": [
+   {
+    "bsw": [],
+    "swc": "1.5",
+    "cbcode": [],
+    "code": "Default",
+    "note": "",
+    "ccw": [],
+    "codename": "Sniper",
+    "cost": "30",
+    "spec": []
+   },
+   {
+    "bsw": [
+     "Antipersonnel Mines"
+    ],
+    "swc": "1.5",
+    "cbcode": [],
+    "code": "Minelayer",
+    "note": "",
+    "ccw": [],
+    "codename": "",
+    "cost": "32",
+    "spec": ["Minelayer"]
+   }
+  ],
+  "ccw": [
+   "Pistol",
+   "Knife"
+  ],
+  "bsw": ["Viral Sniper Rifle"],
+  "ava": "2",
+  "irr": "",
+  "arm": "1",
+  "cbcode": [
+   "280917-0480"
+  ],
+  "bts": "-3",
+  "army": "Tohaa",
+  "note": "",
+  "cube": "X",
+  "bs": "12",
+  "cc": "13",
+  "imp": "",
+  "name": "Nikoul",
+  "isc": "Nikoul Ambush Unit",
+  "mov": "4-4",
+  "type": "LI",
+  "ph": "11",
+  "spec": [
+   "Symbiont Armour",
+   "Multispectral Visor L1",
+   "Sapper"
+  ],
+  "w": "1",
+  "wip": "13",
+  "altp": [
+   {
+    "cube": "X",
+    "bs": "12",
+    "ava": " ",
+    "irr": " ",
+    "arm": "0",
+    "mov": "4-4",
+    "cbcode": [],
+    "bts": "0",
+    "army": "Tohaa",
+    "cc": "13",
+    "isc": "(Inactive Armour)",
+    "imp": " ",
+    "type": "LI",
+    "ph": "11",
+    "w": "1 ",
+    "wip": "13",
+    "bsw":[],
+    "ccw":[],
+    "spec":[]
+   }
+  ]
+ },
  {
   "childs": [
    {

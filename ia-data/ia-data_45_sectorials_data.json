@@ -1096,7 +1096,8 @@
    },
    {
     "ava": "T",
-    "isc": "Neoterra Bolts"
+    "isc": "Neoterra Bolts",
+    "linkable": true
    },
    {
     "ava": "1",
