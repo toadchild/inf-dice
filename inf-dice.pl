@@ -19,7 +19,7 @@ Content-Type: text/html; charset=utf-8
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Infinity Dice Calculator</title>
+        <title>Infinity Dice Calculator (N3)</title>
         <link href="inf-dice.css" rel="stylesheet" type="text/css">
         <link href="hitbar.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="inf-dice.js"></script>
@@ -34,7 +34,7 @@ sub print_top{
     print <<EOF
     <div id="head" class="databox">
     <div class='content'>
-    <h1>Infinity Dice Calculator</h1>
+    <h1>Infinity Dice Calculator (N3)</h1>
 <p>
 Use the Model and Action Selection tools below to describe the scenario you
 want to learn about.  You can pick the faction, model, action, and weapons
@@ -1673,7 +1673,7 @@ sub execute_backend{
     my (@args) = @_;
     my $output;
 
-    if(!open DICE, '-|', '/usr/local/bin/inf-dice', @args){
+    if(!open DICE, '-|', '/usr/local/bin/inf-dice-n3', @args){
         $output->{error} = 'Unable to execute backend component.';
     }
     while(<DICE>){
