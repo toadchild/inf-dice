@@ -1,0 +1,165 @@
+#p1 {
+    width: 48%;
+    float:left;
+}
+
+#p2 {
+    width: 48%;
+    float:right;
+}
+
+#output .subtitle {
+    text-align: center;
+    font-style: italic;
+}
+
+#output .contestant {
+    font-weight: bold;
+}
+
+#submit {
+    clear: both;
+    text-align: center;
+}
+
+.databox {
+    text-align: left;
+    border: 2px solid #d9f3fd;
+    border-radius: 9px;
+    margin: 20px;
+
+    background-color: #0a2d32;
+    box-shadow: 0px 0px 20px #d9f3fd;
+}
+
+.databox .content {
+    margin: 20px;
+}
+
+.databox input {
+    background-color: #444444;
+    color: white;
+}
+
+.databox button {
+    background-color: #444444;
+    color: white;
+}
+
+.inner-databox {
+    text-align: left;
+    border: 2px solid #d9f3fd;
+    border-radius: 9px;
+    margin: 0px;
+    margin-bottom: 20px;
+
+    color: black;
+    background-image:url('hex.png');
+}
+
+.inner-databox select {
+    background-color: white;
+    color: black;
+}
+
+.inner-databox input {
+    background-color: white;
+    color: black;
+}
+
+#p1.inner-databox {
+    background-color: #a27fb6;
+}
+
+#p2.inner-databox {
+    background-color: #80a248;
+}
+
+#input {
+}
+
+#time {
+    font-size: 75%;
+    color: grey;
+    margin: 20px;
+}
+
+#contact {
+    color: grey;
+    margin: 20px;
+}
+
+#raw_output {
+}
+
+.output_error {
+    color: red;
+}
+
+.output_data {
+}
+
+.hit_chance {
+    width: 4em;
+    text-align: right;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+body {
+    background-color: #0e4759;
+    color: white;
+    font-family: sans-serif;
+}
+
+a:link {
+    color: inherit;
+}
+
+a:visited {
+    color: inherit;
+}
+
+a:active {
+    color: inherit;
+}
+
+a:hover {
+    color: inherit;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+th {
+    text-align: center;
+}
+
+.statline table {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.statline .skills {
+    margin-left: 2em;
+    font-style: italic;
+    font-size: 90%;
+}
+
+.statline table {
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.statline th {
+    border: 1px solid black;
+}
+
+.statline td {
+    border: 1px solid black;
+}

@@ -1,0 +1,39 @@
+ {
+  "name": "Civil",
+  "isc": "Civils",
+  "cbcode": [],
+  "bts": "0",
+  "wip": "11",
+  "army": "Extra",
+  "mov": "4-4",
+  "ph": "10",
+  "type": "LI",
+  "cc": "6",
+  "cube": "X",
+  "note": "",
+  "bs": "5",
+  "irr": "",
+  "arm": "0",
+  "w": "1",
+  "bsw": [],
+  "ava": "T",
+  "spec": [
+   "Civil"
+  ],
+  "childs": [
+   {
+    "cost": "0",
+    "code": "Default",
+    "codename": "",
+    "cbcode": [],
+    "swc": "0",
+    "spec": [],
+    "bsw": [],
+    "note": "",
+    "ccw": []
+   }
+  ],
+  "ccw": [],
+  "imp": "",
+  "functions": []
+ }
