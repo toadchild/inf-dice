@@ -3,6 +3,7 @@
   "army": "Panoceania",
   "wip": "12",
   "cbcode": [
+   "280274-0492",
    "280207-0020",
    "280209-0027",
    "280210-0028",
@@ -148,7 +149,8 @@
     "swc": "0",
     "cbcode": [],
     "spec": [
-     "Forward Observer"
+     "Forward Observer",
+     "Deployable Repeater"
     ],
     "bsw": [
      "Combi Rifle"
