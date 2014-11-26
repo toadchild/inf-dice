@@ -1456,4 +1456,136 @@
  "type": "LI",
  "w": "1",
  "wip": "14"
+},{
+ "arm": "2",
+ "army": "Tohaa",
+ "ava": "4",
+ "bs": "12",
+ "bsw": [],
+ "bts": "-3",
+ "cbcode": [
+        "280919-0503",
+        "280918-0491"
+        ],
+ "cc": "15",
+ "ccw": [
+  "Pistol",
+  "Knife"
+ ],
+ "childs": [
+  {
+   "bsw": [
+    "Combi Rifle",
+    "E\/M Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Default",
+   "codename": "c+em",
+   "cost": "32",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Combi Rifle (2)"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "2combi",
+   "codename": "2c",
+   "cost": "32",
+   "note": "",
+   "spec": [],
+   "swc": "0.5"
+  },
+  {
+   "bsw": [
+    "Boarding Shotgun",
+    "E\/M Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "bs+em",
+   "codename": "",
+   "cost": "32",
+   "note": "",
+   "spec": [],
+   "swc": "0"
+  },
+  {
+   "bsw": [
+    "Spitfire"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "Spitfire",
+   "codename": "",
+   "cost": "35",
+   "note": "",
+   "spec": [],
+   "swc": "1.5"
+  },
+  {
+   "bsw": [
+    "Combi Rifle",
+    "E\/M Grenades"
+   ],
+   "cbcode": [],
+   "ccw": [],
+   "code": "fo",
+   "codename": "",
+   "cost": "35",
+   "note": "",
+   "spec": [
+    "Forward Observer"
+   ],
+   "swc": "0"
+  }
+ ],
+ "cube": "X",
+ "imp": "",
+ "irr": "",
+ "isc": "Kotail Mobile Unit",
+ "mov": "6-4",
+ "name": "Kotail",
+ "note": "",
+ "ph": "12",
+ "spec": [
+  "Symbiont Armour",
+  "Holoprojector L2",
+  "Super-Jump",
+        "V: Courage"
+ ],
+ "type": "LI",
+ "w": "1",
+ "wip": "13",
+  "altp": [
+   {
+    "cube": "X",
+    "bs": "12",
+    "ava": " ",
+    "irr": " ",
+    "arm": "0",
+    "mov": "4-4",
+    "cbcode": [
+    ],
+    "bts": "0",
+    "army": "Tohaa",
+    "cc": "15",
+    "isc": "(Inactive Armour)",
+    "imp": "X",
+    "type": "LI",
+    "ph": "10",
+    "w": "1 ",
+    "wip": "13",
+    "bsw":[],
+    "ccw":[],
+    "spec":[
+        "V: Courage"
+        ]
+   }
+  ]
 }
+

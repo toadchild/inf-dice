@@ -1115,7 +1115,9 @@
   "Flash Pulse"
  ],
  "bts": "0",
- "cbcode": [],
+ "cbcode": [
+     "280718-0495"
+ ],
  "cc": "10",
  "ccw": [
   "Stun Pistol",
