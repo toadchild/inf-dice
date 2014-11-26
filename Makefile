@@ -2,18 +2,19 @@ CFLAGS=-O2
 LDFLAGS=
 LDLIBS=-lm -lpthread
 
-WWWDIR=/var/www/inf-dice
+WWWDIR=/var/www/inf-dice/2e
 BINDIR=/usr/local/bin
 
-WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js
-BIN_TARGETS=inf-dice
+WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js .htaccess
+BIN_TARGETS=inf-dice-2e
 
 all: ${WWW_TARGETS} ${BIN_TARGETS}
 
 clean:
 	rm -f ${WWW_TARGETS} ${BIN_TARGETS} dual_weapons.dat dual_ccw.dat inf-dice.o
 
-inf-dice: inf-dice.o
+inf-dice-2e: inf-dice.o
+	${CC} ${CFLAGS} ${LDFLAGS} ${LDLIBS} $< -o $@
 
 inf-dice.o: inf-dice.c
 
@@ -38,7 +39,7 @@ weapon_data.js: process_weapon.pl ia-data/* dual_weapons.dat dual_ccw.dat \
 
 install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice.js inf-dice.css inf-dice.pl ${WWW_TARGETS} ${WWWDIR}
-	cp inf-dice ${BINDIR}
+	cp inf-dice-2e ${BINDIR}
 
 diff:
 	for i in ${WWW_TARGETS}; do diff -u ${WWWDIR} $$i; done
