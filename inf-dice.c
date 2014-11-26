@@ -369,7 +369,7 @@ static void count_player_results(struct player *us, struct player *them, int *hi
         if(us->d[i].is_hit){
             if(us->d[i].is_crit){
                 // crit, see if it was canceled
-                if(!(them->stat >= us->stat && them->d[best].is_crit)){
+                if(!(them->d[best].is_crit)){
                     (*crits)++;
                 }else{
                     // All lower dice will also be canceled
@@ -379,9 +379,8 @@ static void count_player_results(struct player *us, struct player *them, int *hi
                 // it was a regular hit, see if it was canceled
                 if(!(us->template && them->d[best].is_hit) &&
                         (them->template || !them->d[best].is_hit ||
-                        (!them->d[best].is_crit &&
-                        (them->d[best].value < us->d[i].value ||
-                        (them->d[best].value == us->d[i].value && them->stat < us->stat))))){
+                            (!them->d[best].is_crit &&
+                                (them->d[best].value < us->d[i].value)))){
                     (*hits)++;
                 }else{
                     // All lower dice will also be canceled
