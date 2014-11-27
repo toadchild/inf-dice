@@ -219,6 +219,10 @@ for my $weapon (@$poison_ccw){
     $weapon_data->{$new_weapon->{name}} = $new_weapon;
 }
 
+# new ammo types
+$all_ammo->{Breaker} = 1;
+$all_ammo->{DT} = 1;
+
 open $file, '>', 'weapon_data.js' or die "Unable to open file";
 print $file 'var weapon_data = ';
 print $file $json->encode($weapon_data);

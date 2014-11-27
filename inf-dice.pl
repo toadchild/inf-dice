@@ -56,34 +56,37 @@ EOF
 }
 
 my $ammo_codes = {
-    Normal => {code => 'N'},
-    Shock => {code => 'N', fatal => 1},
-    Swarm => {code => 'N', fatal => 1, save => 'bts'},
-    T2 => {code => 'N', dam => 2},
-    AP => {code => 'N', ap => 0.5},
-    'AP+DA' => {code => 'D', ap => 0.5},
-    'AP+EXP' => {code => 'E', ap => 0.5},
-    'AP+Shock' => {code => 'N', ap => 0.5, fatal => 1},
-    DA => {code => 'D'},
-    'DA+Shock' => {code => 'D', fatal => 1},
-    EXP => {code => 'E'},
-    Fire => {code => 'F', fatal_symbiont => 9},
-    Monofilament => {code => 'N', fixed_dam => 12, fatal => 9},
-    K1 => {code => 'N', fixed_dam => 12},
-    Viral => {code => 'D', save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
-    Nanotech => {code => 'N', save => 'bts'},
-    Flash => {code => 'N', save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'E/M' => {code => 'N', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'E/M2' => {code => 'D', save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
-    'Zero-V Smoke' => {code => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
-    'Adhesive' => {code => 'N', alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'Dep. Repeater' => {code => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
+    Normal => {saves => 1},
+    Shock => {saves => 1, fatal => 1},
+    Swarm => {saves => 1, fatal => 1, save => 'bts'},
+    T2 => {saves => 1, dam => 2},
+    AP => {saves => 1, ap => 0.5},
+    'AP+DA' => {saves => 2, ap => 0.5},
+    'AP+EXP' => {saves => 3, ap => 0.5},
+    'AP+Shock' => {saves => 1, ap => 0.5, fatal => 1},
+    DA => {saves => 2},
+    'DA+Shock' => {saves => 2, fatal => 1},
+    EXP => {saves => 3},
+    Fire => {saves => 'F', fatal_symbiont => 9},
+    Monofilament => {saves => 1, fixed_dam => 12, fatal => 9},
+    K1 => {saves => 1, fixed_dam => 12},
+    Viral => {saves => 2, save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
+    Nanotech => {saves => 1, save => 'bts'},
+    Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'E/M' => {saves => 1, ap => 0.5, save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'E/M2' => {saves => 2, ap => 0.5, save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
+    'Zero-V Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
+    'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'Dep. Repeater' => {saves => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
+    # N3 new ammos, may not yet be in any weapons
+    'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
+    'DT' => {saves => 2, save => 'bts'},
     # Placeholders for unimplemented ammos
-    'Plasma' => {code => 'N'},
-    'N+E/M(12)' => {code => 'N'},
-    'AP+E/M(12)' => {code => 'N', ap => 0.5},
-    'Stun' => {code => 'N', save => 'bts', nonlethal => 1},
+    'Plasma' => {saves => 1},
+    'N+E/M(12)' => {saves => 1},
+    'AP+E/M(12)' => {saves => 1, ap => 0.5},
+    'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
 };
 
 my $skill_codes = {
@@ -1044,7 +1047,7 @@ sub gen_attack_args{
     }else{
         $ap = $code->{ap} // 1;
         $save = $code->{save} // 'arm';
-        $ammo = $code->{code};
+        $ammo = $code->{saves};
     }
 
     $arm = ceil(abs(param("$them.$save") // 0) * $ap);

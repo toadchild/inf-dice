@@ -21,17 +21,17 @@
 #define MIN(a,b) (a < b ? a : b)
 
 enum ammo_t{
-    AMMO_NORMAL,
-    AMMO_DA,
-    AMMO_EXP,
+    AMMO_1,
+    AMMO_2,
+    AMMO_3,
     AMMO_FIRE,
     AMMO_NONE,
 };
 
 static const char *ammo_labels[] = {
-    "NORMAL",
-    "DA",
-    "EXP",
+    "1",
+    "2",
+    "3",
     "FIRE",
     "NONE",
 };
@@ -297,15 +297,15 @@ static void calc_player_successes(struct player *p){
                         p->success[crits + hits] += p->hit[hits][crits][dam];
                     }else{
                         switch(p->ammo){
-                            case AMMO_DA:
+                            case AMMO_2:
                                 // DA - two saves per hit, plus the second die for crits
                                 saves = 2 * hits + crits;
                                 break;
-                            case AMMO_EXP:
+                            case AMMO_3:
                                 // EXP - three saves per hit, plus the extra two for crits
                                 saves = 3 * hits + 2 * crits;
                                 break;
-                            case AMMO_NORMAL:
+                            case AMMO_1:
                                 // Normal - one save per regular hit
                                 saves = hits;
                                 break;
@@ -711,7 +711,7 @@ static void tabulate(struct player *p1, struct player *p2){
 }
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d DAM %2d AMMO %s\n", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, p->dam, ammo_labels[p->ammo]);
+    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d DAM %2d SAVES %s\n", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, p->dam, ammo_labels[p->ammo]);
 }
 
 static void usage(const char *program){
@@ -721,14 +721,14 @@ static void usage(const char *program){
 
 static void parse_ammo(const char *ammo, struct player *p){
     switch(ammo[0]){
-        case 'N':
-            p->ammo = AMMO_NORMAL;
+        case '1':
+            p->ammo = AMMO_1;
             break;
-        case 'D':
-            p->ammo = AMMO_DA;
+        case '2':
+            p->ammo = AMMO_2;
             break;
-        case 'E':
-            p->ammo = AMMO_EXP;
+        case '3':
+            p->ammo = AMMO_3;
             break;
         case 'F':
             p->ammo = AMMO_FIRE;
@@ -737,7 +737,7 @@ static void parse_ammo(const char *ammo, struct player *p){
             p->ammo = AMMO_NONE;
             break;
         default:
-            printf("ERROR: P%d AMMO type '%s' unknown.  Must be one of N, D, E, F, -\n", p->player_num, ammo);
+            printf("ERROR: P%d SAVES type '%s' unknown.  Must be one of 1, 2, 3, F, -\n", p->player_num, ammo);
             exit(1);
             break;
     }
