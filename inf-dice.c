@@ -12,7 +12,6 @@
 #define STAT_MAX 40
 #define ROLL_MAX 20
 #define DAM_MAX 20
-#define ARM_BONUS_MAX 3
 
 // Other assumptions require that NUM_THREADS equals ROLL_MAX
 #define NUM_THREADS ROLL_MAX
@@ -64,7 +63,6 @@ struct player{
     int stat;                   // target number for rolls
     int crit_val;               // minimum value for a crit
     int crit_boost;             // bonus to die roll for stat > 20
-    int arm_bonus;              // armor bonus if beaten in CC
     int burst;                  // number of dice
     int dam;                    // damage value
     int modified_dam;           // damage value after conditional modifiers
@@ -353,13 +351,11 @@ static void count_player_results(struct player *us, struct player *them, int *hi
 
     // Find highest successful roll of other player
     // Use the fact that the array is sorted
-    // If they scored a hit, grant them an ARM bonus
     *dam = us->dam;
     best = 0;
     for(i = them->burst - 1; i >= 0; i--){
         if(them->d[i].is_hit){
             best = i;
-            *dam = MAX(us->dam - them->arm_bonus, 0);
             break;
         }
     }
@@ -715,7 +711,7 @@ static void tabulate(struct player *p1, struct player *p2){
 }
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d DAM %2d ARM_BONUS %d AMMO %s\n", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, p->dam, p->arm_bonus, ammo_labels[p->ammo]);
+    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d DAM %2d AMMO %s\n", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, p->dam, ammo_labels[p->ammo]);
 }
 
 static void usage(const char *program){
@@ -809,19 +805,10 @@ static void parse_dam(const char *str, struct player *p){
     }
 }
 
-static void parse_arm_bonus(const char *str, struct player *p){
-    p->arm_bonus = strtol(str, NULL, 10);
-
-    if(p->arm_bonus < 0 || p->arm_bonus > ARM_BONUS_MAX){
-        printf("ERROR: P%d ARM_BONUS %d must be in the range of 0 to %d\n", p->player_num, p->arm_bonus, ARM_BONUS_MAX);
-        exit(1);
-    }
-}
-
 static void parse_args(int argc, const char *argv[], struct player *p1, struct player *p2){
     int i;
 
-    if(argc != 11){
+    if(argc != 9){
         usage(argv[0]);
     }
 
@@ -830,13 +817,11 @@ static void parse_args(int argc, const char *argv[], struct player *p1, struct p
     parse_b(argv[i++], p1);
     parse_dam(argv[i++], p1);
     parse_ammo(argv[i++], p1);
-    parse_arm_bonus(argv[i++], p1);
 
     parse_stat(argv[i++], p2);
     parse_b(argv[i++], p2);
     parse_dam(argv[i++], p2);
     parse_ammo(argv[i++], p2);
-    parse_arm_bonus(argv[i++], p2);
 
     // Quick and dirty CPU limiter
     if(p1->burst + p2->burst > 9){

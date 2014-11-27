@@ -68,7 +68,7 @@ my $ammo_codes = {
     'DA+Shock' => {code => 'D', fatal => 1},
     EXP => {code => 'E'},
     Fire => {code => 'F', fatal_symbiont => 9},
-    Monofilament => {code => 'N', fixed_dam => 12, no_arm_bonus => 1, fatal => 9},
+    Monofilament => {code => 'N', fixed_dam => 12, fatal => 9},
     K1 => {code => 'N', fixed_dam => 12},
     Viral => {code => 'D', save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
     Nanotech => {code => 'N', save => 'bts'},
@@ -92,6 +92,14 @@ my $skill_codes = {
     'hack_def' => {title => 'Defensive Hacking', no_lof => 1, dam => 0, format => '%s Hacks Defensively against %3$s'},
     'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1, format => '%s Hacks %3$s%4$s'},
     'dodge' => {title => 'Dodge', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
+};
+
+my $ma_codes = {
+    1 => {attack => 0, enemy => -3, damage => 1, burst => 0},
+    2 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+    3 => {attack => 3, enemy => -3, damage => 0, burst => 0},
+    4 => {attack => 0, enemy =>  0, damage => 0, burst => 1},
+    5 => {attack => 0, enemy => -6, damage => 0, burst => 0},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -195,16 +203,6 @@ my $hacker_labels = {
     1 => 'Defensive Hacking Device',
     2 => 'Hacking Device',
     3 => 'Hacking Device Plus',
-};
-
-my $ma = [0, 1, 2, 3, 4, 5];
-my $ma_labels = {
-    0 => 'None',
-    1 => 'Level 1',
-    2 => 'Level 2',
-    3 => 'Level 3',
-    4 => 'Level 4',
-    5 => 'Level 5',
 };
 
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
@@ -423,14 +421,6 @@ sub print_input_attack_section{
               -label => "Marksmanship",
           ),
           "<br>",
-          span_popup_menu(-name => "$player.ma",
-              -values => $ma,
-              -default => param("$player.ma") // '',
-              -labels => $ma_labels,
-              -label => "Martial Arts",
-              -onchange => "set_cc_first_strike()",
-          ),
-          "<br>",
           span_popup_menu(-name => "$player.xvisor",
               -values => $xvisor,
               -default => param("$player.xvisor") // '',
@@ -443,14 +433,12 @@ sub print_input_attack_section{
               -checked => defined(param("$player.nbw")),
               -value => 1,
               -label => 'Natural Born Warrior',
-              -onchange => "set_cc_first_strike(); set_berserk()",
           ),
           "<br>",
           span_checkbox(-name => "$player.has_berserk",
               -checked => defined(param("$player.has_berserk")),
               -value => 1,
               -label => 'Berserk',
-              -onchange => "set_berserk()",
           ),
           "<br>",
           span_checkbox(-name => "$player.sapper",
@@ -526,6 +514,10 @@ sub print_input_attack_section{
 
     print "<div id='$player.sec_cc'>",
           "<h3>CC Modifiers</h3>",
+          span_popup_menu(-name => "$player.ma",
+              -label => "Martial Arts",
+          ),
+          "<br>",
           span_popup_menu(-name => "$player.gang_up",
               -values => $gang_up,
               -default => param("$player.gang_up") // '',
@@ -1093,7 +1085,6 @@ sub gen_attack_args{
     my ($ammo_name, $code, $immunity);
     my $type;
     my @mod_strings;
-    my $arm_bonus = 0;
 
     if((param("$us.link") // 0) >= 3){
         $link_b = 1;
@@ -1241,9 +1232,6 @@ sub gen_attack_args{
             $stat += $misc_mod;
         }
 
-        $stat = max($stat, 0);
-        push @mod_strings, "Net $stat_name is $stat";
-
         $b = (param("$us.b") // 1);
         if($link_b){
             push @mod_strings, sprintf('Link Team grants %+d B', $link_b);
@@ -1271,6 +1259,40 @@ sub gen_attack_args{
         if($code->{not_attack}){
             $type = 'normal';
         }
+
+        # CC modifiers affect us if they are using a CC skill
+        if($other_action eq 'cc'){
+            my $ikohl = param("$them.ikohl") // 0;
+            my $w_type = param("$us.w_type") // 'W';
+            my $them_ma = param("$them.ma") // 0;
+
+            if($ikohl){
+                # iKohl does not work on models with STR
+                if($w_type eq 'STR'){
+                    $ikohl = 0;
+                    push @mod_strings, 'STR ignores i-Kohl';
+                }else{
+                    push @mod_strings, sprintf('i-Kohl grants %+d %s', $ikohl, $stat_name);
+                    $stat += $ikohl;
+                }
+            }
+
+            # Penalties from their MA skill
+            if($them_ma){
+                if(!param("$us.nbw")){
+                    if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
+                        push @mod_strings, sprintf('Opponent Martial Arts grants %+d %s', $ma_att, $stat_name);
+                        $stat += $ma_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
+                }
+            }
+        }
+
+        $stat = max($stat, 0);
+        push @mod_strings, "Net $stat_name is $stat";
+
     }elsif($action eq 'dtw'){
         # DTW mods
         $type = 'normal';
@@ -1345,31 +1367,16 @@ sub gen_attack_args{
         if($code->{not_attack}){
             $type = 'normal';
         }
+
     }elsif($action eq 'cc'){
         # CC mods
         $type = 'ftf';
-        $arm_bonus = 3;
 
         $stat = param("$us.cc") // 0;
         push @mod_strings, "Base CC of $stat";
 
         my $us_ma = param("$us.ma") // 0;
         my $them_ma = param("$them.ma") // 0;
-
-        # monofilament allows no CC ARM bonus
-        if($code->{no_arm_bonus}){
-            $arm_bonus = 0;
-        }
-
-        # CC ARM bonus only counts if both models are in CC
-        if($other_action ne 'cc'){
-            $arm_bonus = 0;
-        }
-
-        # No CC ARM bonus if they have Martial Arts unless we have NBW or MA4+
-        if($them_ma && !(param("$us.nbw") || ($us_ma >= 4))){
-            $arm_bonus = 0;
-        }
 
         # berserk only works if they CC or Dodge in response
         # We must have berserk and they must not have NBW
@@ -1386,17 +1393,47 @@ sub gen_attack_args{
         # iKohl does not work on models with STR
         my $ikohl = param("$them.ikohl") // 0;
         my $w_type = param("$us.w_type") // 'W';
-        # i-Kohl also only works if the other party is executing CC
         if($ikohl){
             if($w_type eq 'STR'){
                 $ikohl = 0;
                 push @mod_strings, 'STR ignores i-Kohl';
-            }elsif($other_action ne 'cc'){
-                $ikohl = 0;
-                push @mod_strings, 'i-Kohl negated by executing a non-CC skill';
             }else{
                 push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
                 $stat += $ikohl;
+            }
+        }
+
+        $b = 1;
+
+        # Bonuses from our MA skill
+        if($us_ma){
+            if(!param("$them.nbw")){
+                if(my $ma_att = $ma_codes->{$us_ma}{attack}){
+                    push @mod_strings, sprintf('Martial Arts grants %+d CC', $ma_att);
+                    $stat += $ma_att;
+                }
+                if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
+                    push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
+                    $dam += $ma_dam;
+                }
+                if(my $ma_b = $ma_codes->{$us_ma}{burst}){
+                    push @mod_strings, sprintf('Martial Arts grants %+d B', $ma_b);
+                    $b += $ma_b;
+                }
+            }else{
+                push @mod_strings, 'Martial Arts canceled by Natural Born Warrior';
+            }
+        }
+
+        # Penalties from their MA skill
+        if($other_action eq 'cc' && $them_ma){
+            if(!param("$us.nbw")){
+                if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
+                    push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
+                    $stat += $ma_att;
+                }
+            }else{
+                push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
             }
         }
 
@@ -1418,8 +1455,6 @@ sub gen_attack_args{
 
         $stat = max($stat, 0);
         push @mod_strings, "Net CC is $stat";
-
-        $b = 1;
 
         # First strike requires MA 3+, but is canceled by the opponent having MA 4+ or NBW
         if($other_action eq 'cc' || $other_action eq 'dodge'){
@@ -1443,7 +1478,6 @@ sub gen_attack_args{
         $b,
         $dam,
         $ammo,
-        $arm_bonus,
     );
 }
 
@@ -1580,7 +1614,6 @@ sub gen_hack_args{
         $b,
         0,
         '-',
-        0,
     );
 }
 
@@ -1636,7 +1669,6 @@ sub gen_dodge_args{
         1,
         0,
         '-',
-        0,
     );
 }
 
@@ -1648,7 +1680,6 @@ sub gen_none_args{
         1,
         0,
         '-',
-        0,
     );
 }
 

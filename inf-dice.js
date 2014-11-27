@@ -122,64 +122,6 @@ function set_ammo(player, check_params){
     }
 }
 
-// helper function for set_action
-// berserk works in CC vs. CC, Dodge, or None
-function set_berserk(){
-    var action_1 = document.getElementsByName("p1.action")[0].value;
-    var action_2 = document.getElementsByName("p2.action")[0].value;
-    var berserk_1 = document.getElementsByName("p1.has_berserk")[0].checked;
-    var berserk_2 = document.getElementsByName("p2.has_berserk")[0].checked;
-    var nbw_1 = document.getElementsByName("p1.nbw")[0].checked;
-    var nbw_2 = document.getElementsByName("p2.nbw")[0].checked;
-
-    // NBW disabled the opponent's berserk
-    berserk_1 = berserk_1 && !nbw_2;
-    berserk_2 = berserk_2 && !nbw_1;
-
-    if(berserk_1 && action_1 == "cc" && berserk_2 && action_2 == "cc"){
-        enable_input("p1.berserk");
-        enable_input("p2.berserk");
-    }else if(berserk_1 && action_1 == "cc" && (action_2 == "dodge" || action_2 == "none" || action_2 == "cc")){
-        enable_input("p1.berserk");
-        disable_input("p2.berserk");
-    }else if(berserk_2 && action_2 == "cc" && (action_1 == "dodge" || action_1 == "none" || action_1 == "cc")){
-        disable_input("p1.berserk");
-        enable_input("p2.berserk");
-    }else{
-        disable_input("p1.berserk");
-        disable_input("p2.berserk");
-    }
-}
-
-function set_cc_first_strike(){
-    var action_1 = document.getElementsByName("p1.action")[0].value;
-    var action_2 = document.getElementsByName("p2.action")[0].value;
-
-    // First strike requires MA 3+, but is canceled by the opponent having MA 4+ or NBW
-    var ma_1 = document.getElementsByName("p1.ma")[0].value;
-    var ma_2 = document.getElementsByName("p2.ma")[0].value;
-    var nbw_1 = document.getElementsByName("p1.nbw")[0].checked;
-    var nbw_2 = document.getElementsByName("p2.nbw")[0].checked;
-
-    if(action_1 == "cc"){
-        if((action_2 == "cc" || action_2 == "dodge") &&
-                (ma_1 >= 3 && !(nbw_2 || ma_2 >= 4))){
-            enable_input("p1.first_strike");
-        }else{
-            disable_input("p1.first_strike");
-        }
-    }
-
-    if(action_2 == "cc"){
-        if((action_1 == "cc" || action_1 == "dodge") &&
-                (ma_2 >= 3 && !(nbw_1 || ma_1 >= 4))){
-            enable_input("p2.first_strike");
-        }else{
-            disable_input("p2.first_strike");
-        }
-    }
-}
-
 function set_sapper_foxhole(){
     var action_1 = document.getElementsByName("p1.action")[0].value;
     var action_2 = document.getElementsByName("p2.action")[0].value;
@@ -441,8 +383,6 @@ function set_action(player){
         disable_display(player + ".sec_other");
     }
 
-    set_berserk();
-    set_cc_first_strike();
     set_sapper_foxhole();
 
     populate_weapons(player);
@@ -636,6 +576,31 @@ function populate_weapons(player, check_params){
     set_weapon(player, check_params);
 }
 
+function populate_ma(player, check_params){
+    var ma_list = document.getElementsByName(player + ".ma")[0];
+    var unit = get_unit_data(player);
+
+    var selected_ma = ma_list.value;
+    if(check_params){
+        selected_ma = params[player + ".ma"];
+    }
+
+    var ma_max = 5;
+    if(unit){
+        ma_max = unit["ma"] || 0;
+    }
+
+    ma_list.length = 0;
+
+    for(var i = 0; i <= ma_max; i++){
+        ma_list.options[i] = new Option(ma_labels[i], i);
+
+        if(i == selected_ma){
+            ma_list.options[i].selected = true;
+        }
+    }
+}
+
 function get_unit_data(player){
     var faction_name = player + ".faction";
     var faction = document.getElementsByName(faction_name)[0].value;
@@ -764,7 +729,6 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"] || 0;
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
-        document.getElementsByName(player + ".ma")[0].value = unit["ma"] || 0;
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
         document.getElementsByName(player + ".xvisor")[0].value = unit["xvisor"] || 0;
 
@@ -796,6 +760,7 @@ function set_unit(player, check_params){
 
     populate_actions(player, check_params);
     populate_weapons(player, check_params);
+    populate_ma(player, check_params);
 }
 
 function populate_actions(player, check_params){
@@ -1009,3 +974,13 @@ var master_action_list = [
         "value": "none",
     },
 ];
+
+var ma_labels = [
+    'None',
+    'Level 1',
+    'Level 2',
+    'Level 3',
+    'Level 4',
+    'Level 5',
+];
+
