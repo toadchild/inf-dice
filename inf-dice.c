@@ -63,6 +63,7 @@ struct player{
     int player_num;             // ID of player
     int stat;                   // target number for rolls
     int crit_val;               // minimum value for a crit
+    int crit_boost;             // bonus to die roll for stat > 20
     int arm_bonus;              // armor bonus if beaten in CC
     int burst;                  // number of dice
     int dam;                    // damage value
@@ -470,15 +471,15 @@ static int template_factor(struct player *p){
 void print_roll(struct dice *d, int64_t multiplier, int dam1, int dam2){
     int i;
     for(i = 0; i < d->p1.burst; i++){
-        printf("%02d ", d->p1.d[i].value);
+        printf("%2d ", d->p1.d[i].value);
     }
     printf("| ");
     for(i = 0; i < d->p2.burst; i++){
-        printf("%02d ", d->p2.d[i].value);
+        printf("%2d ", d->p2.d[i].value);
     }
-    printf("x %lld", multiplier);
+    printf("x %4lld", multiplier);
 
-    printf("| dam1: %d dam2: %d\n", dam1, dam2);
+    printf(" | dam1: %d dam2: %d\n", dam1, dam2);
 }
 
 /*
@@ -581,7 +582,7 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
         for(i = start1; i <= ROLL_MAX; i += step){
             b = d->p1.burst - b1;
 
-            d->p1.d[b].value = i;
+            d->p1.d[b].value = i + d->p1.crit_boost;
 
             annotate_roll(&d->p1, b);
 
@@ -606,7 +607,7 @@ static void roll_dice(int b1, int b2, int start1, int start2, struct dice *d, in
         for(i = start2; i <= ROLL_MAX; i++){
             b = d->p2.burst - b2;
 
-            d->p2.d[b].value = i;
+            d->p2.d[b].value = i + d->p2.crit_boost;
 
             annotate_roll(&d->p2, b);
 
@@ -714,7 +715,7 @@ static void tabulate(struct player *p1, struct player *p2){
 }
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d STAT %2d CRIT %2d B %d TEMPLATE %d DAM %2d ARM_BONUS %d AMMO %s\n", p_num, p->stat, p->crit_val, p->burst, p->template, p->dam, p->arm_bonus, ammo_labels[p->ammo]);
+    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d DAM %2d ARM_BONUS %d AMMO %s\n", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, p->dam, p->arm_bonus, ammo_labels[p->ammo]);
 }
 
 static void usage(const char *program){
@@ -782,7 +783,8 @@ static void parse_stat(const char *str, struct player *p){
         if(no_crit){
             p->crit_val = ROLL_MAX + 1;
         }else if(p->stat > ROLL_MAX){
-            p->crit_val = ROLL_MAX - (p->stat - ROLL_MAX);
+            p->crit_val = ROLL_MAX;
+            p->crit_boost = p->stat - ROLL_MAX;
         }else{
             p->crit_val = p->stat;
         }
