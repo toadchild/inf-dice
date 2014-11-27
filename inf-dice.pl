@@ -483,6 +483,10 @@ sub print_input_attack_section{
           span_popup_menu(-name => "$player.dam",
               -label => 'DAM',
           ),
+          span_checkbox(-name => "$player.template",
+              -checked => defined(param("$player.template")),
+              -value => 1,
+              -label => 'Template'),
           "</div>";
 
     print "<div id='$player.sec_shoot'>
@@ -1173,8 +1177,13 @@ sub gen_attack_args{
         }
 
         if($cover){
-            push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
-            $arm += $cover;
+            # template weapons ignore the ARM bonus of cover
+            if(param("$us.template") // 0){
+                push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
+            }else{
+                push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
+                $arm += $cover;
+            }
         }
 
         # Smoke provides no defense against non-lof skills

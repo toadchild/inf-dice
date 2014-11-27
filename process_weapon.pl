@@ -55,6 +55,11 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             $shotgun = 1;
         }
 
+        my $template = 0;
+        if($weapon->{template} ne "No"){
+            $template = 1;
+        }
+
         my @ammo;
         if($multi || $shotgun){
             @ammo = split /\//, $weapon->{ammo};
@@ -78,7 +83,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
         $new_weapon->{name} = $weapon->{name};
 
-        my @b;
+        my (@b, @t);
         for my $ammo (@ammo){
             # sanity check ammo types
             $all_ammo->{$ammo} = 1;
@@ -101,10 +106,23 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             }
 
             push @b, $b;
+
+            # Template per ammo type
+            # Only shotguns care right now
+            if($shotgun){
+                if($ammo eq 'Normal' || $ammo eq 'Fire'){
+                    push @t, 1;
+                }else{
+                    push @t, 0;
+                }
+            }else{
+                push @t, $template;
+            }
         }
 
         $new_weapon->{ammo} = \@ammo;
         $new_weapon->{b} = \@b;
+        $new_weapon->{template} = \@t;
 
         $new_weapon->{dam} = $weapon->{damage};
 

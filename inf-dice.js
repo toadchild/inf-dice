@@ -120,6 +120,33 @@ function set_ammo(player, check_params){
             b_list.options[b_list.options.length - 1].selected = true;
         }
     }
+
+    // Set template flag based on ammo type
+    var template_box = document.getElementsByName(player + ".template")[0];
+    var template = template_box.checked;;
+
+    if(check_params && params[player + ".template"]){
+        template = params[player + ".template"];
+        if(weapon){
+            template_box.disabled = true;
+        }else{
+            template_box.disabled = false;
+        }
+    }else{
+        if(weapon){
+            for(var i = 0; i < weapon["ammo"].length; i++){
+                if(ammo == weapon["ammo"][i]){
+                    template = weapon["template"][i];
+                    break;
+                }
+            }
+            template_box.disabled = true;
+        }else{
+            template_box.disabled = false;
+        }
+    }
+
+    template_box.checked = template;
 }
 
 function set_sapper_foxhole(){
