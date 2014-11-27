@@ -76,7 +76,7 @@ struct player{
     // second index is number of crits
     // third index is the damage of the hit
     // value is number of times this happened
-    int64_t hit[B_MAX + 1][B_MAX + 1][DAM_MAX + 1];;
+    int64_t hit[B_MAX + 1][B_MAX + 1][DAM_MAX + 1];
 
     // Number of times N successes was inflicted
     double success[SUCCESS_MAX + 1];
