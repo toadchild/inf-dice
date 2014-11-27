@@ -151,8 +151,6 @@ function set_action(player){
 
     if(action.value == "bs"){
         // action
-        enable_display(player + ".first_strike");
-        enable_input(player + ".first_strike");
         disable_display(player + ".intuitive");
 
         // weapon
@@ -184,8 +182,6 @@ function set_action(player){
         enable_display(player + ".sec_other");
     }else if(action.value == "spec"){
         // action
-        enable_display(player + ".first_strike");
-        enable_input(player + ".first_strike");
         disable_display(player + ".intuitive");
 
         // weapon
@@ -217,8 +213,6 @@ function set_action(player){
         enable_display(player + ".sec_other");
     }else if(action.value == "dtw"){
         // action
-        enable_display(player + ".first_strike");
-        enable_input(player + ".first_strike");
         enable_display(player + ".intuitive");
 
         // weapon
@@ -250,7 +244,6 @@ function set_action(player){
         disable_display(player + ".sec_other");
     }else if(action.value == "cc"){
         // action
-        enable_display(player + ".first_strike");
         disable_display(player + ".intuitive");
 
         // weapon
@@ -282,7 +275,6 @@ function set_action(player){
         enable_display(player + ".sec_other");
     }else if(action.value == "dodge"){
         // action
-        disable_display(player + ".first_strike");
         disable_display(player + ".intuitive");
 
         // weapon
@@ -314,12 +306,6 @@ function set_action(player){
         enable_display(player + ".sec_other");
     }else if(action.value == "hack_imm" || action.value == "hack_ahp" || action.value == "hack_def" || action.value == "hack_pos"){
         // action
-        if(action.value == "hack_def"){
-            disable_display(player + ".first_strike");
-        }else{
-            enable_display(player + ".first_strike");
-            enable_input(player + ".first_strike");
-        }
         disable_display(player + ".intuitive");
 
         // weapon
@@ -351,7 +337,6 @@ function set_action(player){
         enable_display(player + ".sec_other");
     }else if(action.value == "none"){
         // action
-        disable_display(player + ".first_strike");
         disable_display(player + ".intuitive");
 
         // weapon

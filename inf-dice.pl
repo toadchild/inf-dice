@@ -456,12 +456,6 @@ sub print_input_attack_section{
               -onchange => "set_action('$player')",
           ),
           "<br>",
-          span_checkbox(-name => "$player.first_strike",
-              -checked => defined(param("$player.first_strike")),
-              -value => 1,
-              -label => "First Strike",
-          ),
-          "<br>",
           span_checkbox(-name => "$player.intuitive",
               -checked => defined(param("$player.intuitive")),
               -value => 1,
@@ -920,64 +914,6 @@ sub print_simultaneous_output{
     }
 }
 
-sub print_first_strike_output{
-    my ($output) = @_;
-
-    print "<h2>First Strike</h2>\n";
-    print_roll_subtitle();
-
-    my ($max_1, $max_2, $dis_1, $dis_2);
-
-    # determine order of attacks
-    my ($first, $second, @first_order, @second_order);
-    if($output->{first_strike} == 1){
-        $first = 'A';
-        $second = 'B';
-        @first_order = (1, 2);
-        @second_order = (2, 1);
-    }else{
-        $first = 'B';
-        $second = 'A';
-        @first_order = (2, 1);
-        @second_order = (1, 2);
-    }
-
-    if($output->{$first}{hits}){
-        ($max_1, $dis_1) = print_player_output($output->{$first}, @first_order);
-
-        # $dis_1 has the number of wounds needed to incapacitate the other player
-        my $dis_chance = $output->{$first}{cumul_hits}{$first_order[0]}{$dis_1};
-
-        # scale all their results down by this amount
-        for my $w (keys %{$output->{$second}{cumul_hits}{$second_order[0]}}){
-            $output->{$second}{cumul_hits}{$second_order[0]}{$w} *= 1 - ($dis_chance / 100.0);
-        }
-        for my $w (keys %{$output->{$second}{hits}{$second_order[0]}}){
-            $output->{$second}{hits}{$second_order[0]}{$w} *= 1 - ($dis_chance / 100.0);
-        }
-        $output->{$second}{hits}{0} *= 1 - ($dis_chance / 100.0);
-
-        # Put chance of being disabled in the hit results
-        $output->{$second}{disabled}{$second_order[0]} = $dis_chance;
-
-        print_miss_output($output->{$first}, 'No success');
-    }
-
-    if($output->{$second}{hits}){
-        ($max_2, $dis_2) = print_player_output($output->{$second}, @second_order);
-
-        print_miss_output($output->{$second}, 'No success');
-    }
-
-    if($output->{$first}{hits}){
-        print_hitbar_output($output->{$first}, $max_1, $max_1);
-    }
-
-    if($output->{$second}{hits}){
-        print_hitbar_output($output->{$second}, $max_2, $max_2);
-    }
-}
-
 sub print_none_output{
     my ($output) = @_;
 
@@ -1007,8 +943,6 @@ sub print_output{
         print_normal_output($output);
     }elsif($output->{type} eq 'simultaneous'){
         print_simultaneous_output($output);
-    }elsif($output->{type} eq 'first_strike'){
-        print_first_strike_output($output);
     }elsif($output->{type} eq 'none'){
         print_none_output($output);
     }
@@ -1250,11 +1184,6 @@ sub gen_attack_args{
             }
         }
 
-        # First strike
-        if(param("$us.first_strike")){
-            $type = "first_strike";
-        }
-
         # Some weapons aren't attacks
         if($code->{not_attack}){
             $type = 'normal';
@@ -1314,11 +1243,6 @@ sub gen_attack_args{
         # templates are FTF against Dodge
         if($other_action eq 'dodge'){
             $type = 'ftf';
-        }
-
-        # First strike
-        if(param("$us.first_strike")){
-            $type = "first_strike";
         }
 
     }elsif($action eq 'spec'){
@@ -1455,13 +1379,6 @@ sub gen_attack_args{
 
         $stat = max($stat, 0);
         push @mod_strings, "Net CC is $stat";
-
-        # First strike requires MA 3+, but is canceled by the opponent having MA 4+ or NBW
-        if($other_action eq 'cc' || $other_action eq 'dodge'){
-            if(param("$us.first_strike") && $us_ma >= 3 && !(param("$them.nbw") || ($them_ma >= 4))){
-                $type = "first_strike";
-            }
-        }
     }
 
     if(!$code->{alt_save}){
@@ -1512,10 +1429,6 @@ sub gen_hack_args{
             $type = 'normal';
         }
 
-        # First strike
-        if(param("$us.first_strike")){
-            $type = "first_strike";
-        }
     }elsif($action eq 'hack_pos'){
         my $unit_type = param("$them.type") // '';
         my $faction = param("$us.faction") // '';
@@ -1541,20 +1454,12 @@ sub gen_hack_args{
             $b = 2;
         }
 
-        # First strike
-        if(param("$us.first_strike")){
-            $type = "first_strike";
-        }
     }elsif($action eq 'hack_ahp'){
         my $hacker = param("$them.hacker") // 0;
         if($hacker > 0){
             $can_hack = 1;
         }
 
-        # First strike
-        if(param("$us.first_strike")){
-            $type = "first_strike";
-        }
     }elsif($action eq 'hack_def'){
         # Defensive Hacking is only useful against hacking attacks
         if($other_action eq 'hack_ahp' || $other_action eq 'hack_imm' || $other_action eq 'hack_pos'){
@@ -1774,16 +1679,6 @@ sub generate_output{
         # One player is making a Normal Roll
         $output = execute_backend(@args1, @args2);
         $output->{type} = 'normal';
-    }elsif($act_1 eq 'first_strike' && ($act_2 ne 'first_strike')){
-        # P1 gets first strike
-        $output = execute_backend_simultaneous(\@args1, \@args2);
-        $output->{type} = 'first_strike';
-        $output->{first_strike} = 1;
-    }elsif($act_2 eq 'first_strike' && ($act_1 ne 'first_strike')){
-        # P2 gets first strike
-        $output = execute_backend_simultaneous(\@args1, \@args2);
-        $output->{type} = 'first_strike';
-        $output->{first_strike} = 2;
     }elsif($act_1 eq 'normal' || $act_2 eq 'normal'){
         # Simultaneous Normal Rolls
         $output = execute_backend_simultaneous(\@args1, \@args2);
