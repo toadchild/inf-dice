@@ -1238,8 +1238,6 @@ sub gen_attack_args{
             $b += $link_b;
         }
 
-        $arm += $cover;
-
         # templates are FTF against Dodge
         if($other_action eq 'dodge'){
             $type = 'ftf';
