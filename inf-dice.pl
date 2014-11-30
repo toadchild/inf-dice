@@ -529,7 +529,7 @@ sub print_input_attack_section{
           span_checkbox(-name => "$player.berserk",
               -checked => defined(param("$player.berserk")),
               -value => 3,
-              -label => 'Berserk (+9 CC, Normal Rolls)'),
+              -label => 'Berserk (+6 CC, Normal Rolls)'),
           "</div>\n";
 
     print "<div id='$player.sec_hack'>",
@@ -1312,13 +1312,12 @@ sub gen_attack_args{
         my $us_ma = param("$us.ma") // 0;
         my $them_ma = param("$them.ma") // 0;
 
-        # berserk only works if they CC or Dodge in response
         # We must have berserk and they must not have NBW
-        if(param("$us.has_berserk") && param("$us.berserk") && ($other_action eq 'cc' || $other_action eq 'dodge' || $other_action eq 'none')){
+        if(param("$us.has_berserk") && param("$us.berserk")){
             if(!param("$them.nbw")){
-                $stat += 9;
+                $stat += 6;
                 $type = 'normal';
-                push @mod_strings, 'Berserk grants +9 CC';
+                push @mod_strings, 'Berserk grants +6 CC';
             }else{
                 push @mod_strings, 'Berserk canceled by Natural Born Warrior';
             }
