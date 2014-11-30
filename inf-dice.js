@@ -127,11 +127,6 @@ function set_ammo(player, check_params){
 
     if(check_params && params[player + ".template"]){
         template = params[player + ".template"];
-        if(weapon){
-            template_box.disabled = true;
-        }else{
-            template_box.disabled = false;
-        }
     }else{
         if(weapon){
             for(var i = 0; i < weapon["ammo"].length; i++){
@@ -140,9 +135,6 @@ function set_ammo(player, check_params){
                     break;
                 }
             }
-            template_box.disabled = true;
-        }else{
-            template_box.disabled = false;
         }
     }
 
