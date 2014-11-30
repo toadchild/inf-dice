@@ -1559,11 +1559,7 @@ sub gen_dodge_args{
 
     my $type = 'ftf';
 
-    # -6 to dodge templates
-    if(param("$them.action") eq 'dtw'){
-        push @mod_strings, 'Direct Template Weapon grants -6 PH';
-        $stat -= 6;
-    }elsif(param("$them.action") eq 'dodge'){
+    if(param("$them.action") eq 'dodge'){
         # double-dodge is normal rolls
         $type = 'normal';
     }
