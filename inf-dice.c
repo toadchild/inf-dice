@@ -65,7 +65,6 @@ struct player{
     int crit_boost;             // bonus to die roll for stat > 20
     int burst;                  // number of dice
     int dam;                    // damage value
-    int modified_dam;           // damage value after conditional modifiers
     int template;               // Is this a template weapon
     enum ammo_t ammo;           // ammo type
 
