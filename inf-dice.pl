@@ -95,6 +95,7 @@ my $skill_codes = {
     'hack_def' => {title => 'Defensive Hacking', no_lof => 1, dam => 0, format => '%s Hacks Defensively against %3$s'},
     'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1, format => '%s Hacks %3$s%4$s'},
     'dodge' => {title => 'Dodge', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
+    'change_face' => {title => 'Change Facing', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
 };
 
 my $ma_codes = {
@@ -1251,7 +1252,7 @@ sub gen_attack_args{
         }
 
         # templates are FTF against Dodge
-        if($other_action eq 'dodge'){
+        if($other_action eq 'dodge' || $other_action eq 'change_face'){
             $type = 'ftf';
         }
 
@@ -1482,7 +1483,7 @@ sub gen_hack_args{
     }
 
     # Dodge does not protect against hacking
-    if($other_action eq 'dodge'){
+    if($other_action eq 'dodge' || $other_action eq 'change_face'){
         $type = 'normal';
     }
 
@@ -1532,18 +1533,25 @@ sub gen_hack_args{
 }
 
 sub gen_dodge_args{
-    my ($us, $them) = @_;
+    my ($us, $them, $change_face) = @_;
     my @mod_strings;
 
     my $dodge_unit = 0;
     my $unit_type = param("$us.type") // '';
     my $motorcycle = param("$us.motorcycle") // 0;
-    if($unit_type eq 'REM' || $unit_type eq 'TAG' || $motorcycle){
+    if($unit_type eq 'REM' || $motorcycle){
+        $dodge_unit = -3;
+    } elsif($unit_type eq 'TAG'){
         $dodge_unit = -6;
     }
 
     my $stat = param("$us.ph") // 0;
     push @mod_strings, "Base PH of $stat";
+
+    if($change_face){
+        push @mod_strings, sprintf('Change facing grants %+d PH', $change_face);
+        $stat += $change_face;
+    }
 
     if($dodge_unit){
         push @mod_strings, sprintf('Unit type grants %+d PH', $dodge_unit);
@@ -1558,7 +1566,7 @@ sub gen_dodge_args{
 
     my $type = 'ftf';
 
-    if(param("$them.action") eq 'dodge'){
+    if(param("$them.action") eq 'dodge' || param("$them.action") eq 'change_face'){
         # double-dodge is normal rolls
         $type = 'normal';
     }
@@ -1602,7 +1610,9 @@ sub gen_args{
     }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
         return gen_hack_args($us, $them);
     }elsif($action eq 'dodge'){
-        return gen_dodge_args($us, $them);
+        return gen_dodge_args($us, $them, 0);
+    }elsif($action eq 'change_face'){
+        return gen_dodge_args($us, $them, -3);
     }else{
         return gen_none_args();
     }
