@@ -1347,8 +1347,12 @@ sub gen_attack_args{
                     $stat += $ma_att;
                 }
                 if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
-                    push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
-                    $dam += $ma_dam;
+                    if(!$code->{fixed_dam}){
+                        push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
+                        $dam += $ma_dam;
+                    }else{
+                        push @mod_strings, sprintf('Martial Arts DAM bonus ignored by %s', $ammo_name);
+                    }
                 }
                 if(my $ma_b = $ma_codes->{$us_ma}{burst}){
                     push @mod_strings, sprintf('Martial Arts grants %+d B', $ma_b);
