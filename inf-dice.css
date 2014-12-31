@@ -24,12 +24,14 @@
 
 .databox {
     text-align: left;
-    border: 2px solid #d9f3fd;
-    border-radius: 9px;
+    border-radius: 6px;
     margin: 20px;
+    padding: 1px;
+    background-color: #425a67;
 
-    background-color: #0a2d32;
-    box-shadow: 0px 0px 20px #d9f3fd;
+    border-bottom-color: #13111d;
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
 }
 
 .databox .content {
@@ -49,7 +51,7 @@
 .inner-databox {
     text-align: left;
     border: 2px solid #d9f3fd;
-    border-radius: 9px;
+    border-radius: 6px;
     margin: 0px;
     margin-bottom: 20px;
 
@@ -68,11 +70,11 @@
 }
 
 #p1.inner-databox {
-    background-color: #a27fb6;
+    background-color: #5e4c95;
 }
 
 #p2.inner-databox {
-    background-color: #80a248;
+    background-color: #34b38a;
 }
 
 #input {
@@ -107,7 +109,7 @@
 }
 
 body {
-    background-color: #0e4759;
+    background-color: #181919;
     color: white;
     font-family: sans-serif;
 }
@@ -130,6 +132,7 @@ a:hover {
 
 h1 {
     text-align: center;
+    color: white;
 }
 
 h2 {

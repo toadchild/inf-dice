@@ -7,17 +7,17 @@ my $players = ['p1', 'p2'];
 my $colors = {
     p1 => {
         pure => {
-            r => 0xac,
-            g => 0x87,
-            b => 0xc1,
+            r => 0x5e,
+            g => 0x4c,
+            b => 0x95,
         },
         text => 'black',
     },
     p2 => {
         pure => {
-            r => 136,
-            g => 172,
-            b => 77,
+            r => 0x34,
+            g => 0xb3,
+            b => 0x8a,
         },
         text => 'black',
     },
