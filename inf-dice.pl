@@ -1074,10 +1074,16 @@ sub gen_attack_args{
         $dam = $code->{fixed_dam};
     }
 
+    my $ph_dam = 0;
     if($dam eq 'PH'){
         $dam = param("$us.ph") // 0;
+        $ph_dam = 1;
+    }elsif($dam eq 'PH-1'){
+        $dam = (param("$us.ph") // 1) - 1;
+        $ph_dam = 1;
     }elsif($dam eq 'PH-2'){
         $dam = (param("$us.ph") // 2) - 2;
+        $ph_dam = 1;
     }
 
     my $action = param("$us.action");
@@ -1347,11 +1353,11 @@ sub gen_attack_args{
                     $stat += $ma_att;
                 }
                 if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
-                    if(!$code->{fixed_dam}){
+                    if($ph_dam){
                         push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
                         $dam += $ma_dam;
                     }else{
-                        push @mod_strings, sprintf('Martial Arts DAM bonus ignored by %s', $ammo_name);
+                        push @mod_strings, sprintf('Martial Arts DAM bonus ignored by %s', param("$us.weapon") // "");
                     }
                 }
                 if(my $ma_b = $ma_codes->{$us_ma}{burst}){
