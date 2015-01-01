@@ -36,9 +36,9 @@ my $steps = 5;
 sub initial_color{
     my ($p) = @_;
     return (
-        $colors->{$p}{pure}{r} * 0.5,
-        $colors->{$p}{pure}{g} * 0.5,
-        $colors->{$p}{pure}{b} * 0.5,
+        $colors->{$p}{pure}{r} * 0.75,
+        $colors->{$p}{pure}{g} * 0.75,
+        $colors->{$p}{pure}{b} * 0.75,
     );
 }
 
