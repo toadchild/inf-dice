@@ -36,6 +36,12 @@ sub print_top{
     <div class='content'>
     <h1>Infinity Dice Calculator (2nd Edition)</h1>
 <p>
+This is an <b>OUTDATED</b> version of the Infinity Dice Calculator for the 2rd
+Edition of Infinity.  It is no longer updated.
+There is also a <a href="/n3/">3rd Edition (N3)
+version</a> of this tool.
+</p>
+<p>
 Use the Model and Action Selection tools below to describe the scenario you
 want to learn about.  You can pick the faction, model, action, and weapons
 you are interested in for both the active and reactive player.
