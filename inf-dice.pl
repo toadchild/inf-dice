@@ -36,6 +36,13 @@ sub print_top{
     <div class='content'>
     <h1>Infinity Dice Calculator (N3)</h1>
 <p>
+This is a <b>BETA</b> version of the Infinity Dice Calculator for the 3rd
+Edition of Infinity (N3).  It is incomplete and may still have errors.
+Please report any issues to <a href="mailto:inf-dice\@ghostlords.com">
+inf-dice\@ghostlords.com</a>. There is also a <a href="/2e/">2nd Edition
+version</a> of this tool.
+</p>
+<p>
 Use the Model and Action Selection tools below to describe the scenario you
 want to learn about.  You can pick the faction, model, action, and weapons
 you are interested in for both the active and reactive player.
