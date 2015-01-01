@@ -192,6 +192,7 @@ for my $weapon (@$dual_ccw){
         b => [1],
         dam => 'PH',
         name => $weapon,
+        template => [0],
     };
 
     $weapon_data->{$new_weapon->{name}} = $new_weapon;
@@ -214,6 +215,7 @@ for my $weapon (@$poison_ccw){
         b => [1],
         dam => 'PH',
         name => $weapon,
+        template => [0],
     };
 
     $weapon_data->{$new_weapon->{name}} = $new_weapon;
