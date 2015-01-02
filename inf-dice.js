@@ -67,7 +67,7 @@ function set_ammo(player, check_params){
     var action = document.getElementsByName(action_name)[0];
 
     var ammo;
-    if(action.value == "bs" || action.value == "cc" || action.value == "dtw" || action.value == "spec"){
+    if(action.value == "bs" || action.value == "cc" || action.value == "dtw" || action.value == "spec" || action.value == "supp"){
         ammo = document.getElementsByName(player + ".ammo")[0].value;
     }else{
         // Any case where we aren't attacking
@@ -89,11 +89,15 @@ function set_ammo(player, check_params){
 
     // Get ammo type index so we can look up the corresponding B value
     var max_b = 5;
-    if(weapon){
-        for(var i = 0; i < weapon["ammo"].length; i++){
-            if(ammo == weapon["ammo"][i]){
-                max_b = weapon["b"][i];
-                break;
+    if(action.value == "supp"){
+        max_b = 3;
+    }else{
+        if(weapon){
+            for(var i = 0; i < weapon["ammo"].length; i++){
+                if(ammo == weapon["ammo"][i]){
+                    max_b = weapon["b"][i];
+                    break;
+                }
             }
         }
     }
@@ -102,6 +106,8 @@ function set_ammo(player, check_params){
     var selected_b = 1;
     if(check_params && params[player + ".b"]){
         selected_b = params[player + ".b"];
+    }else if(action.value == "supp"){
+        selected_b = 3;
     }else if(player == "p1" && action.value != "cc"){
         if(weapon){
             // Default to the highest burst for Player 1
@@ -148,13 +154,13 @@ function set_sapper_foxhole(){
     var sapper_1 = document.getElementsByName("p1.sapper")[0].checked;
     var sapper_2 = document.getElementsByName("p2.sapper")[0].checked;
 
-    if(sapper_1 && (action_2 == "bs" || action_2 == "dtw" || action_2 == "spec")){
+    if(sapper_1 && (action_2 == "bs" || action_2 == "dtw" || action_2 == "spec" || action_2 == "supp")){
         enable_input("p1.foxhole");
     }else{
         disable_input("p1.foxhole");
     }
 
-    if(sapper_2 && (action_1 == "bs" || action_1 == "dtw" || action_1 == "spec")){
+    if(sapper_2 && (action_1 == "bs" || action_1 == "dtw" || action_1 == "spec" || action_1 == "supp")){
         enable_input("p2.foxhole");
     }else{
         disable_input("p2.foxhole");
@@ -168,7 +174,7 @@ function set_action(player){
     var other_action_name = other + ".action";
     var other_action = document.getElementsByName(other_action_name)[0];
 
-    if(action.value == "bs"){
+    if(action.value == "bs" || action.value == "supp"){
         // action
         disable_display(player + ".intuitive");
 
@@ -438,9 +444,19 @@ function set_weapon(player, check_params){
         my_range = weapon["ranges"];
     }
 
+    if(action == "supp"){
+        my_range = supp_ranges;
+    }
+
     // Ammo types
     ammo_list.length = 0;
     for(var i = 0; i < my_ammo.length; i++){
+        if(action == "supp"){
+            // Skip ammos with B < 3
+            if(weapon && weapon["b"][i] < 3){
+                continue;
+            }
+        }
         ammo_list.options[i] = new Option(my_ammo[i]);
 
         if(my_ammo[i] == selected_ammo){
@@ -476,7 +492,7 @@ function set_weapon(player, check_params){
 
     // Range bands
     range_list.length = 0;
-    if(action == "bs" || action == "spec"){
+    if(action == "bs" || action == "spec" || action == "supp"){
         var value_match = 1;
         for(var i = 0; i < my_range.length; i++){
             // X Visor sets Long range to 0 and Maximum to -3
@@ -569,7 +585,7 @@ function populate_weapons(player, check_params){
     weapon_list.options[weapon_list.options.length] = new Option("--");
     weapon_list.options[weapon_list.options.length - 1].disabled = true;
 
-    if(action == "bs" || action == "cc" || action == "dtw" || action == "spec"){
+    if(action == "bs" || action == "cc" || action == "dtw" || action == "spec" || action == "supp"){
         weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
 
         if("Custom Weapon" == selected_weapon){
@@ -887,6 +903,10 @@ function action_bs_filter(unit){
     return action_weapon_filter(unit, "bs");
 }
 
+function action_supp_filter(unit){
+    return action_weapon_filter(unit, "supp");
+}
+
 function action_cc_filter(unit){
     return action_weapon_filter(unit, "cc");
 }
@@ -933,6 +953,11 @@ var master_action_list = [
         "label": "Attack - Shoot",
         "value": "bs",
         "filter": action_bs_filter,
+    },
+    { 
+        "label": "Attack - Suppressive Fire",
+        "value": "supp",
+        "filter": action_supp_filter,
     },
     { 
         "label": "Attack - Direct Template Weapon",
@@ -992,3 +1017,8 @@ var ma_labels = [
     'Level 5',
 ];
 
+var supp_ranges = [
+    "0-8/0",
+    "8-16/0",
+    "16-24/-3",
+];

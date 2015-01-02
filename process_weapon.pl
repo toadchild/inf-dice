@@ -60,6 +60,9 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             $template = 1;
         }
 
+        # can we do suppressive fire?
+        my $att_supp = 0;
+
         my @ammo;
         if($multi || $shotgun){
             @ammo = split /\//, $weapon->{ammo};
@@ -105,6 +108,11 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
                 }
             }
 
+            # Temporary check - allow supp fire for all weapons with B >= 3
+            if($b >= 3){
+                $att_supp = 1;
+            }
+
             push @b, $b;
 
             # Template per ammo type
@@ -128,6 +136,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
         $new_weapon->{att_cc} = $weapon->{cc} eq 'Yes' ? 1 : 0;
         $new_weapon->{att_dtw} = $weapon->{cc} eq 'No' && $weapon->{short_dist} eq '--' ? 1 : 0;
+        $new_weapon->{att_supp} = $att_supp;;
 
         if($weapon->{name} eq 'Marker' || $weapon->{name} =~ m/Grenade|GL/){
             $new_weapon->{att_spec} = 1;

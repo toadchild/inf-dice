@@ -644,7 +644,7 @@ sub print_player_output{
 
     # Marksmanship grants Shock in addition to existing ammo types
     if($marksmanship > 0){
-        if($action eq 'bs' && !$code->{nonlethal} && !$code->{fatal}){
+        if(($action eq 'bs' || $action eq 'supp') && !$code->{nonlethal} && !$code->{fatal}){
             $fatal = 1;
         }
     }
@@ -1102,7 +1102,7 @@ sub gen_attack_args{
         $other_code = $ammo_codes->{param("$them.ammo") // 'Normal'};
     }
 
-    if($action eq 'bs'){
+    if($action eq 'bs' || $action eq 'supp'){
         # BS mods
         $type = 'ftf';
 
@@ -1245,6 +1245,12 @@ sub gen_attack_args{
             }
         }
 
+        # Enemy Suppressive Fire
+        if($other_action eq 'supp'){
+            $stat -= 3;
+            push @mod_strings, "Opponent Suppressive Fire grants -3 $stat_name";
+        }
+
         $stat = max($stat, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
@@ -1297,9 +1303,6 @@ sub gen_attack_args{
             $stat += $misc_mod;
         }
 
-        $stat = max($stat, 0);
-        push @mod_strings, "Net $stat_name is $stat";
-
         $b = (param("$us.b") // 1);
 
         $arm += $cover;
@@ -1315,6 +1318,15 @@ sub gen_attack_args{
         if($code->{not_attack}){
             $type = 'normal';
         }
+
+        # Enemy Suppressive Fire
+        if($type eq 'ftf' && $other_action eq 'supp'){
+            $stat -= 3;
+            push @mod_strings, "Opponent Suppressive Fire grants -3 $stat_name";
+        }
+
+        $stat = max($stat, 0);
+        push @mod_strings, "Net $stat_name is $stat";
 
     }elsif($action eq 'cc'){
         # CC mods
@@ -1402,6 +1414,12 @@ sub gen_attack_args{
         if($misc_mod){
             push @mod_strings, sprintf('Additional modifier grants %+d CC', $misc_mod);
             $stat += $misc_mod;
+        }
+
+        # Enemy Suppressive Fire
+        if($other_action eq 'supp'){
+            $stat -= 3;
+            push @mod_strings, "Opponent Suppressive Fire grants -3 CC";
         }
 
         $stat = max($stat, 0);
@@ -1622,7 +1640,7 @@ sub gen_args{
     my ($us, $them) = @_;
 
     my $action = param("$us.action");
-    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'spec'){
+    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'spec' || $action eq 'supp'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
         return gen_hack_args($us, $them);
