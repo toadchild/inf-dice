@@ -1109,6 +1109,7 @@ sub gen_attack_args{
         # look up stat to use
         $stat_name = lc(param("$us.stat") // 'bs');
         $stat = param("$us.$stat_name") // 0;
+        my $mod = 0;
         $stat_name = uc($stat_name);
 
         push @mod_strings, "Base $stat_name of $stat";
@@ -1130,7 +1131,7 @@ sub gen_attack_args{
         if($cover){
             if($marksmanship < 2){
                 push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
-                $stat -= $cover;
+                $mod -= $cover;
             }else{
                 push @mod_strings, sprintf('Marksmanship negates Cover modifier to %s', $stat_name);
             }
@@ -1138,7 +1139,7 @@ sub gen_attack_args{
 
         if($link_bs){
             push @mod_strings, sprintf('Link Team grants %+d %s', $link_bs, $stat_name);
-            $stat += $link_bs;
+            $mod += $link_bs;
         }
 
         my $msv = param("$us.msv") // 0;
@@ -1150,7 +1151,7 @@ sub gen_attack_args{
             $camo = 0;
         }elsif($camo < 0){
             push @mod_strings, sprintf('CH/ODD/ODF grants %+d %s', $camo, $stat_name);
-            $stat += $camo;
+            $mod += $camo;
         }
 
         my $viz = param("$us.viz") // 0;
@@ -1162,7 +1163,7 @@ sub gen_attack_args{
             $viz = 0;
         }elsif($viz < 0){
             push @mod_strings, sprintf('Visibility grants %+d %s', $viz, $stat_name);
-            $stat += $viz;
+            $mod += $viz;
         }
 
         # Regular Smoke is useless against MSV2+
@@ -1179,12 +1180,12 @@ sub gen_attack_args{
         $range =~ m/(-?\d+)$/;
         $range = $1;
         push @mod_strings, sprintf('Range grants %+d %s', $range,  $stat_name);
-        $stat += $range;
+        $mod += $range;
 
         my $misc_mod = param("$us.misc_mod") // 0;
         if($misc_mod){
             push @mod_strings, sprintf('Additional modifier grants %+d %s', $misc_mod, $stat_name);
-            $stat += $misc_mod;
+            $mod += $misc_mod;
         }
 
         $b = (param("$us.b") // 1);
@@ -1228,7 +1229,7 @@ sub gen_attack_args{
                     push @mod_strings, 'STR ignores i-Kohl';
                 }else{
                     push @mod_strings, sprintf('i-Kohl grants %+d %s', $ikohl, $stat_name);
-                    $stat += $ikohl;
+                    $mod += $ikohl;
                 }
             }
 
@@ -1237,7 +1238,7 @@ sub gen_attack_args{
                 if(!param("$us.nbw")){
                     if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
                         push @mod_strings, sprintf('Opponent Martial Arts grants %+d %s', $ma_att, $stat_name);
-                        $stat += $ma_att;
+                        $mod += $ma_att;
                     }
                 }else{
                     push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
@@ -1247,11 +1248,18 @@ sub gen_attack_args{
 
         # Enemy Suppressive Fire
         if($other_action eq 'supp'){
-            $stat -= 3;
+            $mod -= 3;
             push @mod_strings, "Opponent Suppressive Fire grants -3 $stat_name";
         }
 
-        $stat = max($stat, 0);
+        if($mod < -12){
+            push @mod_strings, "Modifier capped at -12";
+            $mod = -12;
+        }elsif($mod > 12){
+            push @mod_strings, "Modifier capped at 12";
+            $mod = 12;
+        }
+        $stat = max($stat + $mod, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
     }elsif($action eq 'dtw'){
@@ -1283,11 +1291,12 @@ sub gen_attack_args{
         $stat_name = lc(param("$us.stat") // 'bs');
         $stat = param("$us.$stat_name") // 0;
         $stat_name = uc($stat_name);
+        my $mod = 0;
 
         push @mod_strings, "Base $stat_name of $stat";
 
         push @mod_strings, sprintf('Speculative Shot grants -6 %s',  $stat_name);
-        $stat -= 6;
+        $mod -= 6;
 
         # Range comes in as 0-8/+3 OR +3
         # Select only the final number
@@ -1295,12 +1304,12 @@ sub gen_attack_args{
         $range =~ m/(-?\d+)$/;
         $range = $1;
         push @mod_strings, sprintf('Range grants %+d %s', $range,  $stat_name);
-        $stat += $range;
+        $mod += $range;
 
         my $misc_mod = param("$us.misc_mod") // 0;
         if($misc_mod){
             push @mod_strings, sprintf('Additional modifier grants %+d %s', $misc_mod, $stat_name);
-            $stat += $misc_mod;
+            $mod += $misc_mod;
         }
 
         $b = (param("$us.b") // 1);
@@ -1321,11 +1330,18 @@ sub gen_attack_args{
 
         # Enemy Suppressive Fire
         if($type eq 'ftf' && $other_action eq 'supp'){
-            $stat -= 3;
+            $mod -= 3;
             push @mod_strings, "Opponent Suppressive Fire grants -3 $stat_name";
         }
 
-        $stat = max($stat, 0);
+        if($mod < -12){
+            push @mod_strings, "Modifier capped at -12";
+            $mod = -12;
+        }elsif($mod > 12){
+            push @mod_strings, "Modifier capped at 12";
+            $mod = 12;
+        }
+        $stat = max($stat + $mod, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
     }elsif($action eq 'cc'){
@@ -1334,6 +1350,7 @@ sub gen_attack_args{
 
         $stat = param("$us.cc") // 0;
         push @mod_strings, "Base CC of $stat";
+        my $mod = 0;
 
         my $us_ma = param("$us.ma") // 0;
         my $them_ma = param("$them.ma") // 0;
@@ -1341,7 +1358,7 @@ sub gen_attack_args{
         # We must have berserk and they must not have NBW
         if(param("$us.has_berserk") && param("$us.berserk")){
             if(!param("$them.nbw")){
-                $stat += 6;
+                $mod += 6;
                 $type = 'normal';
                 push @mod_strings, 'Berserk grants +6 CC';
             }else{
@@ -1358,7 +1375,7 @@ sub gen_attack_args{
                 push @mod_strings, 'STR ignores i-Kohl';
             }else{
                 push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
-                $stat += $ikohl;
+                $mod += $ikohl;
             }
         }
 
@@ -1369,7 +1386,7 @@ sub gen_attack_args{
             if(!param("$them.nbw")){
                 if(my $ma_att = $ma_codes->{$us_ma}{attack}){
                     push @mod_strings, sprintf('Martial Arts grants %+d CC', $ma_att);
-                    $stat += $ma_att;
+                    $mod += $ma_att;
                 }
                 if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
                     if($ph_dam){
@@ -1393,7 +1410,7 @@ sub gen_attack_args{
             if(!param("$us.nbw")){
                 if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
                     push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
-                    $stat += $ma_att;
+                    $mod += $ma_att;
                 }
             }else{
                 push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
@@ -1406,23 +1423,30 @@ sub gen_attack_args{
                 push @mod_strings, "Gang-up canceled by MA 5";
             }else{
                 push @mod_strings, sprintf('Gang-up grants %+d CC', $gang_up);
-                $stat += $gang_up;
+                $mod += $gang_up;
             }
         }
 
         my $misc_mod = param("$us.misc_mod") // 0;
         if($misc_mod){
             push @mod_strings, sprintf('Additional modifier grants %+d CC', $misc_mod);
-            $stat += $misc_mod;
+            $mod += $misc_mod;
         }
 
         # Enemy Suppressive Fire
         if($other_action eq 'supp'){
-            $stat -= 3;
+            $mod -= 3;
             push @mod_strings, "Opponent Suppressive Fire grants -3 CC";
         }
 
-        $stat = max($stat, 0);
+        if($mod < -12){
+            push @mod_strings, "Modifier capped at -12";
+            $mod = -12;
+        }elsif($mod > 12){
+            push @mod_strings, "Modifier capped at 12";
+            $mod = 12;
+        }
+        $stat = max($stat + $mod, 0);
         push @mod_strings, "Net CC is $stat";
     }
 
