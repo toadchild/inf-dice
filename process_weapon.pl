@@ -35,7 +35,7 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
 
     WEAPON: for my $weapon (@$source_data){
         # Skip unimplemented weapons or other equipment
-        if($weapon->{name} =~ m/Mines|Koala|Charges|Discover|Mauler|Electric Pulse|Hedgehog|Observer|Jammer|Sepsitor/){
+        if($weapon->{name} =~ m/Koala|Charges|Discover|Electric Pulse|Hedgehog|Observer|Jammer|Sepsitor/){
             next;
         }
 
