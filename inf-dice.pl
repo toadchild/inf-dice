@@ -1051,7 +1051,7 @@ sub gen_attack_args{
     if($immunities->{$immunity}{$ammo_name}){
         $ap = 1;
         $save = $immunities->{$immunity}{$ammo_name};
-        $ammo = 'N';
+        $ammo = 1;
     }else{
         $ap = $code->{ap} // 1;
         $save = $code->{save} // 'arm';
