@@ -97,12 +97,35 @@ my $ammo_codes = {
 };
 
 my $skill_codes = {
-    'hack_imm' => {fatal => 9, label => 'Immobilized', title => 'Hack to Immobilize', no_lof => 1, format => '%s Hacks %3$s%4$s'},
-    'hack_ahp' => {dam => 'w', title => 'Anti-Hacker Protocols', no_lof => 1, format => '%s Hacks %3$s%4$s'},
-    'hack_def' => {title => 'Defensive Hacking', no_lof => 1, dam => 0, format => '%s Hacks Defensively against %3$s'},
-    'hack_pos' => {fatal => 9, label => 'Possessed', threshold => 2, title => 'Hack to Possess', no_lof => 1, format => '%s Hacks %3$s%4$s'},
     'dodge' => {title => 'Dodge', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
     'change_face' => {title => 'Change Facing', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
+    'reset' => {title => 'Reset', no_lof => 1, dam => 0, format => '%s Resets vs. %3$s'},
+};
+
+my $hack_codes = {
+    # CLAW-1
+    'Blackout' => {mod_att => 0, mod_def => 0, dam => 15, effect => {saves => 1, save => 'bts', format => '%s Disables %3$s'}},
+    'Gotcha!' => {mod_att => 0, mod_def => 0, dam => 13, effect => {saves => 1, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
+    'Overlord' => {mod_att => 0, mod_def => 0, dam => 14, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Possesses %3$s'}},
+    'Spotlight' => {mod_att => -3, mod_def => 0, dam => 0, effect => {saves => 1, save => 'bts', format => '%s Targets %3$s'}},
+    # CLAW-2
+    'Expel' => {mod_att => 0, mod_def => 0, dam => 13, effect => {saves => 1, save => 'bts', format => '%s Expels the Pilot of %3$s'}},
+    'Oblivion' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', format => '%s Isolates %3$s'}},
+    # CLAW-3
+    'Basilisk' => {mod_att => 0, mod_def => 0, dam => 13, effect => {saves => 1, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
+    'Carbonite' => {mod_att => 3, mod_def => 0, dam => 13, effect => {saves => 2, save => 'bts', format => '%s Immobilizes %3$s', fatal => 9}},
+    'Total Control' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 2, save => 'bts', format => '%s Possesses %3$s', fatal => 9}},
+    # SWORD-1
+    'Brain Blast' => {mod_att => 0, mod_def => 0, dam => 14, effect => {saves => 1, save => 'bts'}},
+    # SHIELD-1
+    'Exorcism' => {mod_att => 0, mod_def => -3, dam => 18, reset_wip => 11, effect => {saves => 2, save => 'bts', format => '%s Cancels Possession on %3$s', fatal => 9}},
+    # SHIELD-2
+    'Breakwater' => {mod_att => 0, mod_def => -6, dam => 0, effect => {saves => '-', save => 'bts', format => '%s Defends vs. %3$s'}},
+    # SHIELD-3
+    'Zero Pain' => {mod_att => 0, mod_def => 0, dam => 0, effect => {saves => '-', save => 'bts', format => '%s Defends vs. %3$s', fatal => 9}},
+    # UPGRADE
+    'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
+    'Stop!' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
 };
 
 my $ma_codes = {
@@ -208,12 +231,15 @@ my $msv_labels = {
     3 => 'Level 3',
 };
 
-my $hacker = [0, 1, 2, 3];
+my $hacker = [0, 1, 2, 3, 4, 5, 6];
 my $hacker_labels = {
     0 => 'None',
     1 => 'Defensive Hacking Device',
     2 => 'Hacking Device',
     3 => 'Hacking Device Plus',
+    4 => 'Assault Hacking Device',
+    5 => 'EI Assault Hacking Device',
+    6 => 'EI Hacking Device',
 };
 
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
@@ -423,6 +449,7 @@ sub print_input_attack_section{
               -default => param("$player.hacker") // '',
               -labels => $hacker_labels,
               -label => "Hacking Device",
+              -onchange => "set_hacker('$player')",
           ),
           "<br>",
           span_popup_menu(-name => "$player.marksmanship",
@@ -541,12 +568,14 @@ sub print_input_attack_section{
           "</div>\n";
 
     print "<div id='$player.sec_hack'>",
-          "<h3>Hacking Modifiers</h3>",
-          span_popup_menu(-name => "$player.evo",
-              -values => $evo,
-              -default => param("$player.evo") // '',
-              -labels => $evo_labels,
-              -label => "EVO Support Program",
+          "<h3>Hacking</h3>",
+          span_popup_menu(-name => "$player.hack_program",
+              -label => "Hacking Program",
+              -onchange => "set_hack_program('$player')",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.hack_b",
+              -label => "B",
           ),
           "</div>\n";
 
@@ -634,13 +663,22 @@ sub print_player_output{
     my $marksmanship = param("p$player.marksmanship") // 0;
     my $disabled_h;
 
-    my $code = $skill_codes->{$action};
+    my $code;
+    if($action eq 'hack'){
+        my $program = param("p$player.hack_program") // '';
+        $code = $hack_codes->{$program}{effect};
+        $immunity = '';
+        $marksmanship = 0;
+    }else{
+        $code = $skill_codes->{$action};
+    }
     if(!defined $code){
         $code = $ammo_codes->{$ammo};
     }
+    
+
     my $fatal = $code->{fatal} // 0;
     my $dam = $code->{dam} // 1;
-    my $threshold = $code->{threshold} // 1;
 
     # Marksmanship grants Shock in addition to existing ammo types
     if($marksmanship > 0){
@@ -690,14 +728,6 @@ sub print_player_output{
         $nwi = 0;
     }
 
-    # KOs in one shot, kills on followup
-    if($dam eq 'w'){
-        $dam = $unconscious - $w_taken;
-        if($dam == 0){
-            $dam = 1;
-        }
-    }
-
     if($nwi){
         $unconscious = -1;
     }
@@ -708,10 +738,6 @@ sub print_player_output{
     my $max_h = 0;
     for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
         my $done;
-
-        if($h < $threshold){
-            next;
-        }
 
         $max_h = $h;
         my $w = $h * $dam + $w_taken;
@@ -1486,74 +1512,18 @@ sub gen_hack_args{
 
     my $action = param("$us.action");
     my $other_action = param("$them.action");
-    my $evo = param("$us.evo") // '';
     my $bts = param("$them.bts") // 0;
+    my $program = param("$us.hack_program") // "";
+    my $code = $hack_codes->{$program};
 
-    my $type = 'ftf';
-    my $can_hack = 0;
-    my $b = 1;
     my @mod_strings;
-
-    if($action eq 'hack_imm'){
-        my $unit_type = param("$them.type") // '';
-        my $faction = param("$them.faction") // '';
-
-        if($unit_type eq 'REM' || $unit_type eq 'TAG'){
-            $can_hack = 1;
-        }elsif($unit_type eq 'HI' && $faction ne 'Ariadna'){
-            # Ariadna HI are unhackable
-            $can_hack = 1;
-        }elsif($other_action eq 'hack_def'){
-            $can_hack = 1;
-        }
-
-        # Immobilization does not protect against hacking attacks
-        if($other_action eq 'hack_imm' || $other_action eq 'hack_ahp'){
-            $type = 'normal';
-        }
-
-    }elsif($action eq 'hack_pos'){
-        my $unit_type = param("$them.type") // '';
-        my $faction = param("$us.faction") // '';
-        my $other_faction = param("$them.faction") // '';
-
-        # CA TAGs cannot be possessed by humans
-        if($unit_type eq 'TAG' && ($other_faction ne 'Combined Army' || $faction eq 'Combined Army')){
-            $can_hack = 1;
-        }elsif($other_action eq 'hack_def'){
-            $can_hack = 1;
-        }
-
-        # Immobilization does not protect against hacking attacks
-        if($other_action eq 'hack_imm' || $other_action eq 'hack_ahp'){
-            $type = 'normal';
-        }
-
-        # EVO Capture program
-        if($evo eq 'cap'){
-            # rewrite global skill data to fix capture threshold
-            $skill_codes->{hack_pos}{threshold} = 1;
-        }else{
-            $b = 2;
-        }
-
-    }elsif($action eq 'hack_ahp'){
-        my $hacker = param("$them.hacker") // 0;
-        if($hacker > 0){
-            $can_hack = 1;
-        }
-
-    }elsif($action eq 'hack_def'){
-        # Defensive Hacking is only useful against hacking attacks
-        if($other_action eq 'hack_ahp' || $other_action eq 'hack_imm' || $other_action eq 'hack_pos'){
-            $can_hack = 1;
-        }
-    }
-
-    # If you can't hack it, do nothing
-    if(!$can_hack){
-        return gen_none_args();
-    }
+    my $type = 'ftf';
+    my $b = param("$us.hack_b") // 1;
+    my $dam = $code->{dam} // 0;
+    my $ammo = $code->{effect}{saves} // '1';
+    my $ap = $code->{effect}{ap} // 1;
+    my $arm = ceil(abs(param("$them.bts") // 0) * $ap);
+    $dam = max($dam - $arm, 0);
 
     # Dodge does not protect against hacking
     if($other_action eq 'dodge' || $other_action eq 'change_face'){
@@ -1561,29 +1531,80 @@ sub gen_hack_args{
     }
 
     my $stat = param("$us.wip") // 0;
+    my $mod = 0;
     push @mod_strings, "Base WIP of $stat";
 
-    # EVO support bonuses
-    my $evo_mod = 0;
-    if($evo eq 'sup_1'){
-        $evo_mod = 3;
-    }elsif($evo eq 'sup_2'){
-        $evo_mod = 6;
-    }elsif($evo eq 'sup_3'){
-        $evo_mod = 9;
-    }elsif($evo eq 'ice' && $bts){
-        $bts = -ceil(abs($bts / 2));
-        push @mod_strings, sprintf('EVO Icebreaker reduces BTS to %d', $bts);
+    if($code->{mod_att}){
+        push @mod_strings, sprintf('Hacking program grants %+d WIP', $code->{mod_att});
+        $mod += $code->{mod_att};
     }
 
-    if($evo_mod){
-        push @mod_strings, sprintf('EVO Support grants %+d WIP', $evo_mod);
-        $stat += $evo_mod;
+    # Opponent's Hacking modifier
+    if($other_action eq 'hack'){
+        my $other_program = param("$them.hack_program") // "";
+        my $other_code = $hack_codes->{$other_program};
+        if($other_code->{mod_def}){
+            push @mod_strings, sprintf('Opponent\'s hacking program grants %+d WIP', $other_code->{mod_def});
+            $mod += $other_code->{mod_def};
+        }
     }
 
-    if($bts){
-        push @mod_strings, sprintf('BTS grants %+d WIP', $bts);
-        $stat += $bts;
+    my $misc_mod = param("$us.misc_mod") // 0;
+    if($misc_mod){
+        push @mod_strings, sprintf('Additional modifier grants %+d WIP', $misc_mod);
+        $mod += $misc_mod;
+    }
+
+    if($mod < -12){
+        push @mod_strings, "Modifier capped at -12";
+        $mod = -12;
+    }elsif($mod > 12){
+        push @mod_strings, "Modifier capped at 12";
+        $mod = 12;
+    }
+    $stat = max($stat + $mod, 0);
+    push @mod_strings, "Net WIP is $stat";
+
+    return (
+        $type,
+        \@mod_strings,
+        $stat,
+        $b,
+        $dam,
+        $ammo,
+    );
+}
+
+sub gen_reset_args{
+    my ($us, $them) = @_;
+    my $other_action = param("$them.action");
+    my $mod;
+    my @mod_strings;
+
+    my $stat = param("$us.wip") // 0;
+    push @mod_strings, "Base WIP of $stat";
+
+    # Reset only works against Hacking
+    my $type = 'normal';
+    if(param("$them.action") eq 'hack'){
+        $type = 'ftf';
+    }
+
+    # Opponent's Hacking modifier
+    if($other_action eq 'hack'){
+        my $other_program = param("$them.hack_program") // "";
+        my $other_code = $hack_codes->{$other_program};
+
+        # Possessed TAGs have a restricted WIP
+        if($other_code->{reset_wip}){
+            push @mod_strings, sprintf('Possessed TAG limited to WIP %d', $other_code->{reset_wip});
+            $stat = $other_code->{reset_wip};
+        }
+
+        if($other_code->{mod_def}){
+            push @mod_strings, sprintf('Opponent\'s hacking program grants %+d WIP', $other_code->{mod_def});
+            $mod += $other_code->{mod_def};
+        }
     }
 
     my $misc_mod = param("$us.misc_mod") // 0;
@@ -1592,14 +1613,21 @@ sub gen_hack_args{
         $stat += $misc_mod;
     }
 
-    $stat = max($stat, 0);
+    if($mod < -12){
+        push @mod_strings, "Modifier capped at -12";
+        $mod = -12;
+    }elsif($mod > 12){
+        push @mod_strings, "Modifier capped at 12";
+        $mod = 12;
+    }
+    $stat = max($stat + $mod, 0);
     push @mod_strings, "Net WIP is $stat";
 
     return (
         $type,
         \@mod_strings,
         $stat,
-        $b,
+        1,
         0,
         '-',
     );
@@ -1686,8 +1714,10 @@ sub gen_args{
     my $action = param("$us.action");
     if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'deploy' || $action eq 'spec' || $action eq 'supp'){
         return gen_attack_args($us, $them);
-    }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
+    }elsif($action eq 'hack'){
         return gen_hack_args($us, $them);
+    }elsif($action eq 'reset'){
+        return gen_reset_args($us, $them);
     }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them, 0);
     }elsif($action eq 'change_face'){

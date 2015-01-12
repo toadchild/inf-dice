@@ -360,7 +360,38 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
         enable_display(player + ".sec_other");
-    }else if(action.value == "hack_imm" || action.value == "hack_ahp" || action.value == "hack_def" || action.value == "hack_pos"){
+    }else if(action.value == "reset"){
+        // action
+        disable_display(player + ".intuitive");
+
+        // weapon
+        disable_input(player + ".b");
+        disable_input(player + ".ammo");
+
+        // modifiers
+        disable_input(player + ".range");
+        disable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".motorcycle");
+
+        // cc modifiers
+        disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+
+        // defensive abilities
+        disable_input(other + ".cover");
+        disable_input(other + ".ch");
+        disable_input(other + ".odf");
+        disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        disable_display(player + ".sec_weapon");
+        disable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
+        disable_display(other + ".sec_defense");
+        enable_display(player + ".sec_other");
+    }else if(action.value == "hack"){
         // action
         disable_display(player + ".intuitive");
 
@@ -652,6 +683,101 @@ function populate_ma(player, check_params){
     }
 }
 
+function set_hacker(player, check_params){
+    var program_list = document.getElementsByName(player + ".hack_program")[0];
+    var hacker_level = document.getElementsByName(player + ".hacker")[0].value;
+    console.log(hacker_level);
+    var unit = get_unit_data(player);
+
+    var selected_program = program_list.value;
+    if(check_params){
+        selected_program = params[player + ".hack_program"];
+    }
+
+    var master_programs = [];
+    master_programs = get_hacking_programs(hacker_level);
+
+    program_list.length = 0;
+
+    for(var i = 0; i < master_programs.length; i++){
+        // Skip unimplmented programs
+        if(hacking_burst[master_programs[i]["program"]]){
+            program_list.options[program_list.length] = new Option(master_programs[i]["group"] + ": " + master_programs[i]["program"], master_programs[i]["program"]);
+
+            if(master_programs[i]["program"] == selected_program){
+                program_list.options[i].selected = true;
+            }
+        }
+    }
+
+    set_hack_program(player, check_params);
+}
+
+function set_hack_program(player, check_params){
+    // Set b value for hack attack
+    var program = document.getElementsByName(player + ".hack_program")[0].value;
+    var max_b = hacking_burst[program];
+    var b_list = document.getElementsByName(player + ".hack_b")[0];
+
+    // select a default B value
+    var selected_b = 1;
+    if(check_params && params[player + ".hack_b"]){
+        selected_b = params[player + ".hack_b"];
+    }else if(player == "p1"){
+        // Default to the highest burst for Player 1
+        selected_b = max_b;
+    }
+
+    b_list.length = 0;
+    for(var b = 1; b <= max_b; b++){
+        b_list.options[b_list.options.length] = new Option(b);
+
+        if(b == selected_b){
+            b_list.options[b_list.options.length - 1].selected = true;
+        }
+    }
+}
+
+function get_hacking_programs(hd_level){
+    var programs = [];
+    var hd_data;
+
+    if(hd_level == 1){
+        hd_data = hacking_devices["Defensive Hacking Device"];
+    }else if(hd_level == 2){
+        hd_data = hacking_devices["Hacking Device"];
+    }else if(hd_level == 3){
+        hd_data = hacking_devices["Hacking Device Plus"];
+    }else if(hd_level == 4){
+        hd_data = hacking_devices["Assault Hacking Device"];
+    }else if(hd_level == 5){
+        hd_data = hacking_devices["EI Assault Hacking Device"];
+    }else if(hd_level == 6){
+        hd_data = hacking_devices["EI Hacking Device"];
+    }
+
+    // Get each program from each group
+    for(var i = 0; i < hd_data["groups"].length; i++){
+        var group = hd_data["groups"][i];
+        for(var j = 0; j < hacking_groups[group].length; j++){
+            programs[programs.length] = {
+                "group": group,
+                "program": hacking_groups[group][j]
+            };
+        }
+    }
+
+    // Get each program upgrade
+    for(var i = 0; i < hd_data["upgrades"].length; i++){
+        programs[programs.length] = {
+            "group": "UPGRADE",
+            "program": hd_data["upgrades"][i]
+        };
+    }
+
+    return programs;
+}
+
 function get_unit_data(player){
     var faction_name = player + ".faction";
     var faction = document.getElementsByName(faction_name)[0].value;
@@ -812,6 +938,7 @@ function set_unit(player, check_params){
     populate_actions(player, check_params);
     populate_weapons(player, check_params);
     populate_ma(player, check_params);
+    set_hacker(player, check_params);
 }
 
 function populate_actions(player, check_params){
@@ -954,24 +1081,16 @@ function action_spec_filter(unit){
     return action_weapon_filter(unit, "spec");
 }
 
-function action_hack_n_filter(unit, n){
+function action_hack_filter(unit){
     if(!unit){
         return 1;
     }
 
-    if(unit["hacker"] >= n){
+    if(unit["hacker"] >= 0){
         return 1;
     }
 
     return 0;
-}
-
-function action_hack_1_filter(unit){
-    return action_hack_n_filter(unit, 1);
-}
-
-function action_hack_2_filter(unit){
-    return action_hack_n_filter(unit, 2);
 }
 
 var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
@@ -1023,24 +1142,13 @@ var master_action_list = [
         "value": "change_face",
     },
     { 
-        "label": "Hacking - Immobilize HI/REM/TAG",
-        "value": "hack_imm",
-        "filter": action_hack_2_filter,
+        "label": "Reset",
+        "value": "reset",
     },
     { 
-        "label": "Hacking - Possess TAG",
-        "value": "hack_pos",
-        "filter": action_hack_2_filter,
-    },
-    { 
-        "label": "Hacking - Anti-Hacker Protocols",
-        "value": "hack_ahp",
-        "filter": action_hack_2_filter,
-    },
-    { 
-        "label": "Hacking - Defensive Hacking",
-        "value": "hack_def",
-        "filter": action_hack_1_filter,
+        "label": "Hacking",
+        "value": "hack",
+        "filter": action_hack_filter,
     },
     { 
         "label": "No Action",
@@ -1062,3 +1170,141 @@ var supp_ranges = [
     "8-16/0",
     "16-24/-3",
 ];
+
+var hacking_devices = {
+    "Hacking Device": {
+        "groups": [
+            "CLAW-1",
+            "SWORD-1",
+            "SHIELD-1",
+            "GADGET-1",
+            "GADGET-2"
+        ],
+        "upgrades": []
+    },
+    "EI Hacking Device": {
+        "groups": [
+            "CLAW-1",
+            "SWORD-1",
+            "SHIELD-1",
+            "GADGET-1",
+            "GADGET-2"
+        ],
+        "upgrades": [
+            "Sucker Punch"
+        ]
+    },
+    "Defensive Hacking Device": {
+        "groups": [
+            "SHIELD-1",
+            "SHIELD-2",
+            "SHIELD-3",
+            "GADGET-1"
+        ],
+        "upgrades": [],
+    },
+    "Hacking Device Plus": {
+        "groups": [
+            "CLAW-1",
+            "CLAW-2",
+            "SWORD-1",
+            "SHIELD-1",
+            "SHIELD-2",
+            "GADGET-1",
+            "GADGET-2"
+        ],
+        "upgrades": [
+            "Cybermask",
+            "Sucker Punch",
+            "White Noise"
+        ]
+    },
+    "Assault Hacking Device": {
+        "groups": [
+            "CLAW-1",
+            "CLAW-2",
+            "CLAW-3"
+        ],
+        "upgrades": [ ]
+    },
+    "EI Assault Hacking Device": {
+        "groups": [
+            "CLAW-1",
+            "CLAW-2",
+            "CLAW-3"
+        ],
+        "upgrades": [
+            "Stop!"
+        ]
+    }
+};
+
+var hacking_groups = {
+    "CLAW-1": [
+        "Blackout",
+        "Gotcha!",
+        "Overlord",
+        "Spotlight"
+    ],
+    "CLAW-2": [
+        "Expel",
+        "Oblivion"
+    ],
+    "CLAW-3": [
+        "Basilisk",
+        "Carbonite",
+        "Total Control"
+    ],
+    "SWORD-1": [
+        "Brain Blast"
+    ],
+    "SHIELD-1": [
+        "Exorcism",
+        "Hack Transport Aircraft",
+        "U-Turn"
+    ],
+    "SHIELD-2": [
+        "Breakwater"
+    ],
+    "SHIELD-3": [
+        "Counterstrike",
+        "Zero Pain"
+    ],
+    "GADGET-1": [
+        "Fairy Dust",
+        "Lockpicker",
+        "Controlled Jump"
+    ],
+    "GADGET-2": [
+        "Assissted Fire",
+        "Enhanced Reaction"
+    ]
+};
+
+// Burst values of hacking programs
+// Hacking programs implemented by the backend
+var hacking_burst = {
+    // CLAW-1
+    "Blackout": 1,
+    "Gotcha!": 2,
+    "Overlord": 1,
+    "Spotlight": 1,
+    // CLAW-2
+    "Expel": 1,
+    "Oblivion": 1,
+    // CLAW-3
+    "Basilisk": 3,
+    "Carbonite": 2,
+    "Total Control": 1,
+    // SWORD-1
+    "Brain Blast": 2,
+    // SHIELD-1
+    "Exorcism": 2,
+    // SHIELD-2
+    "Breakwater": 1,
+    // SHIELD-3
+    "Zero Pain": 2,
+    // UPGRADES
+    "Sucker Punch": 1,
+    "Stop!": 2,
+};
