@@ -1578,7 +1578,7 @@ sub gen_hack_args{
 sub gen_reset_args{
     my ($us, $them) = @_;
     my $other_action = param("$them.action");
-    my $mod;
+    my $mod = 0;
     my @mod_strings;
 
     my $stat = param("$us.wip") // 0;
