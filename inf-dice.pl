@@ -1644,7 +1644,7 @@ sub gen_dodge_args{
         $type = 'normal';
     }
 
-    if(param("$them.action") eq 'deploy'){
+    if(param("$them.action") eq 'deploy' && !$change_face){
         # -3 penalty to dodge mines, but is already included in change facing
         $stat -= 3;
         push @mod_strings, sprintf('Dodging a deployable grants -3 PH');
