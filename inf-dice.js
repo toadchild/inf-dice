@@ -64,10 +64,10 @@ function set_ammo(player, check_params){
     var other = other_player(player);
 
     var action_name = player + ".action";
-    var action = document.getElementsByName(action_name)[0];
+    var action = document.getElementsByName(action_name)[0].value;
 
     var ammo;
-    if(action.value == "bs" || action.value == "cc" || action.value == "dtw" || action.value == "spec" || action.value == "supp"){
+    if(action == "bs" || action == "cc" || action == "dtw" || action == "deploy" || action == "spec" || action == "supp"){
         ammo = document.getElementsByName(player + ".ammo")[0].value;
     }else{
         // Any case where we aren't attacking
@@ -89,7 +89,7 @@ function set_ammo(player, check_params){
 
     // Get ammo type index so we can look up the corresponding B value
     var max_b = 5;
-    if(action.value == "supp"){
+    if(action == "supp"){
         max_b = 3;
     }else{
         if(weapon){
@@ -106,9 +106,9 @@ function set_ammo(player, check_params){
     var selected_b = 1;
     if(check_params && params[player + ".b"]){
         selected_b = params[player + ".b"];
-    }else if(action.value == "supp"){
+    }else if(action == "supp"){
         selected_b = 3;
-    }else if(player == "p1" && action.value != "cc"){
+    }else if(player == "p1" && action != "cc"){
         if(weapon){
             // Default to the highest burst for Player 1
             selected_b = max_b;
@@ -154,13 +154,13 @@ function set_sapper_foxhole(){
     var sapper_1 = document.getElementsByName("p1.sapper")[0].checked;
     var sapper_2 = document.getElementsByName("p2.sapper")[0].checked;
 
-    if(sapper_1 && (action_2 == "bs" || action_2 == "dtw" || action_2 == "spec" || action_2 == "supp")){
+    if(sapper_1 && (action_2 == "bs" || action_2 == "spec" || action_2 == "supp")){
         enable_input("p1.foxhole");
     }else{
         disable_input("p1.foxhole");
     }
 
-    if(sapper_2 && (action_1 == "bs" || action_1 == "dtw" || action_1 == "spec" || action_1 == "supp")){
+    if(sapper_2 && (action_1 == "bs" || action_1 == "spec" || action_1 == "supp")){
         enable_input("p2.foxhole");
     }else{
         disable_input("p2.foxhole");
@@ -255,7 +255,38 @@ function set_action(player){
         disable_input(other + ".ikohl");
 
         // defensive abilities
-        enable_input(other + ".cover");
+        disable_input(other + ".cover");
+        disable_input(other + ".ch");
+        disable_input(other + ".odf");
+        disable_input(player + ".hyperdynamics");
+
+        // ability sections
+        enable_display(player + ".sec_weapon");
+        enable_display(player + ".sec_shoot");
+        disable_display(player + ".sec_cc");
+        disable_display(player + ".sec_hack");
+        enable_display(other + ".sec_defense");
+        disable_display(player + ".sec_other");
+    }else if(action.value == "deploy"){
+        // action
+        disable_display(player + ".intuitive");
+
+        // weapon
+        enable_input(player + ".b");
+        enable_input(player + ".ammo");
+
+        // modifiers
+        disable_input(player + ".range");
+        enable_input(player + ".link");
+        disable_input(player + ".viz");
+        disable_input(player + ".motorcycle");
+
+        // cc modifiers
+        disable_input(player + ".gang_up");
+        disable_input(other + ".ikohl");
+
+        // defensive abilities
+        disable_input(other + ".cover");
         disable_input(other + ".ch");
         disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
@@ -468,7 +499,7 @@ function set_weapon(player, check_params){
     stat_list.length = 0;
     if(action == "cc"){
         stat_list.options[0] = new Option("CC");
-    }else if(action == "dtw" || action == "dodge" || action == "change_face"){
+    }else if(action == "dtw" || action == "deploy" || action == "dodge" || action == "change_face"){
         stat_list.options[0] = new Option("--");
     }else{
         for(var i = 0; i < my_stat.length; i++){
@@ -585,7 +616,7 @@ function populate_weapons(player, check_params){
     weapon_list.options[weapon_list.options.length] = new Option("--");
     weapon_list.options[weapon_list.options.length - 1].disabled = true;
 
-    if(action == "bs" || action == "cc" || action == "dtw" || action == "spec" || action == "supp"){
+    if(action == "bs" || action == "cc" || action == "dtw" || action == "deploy" || action == "spec" || action == "supp"){
         weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
 
         if("Custom Weapon" == selected_weapon){
@@ -915,6 +946,10 @@ function action_dtw_filter(unit){
     return action_weapon_filter(unit, "dtw");
 }
 
+function action_deploy_filter(unit){
+    return action_weapon_filter(unit, "deploy");
+}
+
 function action_spec_filter(unit){
     return action_weapon_filter(unit, "spec");
 }
@@ -963,6 +998,11 @@ var master_action_list = [
         "label": "Attack - Direct Template Weapon",
         "value": "dtw",
         "filter": action_dtw_filter,
+    },
+    { 
+        "label": "Attack - Deployable",
+        "value": "deploy",
+        "filter": action_deploy_filter,
     },
     { 
         "label": "Attack - Speculative Shot",

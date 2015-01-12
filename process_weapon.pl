@@ -39,6 +39,13 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
             next;
         }
 
+        # deploy weapons have a dodge penalty
+        if($weapon->{name} =~ m/Mine|Mauler/){
+            $weapon->{deploy} = 1;
+        }else{
+            $weapon->{deploy} = 0;
+        }
+
         # Fix name of Fist attack
         if($weapon->{name} eq 'TAG Fist'){
             $weapon->{name} = 'Fist';
@@ -135,8 +142,9 @@ for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
         $new_weapon->{dam} = $weapon->{damage};
 
         $new_weapon->{att_cc} = $weapon->{cc} eq 'Yes' ? 1 : 0;
-        $new_weapon->{att_dtw} = $weapon->{cc} eq 'No' && $weapon->{short_dist} eq '--' ? 1 : 0;
-        $new_weapon->{att_supp} = $att_supp;;
+        $new_weapon->{att_dtw} = $weapon->{cc} eq 'No' && !$weapon->{deploy} && $weapon->{short_dist} eq '--' ? 1 : 0;
+        $new_weapon->{att_deploy} = $weapon->{deploy};
+        $new_weapon->{att_supp} = $att_supp;
 
         if($weapon->{name} eq 'Marker' || $weapon->{name} =~ m/Grenade|GL/){
             $new_weapon->{att_spec} = 1;

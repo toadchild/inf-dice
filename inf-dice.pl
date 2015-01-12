@@ -1283,6 +1283,20 @@ sub gen_attack_args{
             $type = 'ftf';
         }
 
+    }elsif($action eq 'deploy'){
+        # DTW mods
+        $type = 'normal';
+
+        $stat = 'T';
+
+        # One mine at a time, for now
+        $b = 1;
+
+        # templates are FTF against Dodge
+        if($other_action eq 'dodge' || $other_action eq 'change_face'){
+            $type = 'ftf';
+        }
+
     }elsif($action eq 'spec'){
         # Speculative Shot
         $type = 'ftf';
@@ -1630,6 +1644,12 @@ sub gen_dodge_args{
         $type = 'normal';
     }
 
+    if(param("$them.action") eq 'deploy'){
+        # -3 penalty to dodge mines, but is already included in change facing
+        $stat -= 3;
+        push @mod_strings, sprintf('Dodging a deployable grants -3 PH');
+    }
+
     my $misc_mod = param("$us.misc_mod") // 0;
     if($misc_mod){
         push @mod_strings, sprintf('Additional modifier grants %+d PH', $misc_mod);
@@ -1664,7 +1684,7 @@ sub gen_args{
     my ($us, $them) = @_;
 
     my $action = param("$us.action");
-    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'spec' || $action eq 'supp'){
+    if($action eq 'cc' || $action eq 'bs' || $action eq 'dtw' || $action eq 'deploy' || $action eq 'spec' || $action eq 'supp'){
         return gen_attack_args($us, $them);
     }elsif($action eq 'hack_imm' || $action eq 'hack_ahp' || $action eq 'hack_def' || $action eq 'hack_pos'){
         return gen_hack_args($us, $them);
