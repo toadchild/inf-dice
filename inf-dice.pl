@@ -107,7 +107,7 @@ my $hack_codes = {
     'Blackout' => {mod_att => 0, mod_def => 0, dam => 15, effect => {saves => 1, save => 'bts', format => '%s Disables %3$s'}},
     'Gotcha!' => {mod_att => 0, mod_def => 0, dam => 13, effect => {saves => 1, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
     'Overlord' => {mod_att => 0, mod_def => 0, dam => 14, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Possesses %3$s'}},
-    'Spotlight' => {mod_att => -3, mod_def => 0, dam => 0, effect => {saves => '-', save => 'bts', format => '%s Targets %3$s'}},
+    'Spotlight' => {mod_att => -3, mod_def => 0, dam => 0, effect => {saves => '-', save => 'bts', format => '%s Targets %3$s for 1 Turn'}},
     # CLAW-2
     'Expel' => {mod_att => 0, mod_def => 0, dam => 13, effect => {saves => 1, save => 'bts', format => '%s Expels the Pilot of %3$s'}},
     'Oblivion' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', format => '%s Isolates %3$s'}},
