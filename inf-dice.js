@@ -686,7 +686,6 @@ function populate_ma(player, check_params){
 function set_hacker(player, check_params){
     var program_list = document.getElementsByName(player + ".hack_program")[0];
     var hacker_level = document.getElementsByName(player + ".hacker")[0].value;
-    console.log(hacker_level);
     var unit = get_unit_data(player);
 
     var selected_program = program_list.value;
@@ -756,23 +755,25 @@ function get_hacking_programs(hd_level){
         hd_data = hacking_devices["EI Hacking Device"];
     }
 
-    // Get each program from each group
-    for(var i = 0; i < hd_data["groups"].length; i++){
-        var group = hd_data["groups"][i];
-        for(var j = 0; j < hacking_groups[group].length; j++){
+    if(hd_data){
+        // Get each program from each group
+        for(var i = 0; i < hd_data["groups"].length; i++){
+            var group = hd_data["groups"][i];
+            for(var j = 0; j < hacking_groups[group].length; j++){
+                programs[programs.length] = {
+                    "group": group,
+                    "program": hacking_groups[group][j]
+                };
+            }
+        }
+
+        // Get each program upgrade
+        for(var i = 0; i < hd_data["upgrades"].length; i++){
             programs[programs.length] = {
-                "group": group,
-                "program": hacking_groups[group][j]
+                "group": "UPGRADE",
+                "program": hd_data["upgrades"][i]
             };
         }
-    }
-
-    // Get each program upgrade
-    for(var i = 0; i < hd_data["upgrades"].length; i++){
-        programs[programs.length] = {
-            "group": "UPGRADE",
-            "program": hd_data["upgrades"][i]
-        };
     }
 
     return programs;
