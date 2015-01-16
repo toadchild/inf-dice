@@ -590,11 +590,6 @@ sub print_input_attack_section{
               -checked => defined(param("$player.foxhole")),
               -value => 1,
               -label => 'Foxhole (Cover, Mimetism, Courage)'),
-          "<br>",
-          span_checkbox(-name => "$player.odf",
-              -checked => defined(param("$player.odf")),
-              -value => -6,
-              -label => 'ODF (-6 Opponent BS)'),
           "</div>\n";
     print "<div id='$player.sec_other'>",
           "<h3>Other Modifiers</h3>",
@@ -1143,10 +1138,6 @@ sub gen_attack_args{
         my $marksmanship = param("$us.marksmanship") // 0;
 
         my $camo = param("$them.ch") // 0;
-        my $odf = param("$them.odf") // 0;
-        if($odf < $camo){
-            $camo = $odf;
-        }
         # Foxhole grants Mimetism
         if($foxhole && $camo == 0){
             $camo = -3;
@@ -1173,10 +1164,10 @@ sub gen_attack_args{
             push @mod_strings, "MSV ignores CH modifier";
             $camo = 0;
         }elsif($msv >= 2 && $camo < 0){
-            push @mod_strings, "MSV ignores CH/ODD/ODF modifier";
+            push @mod_strings, "MSV ignores CH/ODD modifier";
             $camo = 0;
         }elsif($camo < 0){
-            push @mod_strings, sprintf('CH/ODD/ODF grants %+d %s', $camo, $stat_name);
+            push @mod_strings, sprintf('CH/ODD grants %+d %s', $camo, $stat_name);
             $mod += $camo;
         }
 

@@ -195,7 +195,6 @@ function set_action(player){
         // defensive abilities
         enable_input(other + ".cover");
         enable_input(other + ".ch");
-        enable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -226,7 +225,6 @@ function set_action(player){
         // defensive abilities
         enable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -257,7 +255,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -288,7 +285,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -319,7 +315,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -350,7 +345,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         enable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -381,7 +375,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -412,7 +405,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
@@ -443,7 +435,6 @@ function set_action(player){
         // defensive abilities
         disable_input(other + ".cover");
         disable_input(other + ".ch");
-        disable_input(other + ".odf");
         disable_input(player + ".hyperdynamics");
 
         // ability sections
