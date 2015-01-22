@@ -1235,20 +1235,7 @@ sub gen_attack_args{
 
         # CC modifiers affect us if they are using a CC skill
         if($other_action eq 'cc'){
-            my $ikohl = param("$them.ikohl") // 0;
-            my $w_type = param("$us.w_type") // 'W';
             my $them_ma = param("$them.ma") // 0;
-
-            if($ikohl){
-                # iKohl does not work on models with STR
-                if($w_type eq 'STR'){
-                    $ikohl = 0;
-                    push @mod_strings, 'STR ignores i-Kohl';
-                }else{
-                    push @mod_strings, sprintf('i-Kohl grants %+d %s', $ikohl, $stat_name);
-                    $mod += $ikohl;
-                }
-            }
 
             # Penalties from their MA skill
             if($them_ma){
