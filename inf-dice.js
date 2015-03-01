@@ -999,9 +999,14 @@ function set_faction(player, check_params){
 
         unit_list.options[unit_list.options.length] = new Option(unit["name"]);
 
-        if(!selected && check_params && unit["name"] == params[player + ".unit"]){
-            unit_list.options[unit_list.options.length - 1].selected = true;
-            selected = true;
+        if(!selected){
+            if(!check_params){
+                unit_list.options[unit_list.options.length - 1].selected = true;
+                selected = true;
+            }else if(unit["name"] == params[player + ".unit"]){
+                unit_list.options[unit_list.options.length - 1].selected = true;
+                selected = true;
+            }
         }
     }
 
