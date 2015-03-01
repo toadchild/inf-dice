@@ -259,14 +259,23 @@ sub has_hacker{
     my ($unit) = @_;
 
     for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/Hacking Device Plus/){
-            return 3;
-        }
-        if($spec =~ m/Defensive Hacking Device/){
+        if($spec eq 'Defensive Hacking Device'){
             return 1;
         }
-        if($spec =~ m/Hacking Device/){
+        if($spec eq 'Hacking Device'){
             return 2;
+        }
+        if($spec eq 'Hacking Device Plus'){
+            return 3;
+        }
+        if($spec eq 'Assault Hacking Device'){
+            return 4;
+        }
+        if($spec eq 'EI Assault Hacking Device'){
+            return 5;
+        }
+        if($spec eq 'EI Hacking Device'){
+            return 6;
         }
     }
 
@@ -369,7 +378,7 @@ sub get_weapons{
         $child->{_processed} = 1;
 
         # All forward observers and HD+ have Flash Pulse inclusive
-        if(has_fo($child) || has_hacker($child) >= 3){
+        if(has_fo($child)){
             $weapons->{'Flash Pulse'} = 1;
         }
 
