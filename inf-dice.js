@@ -46,7 +46,7 @@ function enable_input(id){
 function disable_input(id){
     var obj = document.getElementById(id);
     var styles = [
-        ["color", "#555555"],
+        ["color", "#2c3c44"],
     ];
 
     _set_style_recursive(obj, styles);
