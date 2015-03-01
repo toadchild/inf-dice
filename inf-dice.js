@@ -761,6 +761,8 @@ function get_hacking_programs(hd_level){
         hd_data = hacking_devices["EI Assault Hacking Device"];
     }else if(hd_level == 6){
         hd_data = hacking_devices["EI Hacking Device"];
+    }else if(hd_level == 7){
+        hd_data = hacking_devices["Hacking Device: UPGRADE: Stop!"];
     }
 
     if(hd_data){
@@ -1246,7 +1248,19 @@ var hacking_devices = {
         "upgrades": [
             "Stop!"
         ]
-    }
+    },
+    "Hacking Device: UPGRADE: Stop!": {
+        "groups": [
+            "CLAW-1",
+            "SWORD-1",
+            "SHIELD-1",
+            "GADGET-1",
+            "GADGET-2"
+        ],
+        "upgrades": [
+            "Stop!"
+        ]
+    },
 };
 
 var hacking_groups = {

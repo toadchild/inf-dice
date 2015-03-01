@@ -277,6 +277,9 @@ sub has_hacker{
         if($spec eq 'EI Hacking Device'){
             return 6;
         }
+        if($spec eq 'Hacking Device: UPGRADE: Stop!'){
+            return 7;
+        }
     }
 
     return 0;
