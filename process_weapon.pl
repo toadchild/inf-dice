@@ -9,6 +9,7 @@ use Clone qw(clone);
 my $json = JSON::PP->new;
 $json->pretty(1);
 $json->canonical(1);
+$json->relaxed(1);
 local $/;
 my $json_text;
 
@@ -27,7 +28,7 @@ my $poison_ccw = $json->decode($json_text);
 my $all_ammo = {};
 my $weapon_data = {};
 my $file;
-for my $fname (glob "ia-data/ia-data_*_weapons_data.json"){
+for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
     my $json_text;
     open $file, '<', $fname or die "Unable to open file";
     $json_text = <$file>;

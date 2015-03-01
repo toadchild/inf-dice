@@ -24,16 +24,16 @@ hitbar.css: hitbar.pl
 hex.png: hexgrid.pl
 	./hexgrid.pl 100 hex.png
 
-dual_weapons.dat: process_unit.pl ia-data/*
+dual_weapons.dat: process_unit.pl mayanet_data/Toolbox/*
 	./process_unit.pl
 
-dual_ccw.dat: process_unit.pl ia-data/*
+dual_ccw.dat: process_unit.pl mayanet_data/Toolbox/*
 	./process_unit.pl
 
-unit_data.js: process_unit.pl ia-data/*
+unit_data.js: process_unit.pl mayanet_data/Toolbox/*
 	./process_unit.pl
 
-weapon_data.js: process_weapon.pl ia-data/* dual_weapons.dat dual_ccw.dat \
+weapon_data.js: process_weapon.pl mayanet_data/Toolbox/* dual_weapons.dat dual_ccw.dat \
     poison_ccw.dat
 	./process_weapon.pl
 
@@ -45,5 +45,4 @@ diff:
 	for i in ${WWW_TARGETS}; do diff -u ${WWWDIR} $$i; done
 
 update_data:
-	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/data/
-	wget -m -np -P ia-data/ -nd http://ia-aleph.googlecode.com/hg/ia-aleph/src/main/javascript/lang/ia-lang_40_en.js
+	cd mayanet_data && git pull

@@ -5,10 +5,12 @@ use warnings;
 
 use JSON::PP;
 use Clone qw(clone);
+use Data::Dumper;
 
 my $json = JSON::PP->new;
 $json->pretty(1);
 $json->canonical(1);
+$json->relaxed(1);
 
 my %default_wtype = (
     LI => 'W',
@@ -66,6 +68,11 @@ my @specialist_profiles = (
         ability_func => \&has_sapper,
         name_func => \&name_sapper,
     },
+    {
+        key => 'marksmanship',
+        ability_func => \&has_marksmanship,
+        name_func => \&name_marksmanship,
+    },
 );
 
 sub name_msv{
@@ -103,6 +110,11 @@ sub name_nbw{
 
 sub name_sapper{
     return " (Sapper)";
+}
+
+sub name_marksmanship{
+    my ($marks) = @_;
+    return " (Marksmanship $marks)";
 }
 
 sub has_spec{
@@ -152,7 +164,7 @@ sub has_ikohl{
 
     for my $spec (@{$unit->{spec}}){
         # i-Kohl L3
-        if($spec =~ m/i-Kohl.*(\d+)/){
+        if($spec =~ m/i-K[oh][oh]l.*(\d+)/){
             return -3 * $1;
         }
     }
@@ -305,15 +317,26 @@ sub has_sapper{
     return has_spec(@_, 'Sapper');
 }
 
+sub has_transmutation{
+    return has_spec(@_, 'Transmutation');
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
 sub get_weapons{
-    my ($unit, $new_unit, $inherit_weapon, $ability_func) = @_;
+    my ($unit, $new_unit, $inherit_weapon, $rider, $ability_func) = @_;
     my $weapons = {};
 
     for my $w (@{$unit->{bsw}}){
         $weapons->{$w} = 1;
+    }
+
+    # Kum don't keep their Smoke LGLs when dismounted
+    if($rider){
+        for my $w (@{$new_unit->{weapons}}){
+            $weapons->{$w} = 1 unless $w eq 'Smoke Light Grenade Launcher';
+        }
     }
 
     for my $w (@{$unit->{ccw}}){
@@ -400,16 +423,7 @@ sub get_weapons{
 
     if(keys %$weapons){
         if(!has_aibeacon($new_unit) && $inherit_weapon){
-            # add a Fist if they have no Knife, Pistol, or CCW
-            my $has_ccw = 0;
-            for my $w (keys %$weapons){
-                if($w eq 'Knife' || $w =~ m/CCW/ || $w =~ m/Pistol/){
-                    $has_ccw = 1;
-                }
-            }
-            if(!$has_ccw){
-                $weapons->{Fist} = 1;
-            }
+            $weapons->{'Bare-Handed'} = 1;
         }
 
         $new_unit->{weapons} = [sort keys %$weapons];
@@ -426,11 +440,18 @@ my %unit_type_order = (
     WB => 5,
     TAG => 6,
     REM => 7,
+    "N/A" => 8,         # AI Beacons
 );
 
 sub unit_sort{
     # first sort by unit type
     if($a->{type} ne $b->{type}){
+        if(!defined $unit_type_order{$a->{type}}){
+            die "Unknown type '$a->{type}' in unit $a->{name}";
+        }
+        if(!defined $unit_type_order{$b->{type}}){
+            die "Unknown type '$b->{type}' in unit $b->{name}";
+        }
         return $unit_type_order{$a->{type}} <=> $unit_type_order{$b->{type}};
     }
     # then by name
@@ -475,7 +496,12 @@ sub parse_unit{
     $new_unit->{spec} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
 
     # Modifiers
-    $new_unit->{motorcycle} = 1 if !$rider && has_motorcycle($new_unit);
+    if(!$rider){
+        $new_unit->{motorcycle} = 1 if has_motorcycle($new_unit);
+    }else{
+        delete $new_unit->{motorcycle};
+    }
+
     $new_unit->{nwi} = 1 if has_nwi($new_unit);
     $new_unit->{shasvastii} = 1 if has_shasvastii($new_unit) || $inherit_shasvastii;
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
@@ -519,88 +545,85 @@ sub parse_unit{
     }
 
     # get_weapons goes into the childs list
-    get_weapons($unit, $new_unit, $inherit_weapon, $ability_func);
+    get_weapons($unit, $new_unit, $inherit_weapon, $rider, $ability_func);
+}
+
+sub flatten_unit{
+    my ($unit, $i) = @_;
+
+    if(!exists $unit->{profiles}){
+        $unit->{profiles} = [];
+        return $unit;
+    }
+
+    my $flat_unit = clone($unit);
+    my $profile = $flat_unit->{profiles}->[$i // 0];
+
+    while(my ($key, $value) = each %$profile){
+        if(ref($value) eq 'ARRAY'){
+            push @{$flat_unit->{$key}}, @$value;
+        }else{
+            $flat_unit->{$key} = $value;
+        }
+    }
+
+    return $flat_unit;
 }
 
 my $unit_data = {};
 my $file;
 my $json_text;
 
-# load fixed name data from the locale file
-open $file, '<', 'ia-data/ia-lang_40_en.js' or die "Unable to open file";
-my $found_names = 0;
-while(<$file>){
-    if($found_names){
-        $json_text .= $_;
+for my $fname (glob "mayanet_data/Toolbox/*_units.json"){
+    next if $fname eq "mayanet_data/Toolbox/other_units.json";
 
-        if($_ =~ m/;/){
-            last;
-        }
-    }
-
-    if($_ =~ m/names/){
-        $found_names = 1;
-        $json_text = "{\n";
-    }
-}
-$json_text =~ s/'/"/g;
-$json_text =~ s/;//;
-my $localized_data = $json->decode($json_text);
-
-for my $fname (glob "ia-data/ia-data_*_units_data.json"){
+    warn "Parsing $fname\n";
     local $/;
     open $file, '<', $fname or die "Unable to open file";
-    $json_text = "[\n";
-    $json_text .= <$file>;
-    $json_text .= "]";
+    $json_text = <$file>;
     my $source_data = $json->decode($json_text);
 
     my @unit_list;
     my $faction;
     for my $unit (@$source_data){
+        warn "    Processing $unit->{isc}\n";
+
+        # handle multi-profile units
+        my $flat_unit = flatten_unit($unit);
+
         # Skip Spec-Ops
-        if($unit->{bs} eq 'X'){
+        if($flat_unit->{bs} eq 'X'){
             next;
-        }
-
-        # Apply updates from localized data
-        if(exists $localized_data->{isc}{$unit->{isc}}){
-            $unit->{isc} = $localized_data->{isc}{$unit->{isc}};
-        }
-
-        if(exists $localized_data->{name}{$unit->{name}}){
-            $unit->{name} = $localized_data->{name}{$unit->{name}};
         }
 
         # Use the longer ISC names
-        $unit->{short_name} = $unit->{name};
-        $unit->{name} = $unit->{isc};
+        $flat_unit->{short_name} = $flat_unit->{name};
+        $flat_unit->{name} = $flat_unit->{isc};
 
-        # Patch some unit names
+        # Patch some flat_unit names
 
         # Only keep one kind of Caliban
-        if($unit->{short_name} eq 'Caliban E'){
-            $unit->{name} = 'Caliban';
-        }elsif($unit->{name} =~ m/Caliban/){
+        if($flat_unit->{name} eq 'Shasvastii Caliban (Seed-Embryo)'){
+            $flat_unit->{name} = 'Caliban';
+        }elsif($flat_unit->{name} =~ m/Caliban/){
             next;
-        }elsif($unit->{name} eq '"The Shrouded"'){
-            $unit->{name} = 'Shrouded';
-        }elsif($unit->{name} eq 'Assault Pack'){
-            $unit->{name} = 'Assault Pack Controller';
-        }elsif($unit->{name} eq 'Armoured Cavalry'){
-            $unit->{name} = 'Squalo';
-        }elsif($unit->{name} =~ m/^Tikbalangs/){
-            $unit->{name} = 'Tikbalangs';
+        }elsif($flat_unit->{name} eq '"The Shrouded"'){
+            $flat_unit->{name} = 'Shrouded';
+        }elsif($flat_unit->{name} =~ m/^Tikbalangs/){
+            $flat_unit->{name} = 'Tikbalangs';
+        }elsif($flat_unit->{name} eq 'Kasym Beg (Lieutenant)'){
+            next;
         }
-        $unit->{name} =~ s/^Shasvastii //;
-        $unit->{name} =~ s/^Hassassin //;
-        $unit->{name} =~ s/^The //;
+        $flat_unit->{name} =~ s/^Shasvastii //;
+        $flat_unit->{name} =~ s/^Hassassin //;
+        $flat_unit->{name} =~ s/^The //;
 
         my $new_unit = {};
-        parse_unit($new_unit, $unit);
+        parse_unit($new_unit, $flat_unit);
 
         if(defined($faction) && $faction ne $unit->{army}){
-            die "Mismatched faction in $unit->name: $faction != $unit->army";
+            warn "Skipping unit $unit->{name}: $faction != $unit->{army}";
+            next;
         }
         $faction = $unit->{army};
 
@@ -618,10 +641,10 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
                     my $child_unit = clone($new_unit);
 
                     # stats replace if present, otherwise inherit
-                    $child->{spec} = [@{$unit->{spec}}, @{$child->{spec}}];
-                    $child->{bsw} = [@{$unit->{bsw}}, @{$child->{bsw}}];
-                    $child->{ccw} = [@{$unit->{ccw}}, @{$child->{ccw}}];
-                    $child->{childs} = $unit->{childs};
+                    $child->{spec} = [@{$flat_unit->{spec}}, @{$child->{spec}}];
+                    $child->{bsw} = [@{$flat_unit->{bsw}}, @{$child->{bsw}}];
+                    $child->{ccw} = [@{$flat_unit->{ccw}}, @{$child->{ccw}}];
+                    $child->{childs} = $flat_unit->{childs};
                     parse_unit($child_unit, $child, $specialist->{ability_func});
 
                     $child_unit->{name} = $new_unit->{name} . $specialist->{name_func}($ability);
@@ -635,23 +658,45 @@ for my $fname (glob "ia-data/ia-data_*_units_data.json"){
         }
 
         # Check for alternate profiles
-        for my $alt (@{$unit->{altp}}){
-            next if $alt->{isc} eq 'CrazyKoala';
+        for(my $i = 1; $i < scalar @{$flat_unit->{profiles}}; $i++){
+            my $alt = flatten_unit($unit, $i);
+            delete $alt->{childs};
 
-            my $alt_unit = clone($new_unit);
+            next if $alt->{name} eq 'CrazyKoala';
+
+            if($alt->{name} eq 'Antipode (3)'){
+                $alt->{name} = 'Antipode';
+            }
+
+            warn "        Processing $alt->{name}\n";
+
+            my $alt_unit;
+            if(!$alt->{independent}){
+                $alt_unit = clone($new_unit);
+            }else{
+                # Independent models don't inherit from their controller
+                $alt_unit = {};
+            }
 
             # stats replace if present, otherwise inherit
             parse_unit($alt_unit, $alt);
 
-            my $alt_tag = $alt->{isc};
-            if($alt_tag !~ m/\(/){
-                $alt_tag = "($alt_tag)";
+            if(!$alt->{independent}){
+                my $alt_tag = $alt->{name};
+                if($alt_tag !~ m/\(/){
+                    $alt_tag = "($alt_tag)";
+                }
+                $alt_unit->{name} = "$new_unit->{name} $alt_tag";
             }
-            $alt_unit->{name} = "$new_unit->{name} $alt_tag";
 
             # Tell the base unit how many wounds the Operator has
-            if($alt->{isc} eq 'Operator'){
+            if($alt->{name} eq 'Operator'){
                 $new_unit->{operator} = $alt_unit->{w};
+            }
+
+            # Add transmutation wounds to base profile
+            if(has_transmutation($new_unit)){
+                $new_unit->{w} += $alt->{w};
             }
 
             push @unit_list, $alt_unit;
