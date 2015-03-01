@@ -548,17 +548,25 @@ function set_weapon(player, check_params){
     if(action == "bs" || action == "spec" || action == "supp"){
         var value_match = 1;
         for(var i = 0; i < my_range.length; i++){
-            // X Visor sets Long range to 0 and Maximum to -3
-            // X-2 Visor sets both Long and Maximum to 0
-            if(weapon && ((xvisor == 1 && i == 2) || (xvisor == 2 && i >= 2))){
+            // X Visor sets mod of -3 to 0 and -6 to -3
+            // X-2 Visor sets both -3 and -6 to 0
+            if(weapon && xvisor == 1){
                 var r = my_range[i];
                 var slash_index = r.lastIndexOf("/");
-                r = r.substring(0, slash_index) + "/0";
+                var mod = r.substring(slash_index + 1);
+                if(mod == "-3"){
+                    r = r.substring(0, slash_index) + "/0";
+                }else if(mod == "-6"){
+                    r = r.substring(0, slash_index) + "/-3";
+                }
                 range_list.options[i] = new Option(r);
-            }else if(weapon && xvisor == 1 && i == 3){
+            }else if(weapon && xvisor == 2){
                 var r = my_range[i];
                 var slash_index = r.lastIndexOf("/");
-                r = r.substring(0, slash_index) + "/-3";
+                var mod = r.substring(slash_index + 1);
+                if(mod == "-3" || mod == "-6"){
+                    r = r.substring(0, slash_index) + "/0";
+                }
                 range_list.options[i] = new Option(r);
             }else{
                 range_list.options[i] = new Option(my_range[i]);
