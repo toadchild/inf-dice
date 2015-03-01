@@ -47,20 +47,10 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
             $weapon->{deploy} = 0;
         }
 
-        # Fix name of Fist attack
-        if($weapon->{name} eq 'TAG Fist'){
-            $weapon->{name} = 'Fist';
-        }
-
         # Multiple ammo types and burst reduction
         my $multi = 0;
         if($weapon->{name} =~ m/MULTI/){
             $multi = 1;
-        }
-
-        my $shotgun = 0;
-        if($weapon->{name} =~ m/Shotgun/ && $weapon->{name} !~ m/Light/){
-            $shotgun = 1;
         }
 
         my $template = 0;
@@ -72,7 +62,7 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
         my $att_supp = 0;
 
         my @ammo;
-        if($multi || $shotgun){
+        if($multi){
             @ammo = split /\//, $weapon->{ammo};
         }else{
             @ammo = $weapon->{ammo};
@@ -82,13 +72,9 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
         my $ammo_maps = {
             N => 'Normal',
             PLASMA => 'Plasma',
+            FIRE => 'Fire',
         };
         @ammo = map {exists($ammo_maps->{$_}) ? $ammo_maps->{$_} : $_} @ammo;
-
-        # integrated ammo
-        if($multi){
-            push @ammo, "AP+$ammo[$#ammo]";
-        }
 
         my $new_weapon = {};
 
@@ -108,14 +94,6 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
                 $b = int($1);
             }
 
-            if($multi){
-                if($ammo =~ m/\+/){
-                    $b = 1;
-                }elsif($ammo ne 'Normal'){
-                    $b = 2;
-                }
-            }
-
             # Temporary check - allow supp fire for all weapons with B >= 3
             if($b >= 3){
                 $att_supp = 1;
@@ -123,17 +101,7 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
 
             push @b, $b;
 
-            # Template per ammo type
-            # Only shotguns care right now
-            if($shotgun){
-                if($ammo eq 'Normal' || $ammo eq 'Fire'){
-                    push @t, 1;
-                }else{
-                    push @t, 0;
-                }
-            }else{
-                push @t, $template;
-            }
+            push @t, $template;
         }
 
         $new_weapon->{ammo} = \@ammo;
