@@ -275,7 +275,7 @@ my $factions = [
     'Haqqislam',
     'Mercenary',
     'Nomads',
-    'Panoceania',
+    'PanOceania',
     'Tohaa',
     'Yu Jing',
 ];
