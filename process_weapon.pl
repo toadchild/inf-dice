@@ -79,6 +79,14 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
         my $new_weapon = {};
 
         $new_weapon->{name} = $weapon->{name};
+        if($weapon->{mode}){
+            $new_weapon->{display_name} = $weapon->{name} . " " . $weapon->{mode};
+        }else{
+            $new_weapon->{display_name} = $weapon->{name};
+        }
+
+        # alternate profiles for alternate-fire weapons
+        $new_weapon->{alt_profile} = $weapon->{alt_profile};
 
         my (@b, @t);
         for my $ammo (@ammo){
@@ -110,8 +118,9 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
 
         $new_weapon->{dam} = $weapon->{damage};
 
+        $new_weapon->{att_guided} = ($weapon->{note} =~ m/Guided/) ? 1 : 0;
         $new_weapon->{att_cc} = $weapon->{cc} eq 'Yes' ? 1 : 0;
-        $new_weapon->{att_dtw} = $weapon->{cc} eq 'No' && !$weapon->{deploy} && $weapon->{short_dist} eq '--' ? 1 : 0;
+        $new_weapon->{att_dtw} = $weapon->{cc} eq 'No' && !$weapon->{deploy} && !$weapon->{att_guided} && $weapon->{short_dist} eq '--' ? 1 : 0;
         $new_weapon->{att_deploy} = $weapon->{deploy};
         $new_weapon->{att_supp} = $att_supp;
 

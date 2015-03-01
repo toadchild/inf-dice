@@ -626,11 +626,20 @@ function populate_weapons(player, check_params){
 
     for(var i = 0; i < weapons.length; i++){
         var weapon = weapon_data[weapons[i]];
-        if(weapon && weapon[attack_filter]){
-            weapon_list.options[weapon_list.options.length] = new Option(weapon["name"]);
+        while(weapon){
+            if(weapon[attack_filter]){
+                weapon_list.options[weapon_list.options.length] = new Option(weapon["display_name"], weapon["name"]);
 
-            if(weapon["name"] == selected_weapon){
-                weapon_list.options[weapon_list.options.length - 1].selected = true;
+                if(weapon["name"] == selected_weapon){
+                    weapon_list.options[weapon_list.options.length - 1].selected = true;
+                }
+            }
+
+            // Next profile for multi-profile weapons
+            if(weapon["alt_profile"]){
+                weapon = weapon_data[weapon["alt_profile"]];
+            }else{
+                weapon = undefined;
             }
         }
     }
