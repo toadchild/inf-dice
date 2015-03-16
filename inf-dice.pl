@@ -91,8 +91,8 @@ my $ammo_codes = {
     'DT' => {saves => 2, save => 'bts'},
     # Placeholders for unimplemented ammos
     'Plasma' => {saves => 1},
-    'N+E/M(12)' => {saves => 1},
-    'AP+E/M(12)' => {saves => 1, ap => 0.5},
+    'N+E/M' => {saves => 1},
+    'AP+E/M' => {saves => 1, ap => 0.5},
     'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
 };
 
@@ -158,7 +158,7 @@ my $immunities = {
         Fire => 'arm',
         Nanotech => 'arm',
         Swarm => 'arm',
-        'N+E/M(12)' => 'arm',
+        'N+E/M' => 'arm',
         # TODO verify what happens when a TI model is hit with E/M2
     },
 };

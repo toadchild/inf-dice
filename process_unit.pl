@@ -132,8 +132,8 @@ sub has_aibeacon{
     return has_spec(@_, 'AI Beacon');
 }
 
-sub has_cc2w{
-    return has_spec(@_, 'CC with 2 Weapons');
+sub has_dualwield{
+    return has_spec(@_, 'Dual Wield');
 }
 
 sub has_poison{
@@ -405,8 +405,8 @@ sub get_weapons{
         }
     }
 
-    # If they have CC with two weapons, add a combined CCW
-    if(has_cc2w($new_unit)){
+    # If they have Dual Wield, add a combined CCW
+    if(has_dualwield($new_unit)){
         my @ccws;
         for my $w (keys %$weapons){
             if($w =~ m/ CCW/){

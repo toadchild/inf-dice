@@ -170,8 +170,6 @@ for my $name (keys %$dual_weapons){
         $new_weapon->{name} =~ s/$base_name/$dual_name/;
         $new_weapon->{display_name} =~ s/$base_name/$dual_name/;
 
-        warn Dumper($new_weapon);
-
         $weapon_data->{$new_weapon->{name}} = $new_weapon;
 
         if($new_weapon->{alt_profile}){
@@ -188,9 +186,6 @@ for my $weapon (@$dual_ccw){
     my @ammo = ($1, $2);
     my $ammo = join('+', @ammo);
 
-    # E/M Ammo has a special name
-    $ammo =~ s/E\/M/E\/M(12)/;
-
     $all_ammo->{$ammo} = 1;
 
     my $new_weapon = {
@@ -199,6 +194,7 @@ for my $weapon (@$dual_ccw){
         b => [1],
         dam => 'PH',
         name => $weapon,
+        display_name => $weapon,
         template => [0],
     };
 
