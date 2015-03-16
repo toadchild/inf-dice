@@ -1165,6 +1165,10 @@ sub gen_attack_args{
         }elsif($msv >= 2 && $camo < 0){
             push @mod_strings, "MSV ignores CH/ODD modifier";
             $camo = 0;
+        }elsif($msv == 1 && $camo == -6){
+            $camo += 3;
+            push @mod_strings, sprintf('MSV reduces CH/ODD modifier to %+d %s', $camo, $stat_name);
+            $mod += $camo;
         }elsif($camo < 0){
             push @mod_strings, sprintf('CH/ODD grants %+d %s', $camo, $stat_name);
             $mod += $camo;
