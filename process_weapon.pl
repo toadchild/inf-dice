@@ -5,6 +5,7 @@ use warnings;
 
 use JSON::PP;
 use Clone qw(clone);
+use Data::Dumper;
 
 my $json = JSON::PP->new;
 $json->pretty(1);
@@ -148,17 +149,36 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
         }
 
         $weapon_data->{$new_weapon->{name}} = $new_weapon;
+    }
+}
 
-        # Increase burst for dual weapons
-        if($dual_weapons->{$new_weapon->{name}}){
-            $new_weapon = clone($new_weapon);
+# Increase burst for dual weapons
+for my $name (keys %$dual_weapons){
+    next if $name eq 'CrazyKoala';
 
-            for(my $i = 0; $i < @{$new_weapon->{b}}; $i++){
-                $new_weapon->{b}[$i]++;
-            }
-            $new_weapon->{name} .= " (2)";
+    my $base_name = $name;
+    my $dual_name = $name . " (2)";
 
-            $weapon_data->{$new_weapon->{name}} = $new_weapon;
+    while($name){
+        warn "Dualizing $name\n";
+
+        my $new_weapon = clone($weapon_data->{$name});
+
+        for(my $i = 0; $i < @{$new_weapon->{b}}; $i++){
+            $new_weapon->{b}[$i]++;
+        }
+        $new_weapon->{name} =~ s/$base_name/$dual_name/;
+        $new_weapon->{display_name} =~ s/$base_name/$dual_name/;
+
+        warn Dumper($new_weapon);
+
+        $weapon_data->{$new_weapon->{name}} = $new_weapon;
+
+        if($new_weapon->{alt_profile}){
+            $name = $new_weapon->{alt_profile};
+            $new_weapon->{alt_profile} =~ s/$base_name/$dual_name/;
+        }else{
+            $name = undef;
         }
     }
 }
