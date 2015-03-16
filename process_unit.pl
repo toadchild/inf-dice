@@ -418,21 +418,6 @@ sub get_weapons{
         $weapons->{$new_ccw} = 1;
     }
 
-    # If they have Poison, their CCW gets Shock in addition to its other types
-    if(has_poison($new_unit)){
-        my @ccws;
-        for my $w (keys %$weapons){
-            if($w =~ m/CCW/){
-                push @ccws, $w;
-            }
-        }
-        for my $w (@ccws){
-            delete $weapons->{$w};
-            $poison_ccw->{"Poison $w"} = 1;
-            $weapons->{"Poison $w"} = 1;
-        }
-    }
-
     if(keys %$weapons){
         if(!has_aibeacon($new_unit) && $inherit_weapon){
             $weapons->{'Bare-Handed'} = 1;
