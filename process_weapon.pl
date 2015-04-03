@@ -50,7 +50,7 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
 
         # Multiple ammo types and burst reduction
         my $multi = 0;
-        if($weapon->{name} =~ m/MULTI/){
+        if($weapon->{note} =~ m/MULTI/){
             $multi = 1;
         }
 
