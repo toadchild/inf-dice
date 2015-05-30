@@ -712,7 +712,7 @@ function set_hacker(player, check_params){
             program_list.options[program_list.length] = new Option(master_programs[i]["group"] + ": " + master_programs[i]["program"], master_programs[i]["program"]);
 
             if(master_programs[i]["program"] == selected_program){
-                program_list.options[i].selected = true;
+                program_list.options[program_list.length - 1].selected = true;
             }
         }
     }
