@@ -331,7 +331,7 @@ sub has_sapper{
 }
 
 sub has_transmutation{
-    return has_spec(@_, 'Transmutation');
+    return has_spec(@_, '^Transmutation');
 }
 
 my $dual_weapons = {};
