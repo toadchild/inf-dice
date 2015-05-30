@@ -700,6 +700,11 @@ sub print_player_output{
         $symb_disabled = $wounds;
         $unconscious++;
         $dead++;
+        # Make Symbiont armor shock-immune.
+        # Might not be 100% correct, but is better than before.
+        if($fatal == 1){
+            $fatal = 0;
+        }
     }
 
     if($operator_w){
