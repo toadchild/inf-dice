@@ -694,7 +694,7 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json"), glob("mayanet_data/Too
 
             # Add transmutation wounds to base profile
             if(has_transmutation($new_unit)){
-                $new_unit->{w} += $alt->{w};
+                $new_unit->{w} += $alt->{w} // 0;
             }
 
             push @{$unit_data->{$unit->{army}}}, $alt_unit;
