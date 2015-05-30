@@ -143,10 +143,10 @@ sub has_poison{
 
 sub has_symbiont{
     my ($unit, $inactive) = @_;
+    if($inactive){
+        return 1;
+    }
     if(has_spec($unit, 'Symbiont Armour')){
-        if($inactive){
-            return 1;
-        }
         return 2;
     }
     return 0;
@@ -475,6 +475,7 @@ sub parse_unit{
         $rider = 1;
     }
 
+    # If the parent has symbiont, this unit has inactive symbiont
     my $symbiont_inactive = 0;
     if(has_symbiont($new_unit)){
         $symbiont_inactive = 1;

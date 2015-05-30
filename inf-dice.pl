@@ -700,7 +700,6 @@ sub print_player_output{
         $symb_disabled = $wounds;
         $unconscious++;
         $dead++;
-        $wounds++;
     }
 
     if($operator_w){
