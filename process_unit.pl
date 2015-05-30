@@ -26,6 +26,7 @@ my $skip_list = {
     "Uxìa McNeill" => 1,
     "Tohaa Diplomatic Delegates" => 1,
     "Rasyat Diplomatic Division" => 1,
+    "Teucer" => 1,
 };
 
 my $alternate_names = {
@@ -490,7 +491,7 @@ sub parse_unit{
     $new_unit->{w} = int($unit->{w}) if defined $unit->{w};
     $new_unit->{type} = $unit->{type} if defined $unit->{type} && $unit->{type} ne ' ';
     $new_unit->{w_type} = uc($unit->{wtype} // $default_wtype{$new_unit->{type}});
-    $new_unit->{spec} = $unit->{spec} if defined $unit->{spec} && @{$unit->{spec}};
+    $new_unit->{spec} = $unit->{spec} if defined $unit->{spec};
 
     # Modifiers
     if(!$rider){
@@ -571,7 +572,7 @@ my $unit_data = {};
 my $file;
 my $json_text;
 
-for my $fname (glob "mayanet_data/Toolbox/*_units.json"){
+for my $fname (glob("mayanet_data/Toolbox/*_units.json"), glob("mayanet_data/Toolbox/add_*.json")){
     next if $fname eq "mayanet_data/Toolbox/other_units.json";
 
     warn "Parsing $fname\n";
@@ -580,8 +581,6 @@ for my $fname (glob "mayanet_data/Toolbox/*_units.json"){
     $json_text = <$file>;
     my $source_data = $json->decode($json_text);
 
-    my @unit_list;
-    my $faction;
     for my $unit (@$source_data){
         warn "    Processing $unit->{isc}\n";
 
@@ -618,14 +617,16 @@ for my $fname (glob "mayanet_data/Toolbox/*_units.json"){
         my $new_unit = {};
         parse_unit($new_unit, $flat_unit);
 
-        if(defined($faction) && $faction ne $unit->{army}){
-            warn "Skipping unit $unit->{name}: $faction != $unit->{army}";
+        if($unit->{army} eq "Military Orders"){
             next;
         }
-        $faction = $unit->{army};
+
+        if(!exists $unit_data->{$unit->{army}}){
+            $unit_data->{$unit->{army}} = [];
+        }
 
         if(!$skip_list->{$new_unit->{name}}){
-            push @unit_list, $new_unit;
+            push @{$unit_data->{$unit->{army}}}, $new_unit;
         }
 
         # Check for child units with special skills we care about
@@ -649,7 +650,7 @@ for my $fname (glob "mayanet_data/Toolbox/*_units.json"){
                         $child_unit->{name} = $alternate_names->{$child_unit->{name}};
                     }
 
-                    push @unit_list, $child_unit;
+                    push @{$unit_data->{$unit->{army}}}, $child_unit;
                 }
             }
         }
@@ -696,10 +697,13 @@ for my $fname (glob "mayanet_data/Toolbox/*_units.json"){
                 $new_unit->{w} += $alt->{w};
             }
 
-            push @unit_list, $alt_unit;
+            push @{$unit_data->{$unit->{army}}}, $alt_unit;
         }
     }
-    $unit_data->{$faction} = [sort unit_sort @unit_list];
+}
+
+for my $faction (keys %$unit_data){
+    $unit_data->{$faction} = [sort unit_sort @{$unit_data->{$faction}}];
 }
 
 open $file, '>', 'unit_data.js' or die "Unable to open file";
