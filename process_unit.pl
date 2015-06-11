@@ -334,6 +334,14 @@ sub has_transmutation{
     return has_spec(@_, '^Transmutation');
 }
 
+sub has_g_sync{
+    return has_spec(@_, '^G: Sync');
+}
+
+sub has_g_servant{
+    return has_spec(@_, '^G: Servant');
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
@@ -507,6 +515,8 @@ sub parse_unit{
     $new_unit->{berserk} = 1 if has_berserk($new_unit);
     $new_unit->{sapper} = 1 if has_sapper($new_unit);
 
+    $new_unit->{dependent} = 1 if has_g_sync($new_unit) || has_g_servant($new_unit);
+
     # leveled skills
     my $v;
     if($v = has_ikohl($new_unit)){
@@ -573,7 +583,7 @@ my $unit_data = {};
 my $file;
 my $json_text;
 
-for my $fname (glob("mayanet_data/Toolbox/*_units.json"), glob("mayanet_data/Toolbox/add_*.json")){
+for my $fname (glob("mayanet_data/Toolbox/*_units.json")){
     next if $fname eq "mayanet_data/Toolbox/other_units.json";
 
     warn "Parsing $fname\n";
@@ -663,10 +673,6 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json"), glob("mayanet_data/Too
 
             next if $alt->{name} eq 'CrazyKoala';
 
-            if($alt->{name} eq 'Antipode (3)'){
-                $alt->{name} = 'Antipode';
-            }
-
             warn "        Processing $alt->{name}\n";
 
             my $alt_unit;
@@ -681,11 +687,9 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json"), glob("mayanet_data/Too
             parse_unit($alt_unit, $alt);
 
             if(!$alt->{independent}){
-                my $alt_tag = $alt->{name};
-                if($alt_tag !~ m/\(/){
-                    $alt_tag = "($alt_tag)";
-                }
-                $alt_unit->{name} = "$new_unit->{name} $alt_tag";
+                $alt_unit->{name} = "$new_unit->{name} ($alt_unit->{name})";
+            }elsif($alt_unit->{dependent}){
+                $alt_unit->{name} = "$alt_unit->{name} ($new_unit->{name})";
             }
 
             # Tell the base unit how many wounds the Operator has
@@ -698,7 +702,10 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json"), glob("mayanet_data/Too
                 $new_unit->{w} += $alt->{w} // 0;
             }
 
-            push @{$unit_data->{$unit->{army}}}, $alt_unit;
+            # Don't put on duplicate units
+            if($unit_data->{$unit->{army}}[-1]{name} ne $alt_unit->{name}){
+                push @{$unit_data->{$unit->{army}}}, $alt_unit;
+            }
         }
     }
 }
