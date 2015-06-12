@@ -206,12 +206,22 @@ my $link_labels = {
     5 => '5 (+1 B, +3 BS)',
 };
 
-my $gang_up = [0, 3, 6, 9];
+my $gang_up = [0, 1, 2, 3, 4, 5];
 my $gang_up_labels = {
     0 => 'None',
-    3 => '1 Ally (+3 CC/Dodge)',
-    6 => '2 Allies (+6 CC/Dodge)',
-    9 => '3 Allies (+9 CC/Dodge)',
+    1 => '1 Ally (+1 B)',
+    2 => '2 Allies (+2 B)',
+    3 => '3 Allies (+3 B)',
+    4 => '4 Allies (+4 B)',
+    5 => '5 Allies (+5 B)',
+};
+
+my $coordinated = [0, 1, 2, 3];
+my $coordinated_labels = {
+    0 => 'None',
+    1 => '1 Ally (+1 B / PH)',
+    2 => '2 Allies (+2 B / PH)',
+    3 => '3 Allies (+3 B / PH)',
 };
 
 my $hyperdynamics = [0, 3, 6, 9];
@@ -559,6 +569,13 @@ sub print_input_attack_section{
               -default => param("$player.gang_up") // '',
               -labels => $gang_up_labels,
               -label => "Gang Up",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.coordinated",
+              -values => $coordinated,
+              -default => param("$player.coordinated") // '',
+              -labels => $coordinated_labels,
+              -label => "Coordinated Order",
           ),
           "<br>",
           span_checkbox(-name => "$player.berserk",
@@ -1442,13 +1459,39 @@ sub gen_attack_args{
             }
         }
 
+        # gang up bonus
         my $gang_up = param("$us.gang_up") // 0;
+        my $coordinated = param("$us.coordinated") // 0;
         if($gang_up){
-            if($them_ma >= 5 && !param("$us.nbw")){
-                push @mod_strings, "Gang-up canceled by MA 5";
+            push @mod_strings, sprintf('Gang-up grants %+d B', $gang_up);
+            $b += $gang_up;
+        }
+        # coordinated orders/antipodes
+        elsif($coordinated){
+            push @mod_strings, sprintf('Coordinated Order grants %+d B', $coordinated);
+            $b += $coordinated;
+            if($ph_dam){
+                push @mod_strings, sprintf('Coordinated Order grants %+d DAM', $coordinated);
+                $dam += $coordinated;
             }else{
-                push @mod_strings, sprintf('Gang-up grants %+d CC', $gang_up);
-                $mod += $gang_up;
+                push @mod_strings, sprintf('Coordinated Order DAM bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
+        
+        # If we have MA 5 and they are coordinating, increase B to match
+        my $them_b_bonus = param("$them.gang_up") // 0;
+        if(!$them_b_bonus){
+            $them_b_bonus = param("$them.coordinated") // 0;
+        }
+        if(my $them_ma_b = $ma_codes->{$them_ma}{burst}){
+            $them_b_bonus += $them_ma_b;
+        }
+        if($other_action eq 'cc' && $us_ma >= 5 && ($them_b_bonus)){
+            if(!param("$them.nbw")){
+                push @mod_strings, sprintf('Martial Arts grants %+d B', $them_b_bonus);
+                $b += $them_b_bonus;
+            }else{
+                push @mod_strings, 'Martial Arts 5 B bonus canceled by Natural Born Warrior';
             }
         }
 
