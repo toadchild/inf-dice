@@ -37,7 +37,7 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
 
     WEAPON: for my $weapon (@$source_data){
         # Skip unimplemented weapons or other equipment
-        if($weapon->{name} =~ m/Koala|Charges|Discover|Electric Pulse|Hedgehog|Observer|Jammer|Sepsitor/){
+        if($weapon->{name} =~ m/Koala|Charges|Discover|Electric Pulse|Hedgehog|Jammer|Sepsitor|Suppressive/){
             next;
         }
 
@@ -66,6 +66,11 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
             @ammo = $weapon->{ammo};
         }
 
+        # Add an ammo type for Forward Observer skill
+        if($weapon->{name} eq 'Forward Observer'){
+            @ammo = ('FO');
+        }
+
         # Remap ammo names
         my $ammo_maps = {
             N => 'Normal',
@@ -89,7 +94,9 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
         my (@b, @t);
         for my $ammo (@ammo){
             # sanity check ammo types
-            $all_ammo->{$ammo} = 1;
+            if($ammo !~ m/--/){
+                $all_ammo->{$ammo} = 1;
+            }
 
             my $b;
 
@@ -110,6 +117,9 @@ for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
         $new_weapon->{template} = \@t;
 
         $new_weapon->{dam} = $weapon->{damage};
+        if($new_weapon->{dam} eq 'marking'){
+            $new_weapon->{dam} = '--';
+        }
 
         $new_weapon->{att_guided} = ($weapon->{note} =~ m/Guided/) ? 1 : 0;
         $new_weapon->{att_cc} = $weapon->{cc} eq 'Yes' ? 1 : 0;

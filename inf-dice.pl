@@ -86,9 +86,9 @@ my $ammo_codes = {
     'Zero-V Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
     'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
     'Dep. Repeater' => {saves => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
-    # N3 new ammos, may not yet be in any weapons
     'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
     'DT' => {saves => 2, save => 'bts'},
+    'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     # Placeholders for unimplemented ammos
     'Plasma' => {saves => 1},
     'N+E/M' => {saves => 1},

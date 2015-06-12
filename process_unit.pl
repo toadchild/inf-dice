@@ -364,6 +364,12 @@ sub get_weapons{
         $weapons->{$w} = 1;
     }
 
+    # All forward observers have Flash Pulse inclusive
+    if(has_fo($unit)){
+        $weapons->{'Flash Pulse'} = 1;
+        $weapons->{'Forward Observer'} = 1;
+    }
+
     if(!$inherit_weapon){
         $new_unit->{hacker} = 0;
     }
@@ -389,9 +395,10 @@ sub get_weapons{
         }
         $child->{_processed} = 1;
 
-        # All forward observers and HD+ have Flash Pulse inclusive
+        # All forward observers have Flash Pulse inclusive
         if(has_fo($child)){
             $weapons->{'Flash Pulse'} = 1;
+            $weapons->{'Forward Observer'} = 1;
         }
 
         for my $w (@{$child->{bsw}}){
