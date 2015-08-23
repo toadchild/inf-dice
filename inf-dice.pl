@@ -1526,13 +1526,22 @@ sub gen_attack_args{
         $dam = 20 - max(param("$them.$code->{alt_save}") + $code->{alt_save_mod}, 0);
     }
 
+    my @dam;
+    if($ammo eq '2'){
+        @dam = ($dam, $dam);
+    }elsif($ammo eq '3'){
+        @dam = ($dam, $dam, $dam);
+    }else{
+        @dam = ($dam);
+    }
+
     return (
         $type,
         \@mod_strings,
         $stat,
         $b,
-        $dam,
         $ammo,
+        @dam,
     );
 }
 
@@ -1594,13 +1603,22 @@ sub gen_hack_args{
     $stat = max($stat + $mod, 0);
     push @mod_strings, "Net WIP is $stat";
 
+    my @dam;
+    if($ammo eq '2'){
+        @dam = ($dam, $dam);
+    }elsif($ammo eq '3'){
+        @dam = ($dam, $dam, $dam);
+    }else{
+        @dam = ($dam);
+    }
+
     return (
         $type,
         \@mod_strings,
         $stat,
         $b,
-        $dam,
         $ammo,
+        @dam,
     );
 }
 
@@ -1657,8 +1675,8 @@ sub gen_reset_args{
         \@mod_strings,
         $stat,
         1,
-        0,
         '-',
+        0,
     );
 }
 
@@ -1721,8 +1739,8 @@ sub gen_dodge_args{
         \@mod_strings,
         $stat,
         1,
-        0,
         '-',
+        0,
     );
 }
 
@@ -1732,8 +1750,8 @@ sub gen_none_args{
         [],
         0,
         1,
-        0,
         '-',
+        0,
     );
 }
 
