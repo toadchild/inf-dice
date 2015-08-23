@@ -21,17 +21,13 @@
 #define MIN(a,b) (a < b ? a : b)
 
 enum ammo_t{
-    AMMO_1,
-    AMMO_2,
-    AMMO_3,
+    AMMO_NORMAL,
     AMMO_FIRE,
     AMMO_NONE,
 };
 
 static const char *ammo_labels[] = {
-    "1",
-    "2",
-    "3",
+    "NORMAL",
     "FIRE",
     "NONE",
 };
@@ -64,8 +60,9 @@ struct player{
     int crit_val;               // minimum value for a crit
     int crit_boost;             // bonus to die roll for stat > 20
     int burst;                  // number of dice
-    int dam;                    // damage value
     int template;               // Is this a template weapon
+    int num_saves;              // number of saves for this ammo
+    int dam[SAVES_MAX];         // damage value
     enum ammo_t ammo;           // ammo type
 
     struct result d[B_MAX];     // current set of dice being evaluated
@@ -73,9 +70,8 @@ struct player{
     // count of hit types
     // first index is number of regular hits
     // second index is number of crits
-    // third index is the damage of the hit
     // value is number of times this happened
-    int64_t hit[B_MAX + 1][B_MAX + 1][DAM_MAX + 1];
+    int64_t hit[B_MAX + 1][B_MAX + 1];
 
     // Number of times N successes was inflicted
     double success[SUCCESS_MAX + 1];
@@ -101,16 +97,14 @@ struct dice{
  * certain number of hits/crits.
  */
 static int64_t print_player_hits(struct player *p, int p_num, int64_t num_rolls){
-    int hits, crits, dam;
+    int hits, crits;
     int64_t n_rolls = 0;
 
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
-            for(dam = 0; dam <= DAM_MAX; dam++){
-                if((hits > 0 || crits > 0) && p->hit[hits][crits][dam] > 0){
-                    printf("P%d Hits: %2d Crits: %2d at Dam: %2d - %6.2f%% (%lld)\n", p_num, hits, crits, dam, 100.0 * p->hit[hits][crits][dam] / num_rolls, p->hit[hits][crits][dam]);
-                    n_rolls += p->hit[hits][crits][dam];
-                }
+            if((hits > 0 || crits > 0) && p->hit[hits][crits] > 0){
+                printf("P%d Hits: %2d Crits: %2d - %6.2f%% (%lld)\n", p_num, hits, crits, 100.0 * p->hit[hits][crits] / num_rolls, p->hit[hits][crits]);
+                n_rolls += p->hit[hits][crits];
             }
         }
     }
@@ -167,9 +161,7 @@ static void print_tables(struct dice *d){
     n_rolls += print_player_hits(&d->p1, 1, d->num_rolls);
 
     // sum up all misses from both players
-    for(dam = 0; dam <= DAM_MAX; dam++){
-        n += d->p1.hit[0][0][dam] + d->p2.hit[0][0][dam];
-    }
+    n += d->p1.hit[0][0] + d->p2.hit[0][0];
 
     n_rolls += n;
     printf("No Hits: %6.2f%% %lld\n", 100.0 * n / d->num_rolls, n);
@@ -241,6 +233,30 @@ static double hit_prob(int successes, int trials, double probability){
     return choose(trials, successes) * pow(probability, successes) * pow(1 - probability, trials - successes);
 }
 
+static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int crits, int n, int successes, double prob){
+    if(n == p->num_saves){
+        assert(crits + successes <= SUCCESS_MAX);
+        p->success[crits + successes] += prob * p->hit[hits][crits];
+    }else{
+        int i;
+        double dam_prob = ((double)p->dam[n]) / ROLL_MAX;
+        for(i = 0; i <= saves[n]; i++){
+            double new_prob = hit_prob(i, saves[n], dam_prob);
+            hit_prob_multi_helper(p, saves, hits, crits, n + 1, successes + i, prob * new_prob);
+        }
+    }
+}
+
+/*
+ * hit_prob_multi()
+ *
+ * Recurses to find the probability that any combination of saves passed or
+ * failed.
+ */
+static void hit_prob_multi(struct player *p, int *saves, int hits, int crits){
+    hit_prob_multi_helper(p, saves, hits, crits, 0, 0, 1.0);
+}
+
 /*
  * fire_damage()
  *
@@ -276,49 +292,37 @@ static void calc_player_successes(struct player *p){
 
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
-            for(dam = 0; dam <= DAM_MAX; dam++){
-                if(p->hit[hits][crits][dam] > 0){
+            if(p->hit[hits][crits] > 0){
+                int i;
+                int saves[SAVES_MAX] = {};
+                for(i = 0; i < p->num_saves; i++){
                     // We scored this many hits and crits
                     // now we need to determine how likely it was we caused however many successes
                     // Gotta binomialize!
 
                     // crits always hit, so they are an offset into the success array
                     // then we count up to the max number of hits.
-                    int saves;
                     if(p->ammo == AMMO_FIRE){
                         // Fire ammo
                         // If you fail the save, you must roll again, ad infinitum.
-                        fire_damage(p, hits + crits, crits, dam, p->hit[hits][crits][dam], SUCCESS_MAX);
+                        fire_damage(p, hits + crits, crits, p->dam[i], p->hit[hits][crits], SUCCESS_MAX);
                     }else if(p->ammo == AMMO_NONE){
                         // Non-lethal skill (Dodge, Smoke)
                         // There is no saving throw. Number of successes still
                         // matters for smoke.
-                        p->success[crits + hits] += p->hit[hits][crits][dam];
+                        p->success[crits + hits] += p->hit[hits][crits];
                     }else{
-                        switch(p->ammo){
-                            case AMMO_2:
-                                // DA - two saves per hit, plus the second die for crits
-                                saves = 2 * hits + crits;
-                                break;
-                            case AMMO_3:
-                                // EXP - three saves per hit, plus the extra two for crits
-                                saves = 3 * hits + 2 * crits;
-                                break;
-                            case AMMO_1:
-                                // Normal - one save per regular hit
-                                saves = hits;
-                                break;
-                            default:
-                                printf("ERROR: P%d Unknown ammo type: %d\n", p->player_num, p->ammo);
-                                exit(1);
-                                break;
-                        }
-
-                        for(success = 0; success <= saves; success++){
-                            assert(crits + success <= SUCCESS_MAX);
-                            p->success[crits + success] += hit_prob(success, saves, ((double)dam) / ROLL_MAX) * p->hit[hits][crits][dam];
+                        // Normal - one save per regular hit
+                        // Additional saves for crits after the first die
+                        saves[i] += hits;
+                        if(i > 0){
+                            saves[i] += crits;
                         }
                     }
+                }
+
+                if(p->ammo == AMMO_NORMAL){
+                    hit_prob_multi(p, saves, hits, crits);
                 }
             }
         }
@@ -341,7 +345,7 @@ static void calc_successes(struct dice *d){
  * Compares each die for a given player to the best roll for the other
  * player. Then counts how many uncanceled hits/crits this player scored.
  */
-static void count_player_results(struct player *us, struct player *them, int *hits, int *crits, int *dam){
+static void count_player_results(struct player *us, struct player *them, int *hits, int *crits){
     int i;
     int best;   // offset into them's d array for their best roll
 
@@ -350,7 +354,6 @@ static void count_player_results(struct player *us, struct player *them, int *hi
 
     // Find highest successful roll of other player
     // Use the fact that the array is sorted
-    *dam = us->dam;
     best = 0;
     for(i = them->burst - 1; i >= 0; i--){
         if(them->d[i].is_hit){
@@ -490,7 +493,6 @@ static void count_roll_results(struct dice *d){
     int hits1, crits1;
     int hits2, crits2;
     int fact1, fact2;
-    int dam1, dam2;
     int64_t multiplier;
 
     // Hits are counted as 'multiplier' since we are using matrix symmetries
@@ -506,22 +508,22 @@ static void count_roll_results(struct dice *d){
     multiplier *= template_factor(&d->p1);
     multiplier *= template_factor(&d->p2);
 
-    count_player_results(&d->p1, &d->p2, &hits1, &crits1, &dam1);
-    count_player_results(&d->p2, &d->p1, &hits2, &crits2, &dam2);
+    count_player_results(&d->p1, &d->p2, &hits1, &crits1);
+    count_player_results(&d->p2, &d->p1, &hits2, &crits2);
 
     //print_roll(d, multiplier, dam1, dam2);
 
     if(crits1 + hits1){
-        d->p1.hit[hits1][crits1][dam1] += multiplier;
+        d->p1.hit[hits1][crits1] += multiplier;
     }
 
     if(hits2 + crits2){
-        d->p2.hit[hits2][crits2][dam2] += multiplier;
+        d->p2.hit[hits2][crits2] += multiplier;
     }
 
     // Need to ensure we only count totally whiffed rolls once
     if(hits1 + crits1 + hits2 + crits2 == 0){
-        d->p2.hit[0][0][0] += multiplier;
+        d->p2.hit[0][0] += multiplier;
     }
 
     d->num_rolls += multiplier;
@@ -694,10 +696,8 @@ static void tabulate(struct player *p1, struct player *p2){
         // copy hit and crit data
         for(h = 0; h <= B_MAX; h++){
             for(c = 0; c <= B_MAX; c++){
-                for(dam = 0; dam <= DAM_MAX; dam++){
-                    d[0].p1.hit[h][c][dam] += d[t].p1.hit[h][c][dam];
-                    d[0].p2.hit[h][c][dam] += d[t].p2.hit[h][c][dam];
-                }
+                d[0].p1.hit[h][c] += d[t].p1.hit[h][c];
+                d[0].p2.hit[h][c] += d[t].p2.hit[h][c];
             }
         }
     }
@@ -710,36 +710,19 @@ static void tabulate(struct player *p1, struct player *p2){
 }
 
 static void print_player(const struct player *p, int p_num){
-    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d DAM %2d SAVES %s\n", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, p->dam, ammo_labels[p->ammo]);
+    int i;
+
+    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
+
+    for(i = 0; i < p->num_saves; i++){
+        printf(" DAM[%d] %2d", i, p->dam[i]);
+    }
+    printf("\n");
 }
 
 static void usage(const char *program){
-    printf("Usage: %s <STAT 1> <B 1> <DAM 1> <AMMO 1> <STAT 2> <B 2> <DAM 2> <AMMO 2>\n", program);
+    printf("Usage: %s <STAT 1> <B 1> <AMMO 1> <DAM 1> <...> <STAT 2> <B 2> <AMMO 2> <AMMO 2> <...>\n", program);
     exit(0);
-}
-
-static void parse_ammo(const char *ammo, struct player *p){
-    switch(ammo[0]){
-        case '1':
-            p->ammo = AMMO_1;
-            break;
-        case '2':
-            p->ammo = AMMO_2;
-            break;
-        case '3':
-            p->ammo = AMMO_3;
-            break;
-        case 'F':
-            p->ammo = AMMO_FIRE;
-            break;
-        case '-':
-            p->ammo = AMMO_NONE;
-            break;
-        default:
-            printf("ERROR: P%d SAVES type '%s' unknown.  Must be one of 1, 2, 3, F, -\n", p->player_num, ammo);
-            exit(1);
-            break;
-    }
 }
 
 static void parse_stat(const char *str, struct player *p){
@@ -795,32 +778,77 @@ static void parse_b(const char *str, struct player *p){
     }
 }
 
-static void parse_dam(const char *str, struct player *p){
-    p->dam = strtol(str, NULL, 10);
+static void parse_dam(const char **argv, int argc, int *i, struct player *p){
+    // Format: N D1 A [D2 A2 [D3 A3]]
+    // N is number of damage values coming
+    // Dn is damage value
+    // An is ammo type
+    int save;
 
-    if(p->dam < 0 || p->dam > DAM_MAX){
-        printf("ERROR: P%d DAM %d must be in the range of 0 to %d\n", p->player_num, p->dam, DAM_MAX);
+    char ammo = argv[(*i)++][0];
+    switch(ammo){
+        case '1':
+            p->ammo = AMMO_NORMAL;
+            p->num_saves = 1;
+            break;
+        case '2':
+            p->ammo = AMMO_NORMAL;
+            p->num_saves = 2;
+            break;
+        case '3':
+            p->ammo = AMMO_NORMAL;
+            p->num_saves = 3;
+            break;
+        case 'F':
+            p->ammo = AMMO_FIRE;
+            p->num_saves = 1;
+            break;
+        case '-':
+            p->ammo = AMMO_NONE;
+            p->num_saves = 1;
+            break;
+        default:
+            printf("ERROR: P%d AMMO[%d] type '%c' unknown.  Must be one of 1, 2, 3, F, -\n", p->player_num, save, ammo);
+            exit(1);
+            break;
+    }
+
+    if(*i + p->num_saves > argc){
+        printf("ERROR: Too few damage values for number of saves\n");
         exit(1);
+    }
+
+    for(save = 0; save < p->num_saves; save++){
+        p->dam[save] = strtol(argv[(*i)++], NULL, 10);
+
+        if(p->dam[save] < 0 || p->dam[save] > DAM_MAX){
+            printf("ERROR: P%d DAM[%d] %d must be in the range of 0 to %d\n", p->player_num, save, p->dam[save], DAM_MAX);
+            exit(1);
+        }
     }
 }
 
 static void parse_args(int argc, const char *argv[], struct player *p1, struct player *p2){
     int i;
 
-    if(argc != 9){
+    if(argc < 9){
+        printf("ERROR: Too few arguments\n");
         usage(argv[0]);
     }
 
     i = 1;
     parse_stat(argv[i++], p1);
     parse_b(argv[i++], p1);
-    parse_dam(argv[i++], p1);
-    parse_ammo(argv[i++], p1);
+    parse_dam(argv, argc, &i, p1);
 
     parse_stat(argv[i++], p2);
     parse_b(argv[i++], p2);
-    parse_dam(argv[i++], p2);
-    parse_ammo(argv[i++], p2);
+    parse_dam(argv, argc, &i, p2);
+
+    if(argc > i){
+        printf("ERROR: Too many arguments\n");
+        usage(argv[0]);
+    }
 
     // Quick and dirty CPU limiter
     if(p1->burst + p2->burst > 9){
