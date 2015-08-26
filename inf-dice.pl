@@ -89,8 +89,8 @@ my $ammo_codes = {
     'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
     'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
+    'Plasma' => {saves => 2, save => ['arm', 'bts']},
     # Placeholders for unimplemented ammos
-    'Plasma' => {saves => 1},
     'N+E/M' => {saves => 1},
     'AP+E/M' => {saves => 1, ap => 0.5},
     'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
@@ -1070,7 +1070,9 @@ sub max{
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($arm, $ap, $ammo, $cover, $ignore_cover, $save, $dam);
+    my ($ap, $ammo, $cover, $ignore_cover, $save, $dam);
+    my @dam;
+    my @arm = ();
     my $b;
     my ($stat_name, $stat);
     my ($ammo_name, $code, $immunity);
@@ -1089,6 +1091,20 @@ sub gen_attack_args{
     $code = $ammo_codes->{$ammo_name};
     $immunity = param("$them.immunity") // '';
 
+    $dam = param("$us.dam") // 0;
+
+    my $ph_dam = 0;
+    if($dam eq 'PH'){
+        $dam = param("$us.ph") // 0;
+        $ph_dam = 1;
+    }elsif($dam eq 'PH-1'){
+        $dam = (param("$us.ph") // 1) - 1;
+        $ph_dam = 1;
+    }elsif($dam eq 'PH-2'){
+        $dam = (param("$us.ph") // 2) - 2;
+        $ph_dam = 1;
+    }
+
     # Total Immunity ignores most ammo types
     if($immunities->{$immunity}{$ammo_name}){
         $ap = 1;
@@ -1100,8 +1116,29 @@ sub gen_attack_args{
         $ammo = $code->{saves};
     }
 
-    $arm = ceil(abs(param("$them.$save") // 0) * $ap);
-    $dam = param("$us.dam") // 0;
+    # convert dam into array
+    if($ammo eq '2'){
+        @dam = ($dam) x 2;;
+    }elsif($ammo eq '3'){
+        @dam = ($dam) x 3;
+    }else{
+        @dam = ($dam);
+    }
+
+    # also convert arm to array
+    if(ref($save) eq 'ARRAY'){
+        for my $s (@$save){
+            push @arm, ceil(abs(param("$them.$s") // 0) * $ap);
+        }
+    }else{
+        @arm = (ceil(abs(param("$them.$save") // 0) * $ap)) x scalar @dam;
+    }
+
+    # Monofilament and K1 have fixed damage
+    if($code->{fixed_dam}){
+        map { $_ = 0 } @arm;
+        map { $_ = $code->{fixed_dam} } @dam;
+    }
 
     my $sapper = (param("$them.sapper") // 0);
     my $foxhole = 0;
@@ -1116,24 +1153,6 @@ sub gen_attack_args{
     }
     $ignore_cover = $code->{cover} // 1;
     $cover *= $ignore_cover;
-
-    # Monofilament and K1 have fixed damage
-    if($code->{fixed_dam}){
-        $arm = 0;
-        $dam = $code->{fixed_dam};
-    }
-
-    my $ph_dam = 0;
-    if($dam eq 'PH'){
-        $dam = param("$us.ph") // 0;
-        $ph_dam = 1;
-    }elsif($dam eq 'PH-1'){
-        $dam = (param("$us.ph") // 1) - 1;
-        $ph_dam = 1;
-    }elsif($dam eq 'PH-2'){
-        $dam = (param("$us.ph") // 2) - 2;
-        $ph_dam = 1;
-    }
 
     my $action = param("$us.action");
     my $other_action = param("$them.action");
@@ -1242,7 +1261,7 @@ sub gen_attack_args{
                 push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
             }else{
                 push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
-                $arm += $cover;
+                map { $_ += $cover} @arm;
             }
         }
 
@@ -1357,8 +1376,6 @@ sub gen_attack_args{
 
         $b = (param("$us.b") // 1);
 
-        $arm += $cover;
-
         # Smoke provides no defense against non-lof skills
         if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
             if($other_code->{no_lof}){
@@ -1434,7 +1451,7 @@ sub gen_attack_args{
                 if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
                     if($ph_dam){
                         push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
-                        $dam += $ma_dam;
+                        map { $_ += $ma_dam } @dam;
                     }else{
                         push @mod_strings, sprintf('Martial Arts DAM bonus ignored by %s', param("$us.weapon") // "");
                     }
@@ -1473,7 +1490,7 @@ sub gen_attack_args{
             $b += $coordinated;
             if($ph_dam){
                 push @mod_strings, sprintf('Coordinated Order grants %+d DAM', $coordinated);
-                $dam += $coordinated;
+                map { $_ += $coordinated } @dam;
             }else{
                 push @mod_strings, sprintf('Coordinated Order DAM bonus ignored by %s', param("$us.weapon") // "");
             }
@@ -1520,19 +1537,12 @@ sub gen_attack_args{
     }
 
     if(!$code->{alt_save}){
-        $dam = max($dam - $arm, 0);
+        for(my $i = 0; $i < scalar @dam; $i++){
+            $dam[$i] = max($dam[$i] - $arm[$i], 0);
+        }
     }else{
         # Adhesive makes a PH saving throw instead of DAM - ARM check
-        $dam = 20 - max(param("$them.$code->{alt_save}") + $code->{alt_save_mod}, 0);
-    }
-
-    my @dam;
-    if($ammo eq '2'){
-        @dam = ($dam, $dam);
-    }elsif($ammo eq '3'){
-        @dam = ($dam, $dam, $dam);
-    }else{
-        @dam = ($dam);
+        @dam = (20 - max(param("$them.$code->{alt_save}") + $code->{alt_save_mod}, 0));
     }
 
     return (

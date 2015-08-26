@@ -808,7 +808,7 @@ static void parse_dam(const char **argv, int argc, int *i, struct player *p){
             p->num_saves = 1;
             break;
         default:
-            printf("ERROR: P%d AMMO[%d] type '%c' unknown.  Must be one of 1, 2, 3, F, -\n", p->player_num, save, ammo);
+            printf("ERROR: P%d AMMO type '%c' unknown.  Must be one of 1, 2, 3, F, -\n", p->player_num, ammo);
             exit(1);
             break;
     }
