@@ -1194,6 +1194,16 @@ sub gen_attack_args{
             }
         }
 
+        # Marksmanship L2 adds Shock; makes a second save if first is on BTS
+        if($marksmanship >= 2 && $save eq 'bts'){
+            $save = [('bts') x scalar @dam, 'arm'];
+            push @dam, $dam[0];
+            push @arm, ceil(abs(param("$them.arm") // 0));
+            $ammo++;
+            push @mod_strings, sprintf('Marksmanship L2 grants aditional ARM save at DAM %d', $dam[$#dam]);
+            # TODO: track shock effect
+        }
+
         if($link_bs){
             push @mod_strings, sprintf('Link Team grants %+d %s', $link_bs, $stat_name);
             $mod += $link_bs;
@@ -1804,7 +1814,8 @@ sub execute_backend{
         }elsif(m/^No Successes: +([0-9.]+)/){
             $output->{hits}{0} = $1;
         }elsif(m/^ERROR/ || m/Assertion/){
-            $output->{error} = $_;
+            my $cmd = join(' ', '/usr/local/bin/inf-dice-n3', @args);
+            $output->{error} = $_ . '<br>' . $cmd;
         }
     }
 
