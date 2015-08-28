@@ -1190,18 +1190,21 @@ sub gen_attack_args{
                 push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
                 $mod -= $cover;
             }else{
-                push @mod_strings, sprintf('Marksmanship negates Cover modifier to %s', $stat_name);
+                push @mod_strings, sprintf('Marksmanship L2 negates Cover modifier to %s', $stat_name);
             }
         }
 
-        # Marksmanship L2 adds Shock; makes a second save if first is on BTS
-        if($marksmanship >= 2 && $save eq 'bts'){
-            $save = [('bts') x scalar @dam, 'arm'];
-            push @dam, $dam[0];
-            push @arm, ceil(abs(param("$them.arm") // 0));
-            $ammo++;
-            push @mod_strings, sprintf('Marksmanship L2 grants aditional ARM save at DAM %d', $dam[$#dam]);
+        if($marksmanship >= 1 && $stat_name eq 'BS' && !$code->{nonlethal}){
             # TODO: track shock effect
+
+            if($save eq 'bts'){
+                # Marksmanship L1 adds Shock; makes a second save if first is on BTS
+                $save = [('bts') x scalar @dam, 'arm'];
+                push @dam, $dam[0];
+                push @arm, ceil(abs(param("$them.arm") // 0));
+                $ammo++;
+                push @mod_strings, sprintf('Marksmanship L1 grants aditional ARM save at DAM %d', $dam[$#dam]);
+            }
         }
 
         if($link_bs){
