@@ -133,6 +133,10 @@ sub has_aibeacon{
     return has_spec(@_, 'AI Beacon');
 }
 
+sub has_seedembryo{
+    return has_spec(@_, 'Seed-Embryo');
+}
+
 sub has_dualwield{
     return has_spec(@_, 'Dual Wield');
 }
@@ -290,6 +294,10 @@ sub has_motorcycle{
     return has_spec(@_, "Motorcycle");
 }
 
+sub has_pilot{
+    return has_spec(@_, "Pilot");
+}
+
 sub has_specialist{
     return has_spec(@_, "Specialist");
 }
@@ -353,13 +361,6 @@ sub get_weapons{
         $weapons->{$w} = 1;
     }
 
-    # Kum don't keep their Smoke LGLs when dismounted
-    if($rider){
-        for my $w (@{$new_unit->{weapons}}){
-            $weapons->{$w} = 1 unless $w eq 'Smoke Light Grenade Launcher';
-        }
-    }
-
     for my $w (@{$unit->{ccw}}){
         $weapons->{$w} = 1;
     }
@@ -369,48 +370,46 @@ sub get_weapons{
         $weapons->{'Flash Pulse'} = 1;
         $weapons->{'Forward Observer'} = 1;
     }
-
-    if(!$inherit_weapon){
-        $new_unit->{hacker} = 0;
-    }
     
-    CHILD: for my $child (@{$unit->{childs}}){
-        # Keep specialists out of normal circulation
-        if(!$ability_func){
-            for my $specialist (@specialist_profiles){
-                if($specialist->{ability_func}($child)){
-                    next CHILD;
+    if($inherit_weapon){
+        CHILD: for my $child (@{$unit->{childs}}){
+            # Keep specialists out of normal circulation
+            if(!$ability_func){
+                for my $specialist (@specialist_profiles){
+                    if($specialist->{ability_func}($child)){
+                        next CHILD;
+                    }
                 }
             }
-        }
 
-        # select only the special children otherwise
-        if($ability_func && !&$ability_func($child)){
-            next;
-        }
+            # select only the special children otherwise
+            if($ability_func && !&$ability_func($child)){
+                next;
+            }
 
-        # only read in each child once
-        if($child->{_processed}){
-            next;
-        }
-        $child->{_processed} = 1;
+            # only read in each child once
+            if($child->{_processed}){
+                next;
+            }
+            $child->{_processed} = 1;
 
-        # All forward observers have Flash Pulse inclusive
-        if(has_fo($child)){
-            $weapons->{'Flash Pulse'} = 1;
-            $weapons->{'Forward Observer'} = 1;
-        }
+            # All forward observers have Flash Pulse inclusive
+            if(has_fo($child)){
+                $weapons->{'Flash Pulse'} = 1;
+                $weapons->{'Forward Observer'} = 1;
+            }
 
-        for my $w (@{$child->{bsw}}){
-            $weapons->{$w} = 1;
-        }
+            for my $w (@{$child->{bsw}}){
+                $weapons->{$w} = 1;
+            }
 
-        for my $w (@{$child->{ccw}}){
-            $weapons->{$w} = 1;
-        }
+            for my $w (@{$child->{ccw}}){
+                $weapons->{$w} = 1;
+            }
 
-        if(has_hacker($child)){
-            $new_unit->{hacker} = has_hacker($child);
+            if(has_hacker($child)){
+                $new_unit->{hacker} = has_hacker($child);
+            }
         }
     }
 
@@ -434,15 +433,11 @@ sub get_weapons{
         $weapons->{$new_ccw} = 1;
     }
 
-    if(keys %$weapons){
-        if(!has_aibeacon($new_unit) && $inherit_weapon){
-            $weapons->{'Bare-Handed'} = 1;
-        }
-
-        $new_unit->{weapons} = [sort keys %$weapons];
-    }elsif(!$inherit_weapon){
-        $new_unit->{weapons} = [];
+    if(!has_aibeacon($new_unit) && !has_seedembryo($new_unit)){
+        $weapons->{'Bare-Handed'} = 1;
     }
+
+    $new_unit->{weapons} = [sort keys %$weapons];
 }
 
 my %unit_type_order = (
@@ -481,13 +476,14 @@ sub parse_unit{
         $inherit_shasvastii = 1;
     }
 
-    if($ability_func){
-        $inherit_weapon = 0;
-    }
-
     my $rider = 0;
     if(has_motorcycle($new_unit)){
         $rider = 1;
+    }
+
+    # TAG Pilots don't inherit weapons
+    if(has_pilot($unit)){
+        $inherit_weapon = 0;
     }
 
     # If the parent has symbiont, this unit has inactive symbiont
@@ -656,6 +652,9 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json")){
                 if(!$ability && ($ability = $specialist->{ability_func}($child))){
                     my $child_unit = clone($new_unit);
 
+                    # It will get hacker again if it picks up a child profile with a hacking device
+                    delete $child_unit->{hacker};
+
                     # stats replace if present, otherwise inherit
                     $child->{spec} = [@{$flat_unit->{spec}}, @{$child->{spec}}];
                     $child->{bsw} = [@{$flat_unit->{bsw}}, @{$child->{bsw}}];
@@ -676,7 +675,6 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json")){
         # Check for alternate profiles
         for(my $i = 1; $i < scalar @{$flat_unit->{profiles}}; $i++){
             my $alt = flatten_unit($unit, $i);
-            delete $alt->{childs};
 
             next if $alt->{name} eq 'CrazyKoala';
 
@@ -685,9 +683,13 @@ for my $fname (glob("mayanet_data/Toolbox/*_units.json")){
             my $alt_unit;
             if(!$alt->{independent}){
                 $alt_unit = clone($new_unit);
+                # It will get hacker again if it picks up a child profile with a hacking device
+                delete $alt_unit->{hacker};
             }else{
                 # Independent models don't inherit from their controller
                 $alt_unit = {};
+                # Independent models don't inherit their controller's options
+                delete $alt->{childs};
             }
 
             # stats replace if present, otherwise inherit
