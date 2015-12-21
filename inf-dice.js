@@ -167,6 +167,26 @@ function set_sapper_foxhole(){
     }
 }
 
+function set_berserk(){
+    var action_1 = document.getElementsByName("p1.action")[0].value;
+    var action_2 = document.getElementsByName("p2.action")[0].value;
+
+    var berserk_1 = document.getElementsByName("p1.has_berserk")[0].checked;
+    var berserk_2 = document.getElementsByName("p2.has_berserk")[0].checked;
+
+    if(berserk_1 && action_1 == "cc"){
+        enable_input("p1.berserk");
+    }else{
+        disable_input("p1.berserk");
+    }
+
+    if(berserk_2 && action_2 == "cc"){
+        enable_input("p2.berserk");
+    }else{
+        disable_input("p2.berserk");
+    }
+}
+
 function set_action(player){
     var other = other_player(player);
     var action_name = player + ".action";
@@ -456,6 +476,7 @@ function set_action(player){
     }
 
     set_sapper_foxhole();
+    set_berserk();
 
     populate_weapons(player);
 }
