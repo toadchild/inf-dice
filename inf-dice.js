@@ -194,6 +194,7 @@ function set_action(player){
 
         // defensive abilities
         enable_input(other + ".cover");
+        disable_input(other + ".firewall");
         enable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -224,6 +225,7 @@ function set_action(player){
 
         // defensive abilities
         enable_input(other + ".cover");
+        disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -254,6 +256,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -284,6 +287,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -314,6 +318,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -344,6 +349,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".firewall");
         disable_input(other + ".ch");
         enable_input(player + ".hyperdynamics");
 
@@ -374,6 +380,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        enable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -382,7 +389,7 @@ function set_action(player){
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         disable_display(player + ".sec_hack");
-        disable_display(other + ".sec_defense");
+        enable_display(other + ".sec_defense");
         enable_display(player + ".sec_other");
     }else if(action.value == "hack"){
         // action
@@ -404,6 +411,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        enable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 
@@ -412,7 +420,7 @@ function set_action(player){
         disable_display(player + ".sec_shoot");
         disable_display(player + ".sec_cc");
         enable_display(player + ".sec_hack");
-        disable_display(other + ".sec_defense");
+        enable_display(other + ".sec_defense");
         enable_display(player + ".sec_other");
     }else if(action.value == "none"){
         // action
@@ -434,6 +442,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
 

@@ -608,6 +608,11 @@ sub print_input_attack_section{
               -checked => defined(param("$player.foxhole")),
               -value => 1,
               -label => 'Foxhole (Cover, Mimetism, Courage)'),
+          "<br>",
+          span_checkbox(-name => "$player.firewall",
+              -checked => defined(param("$player.firewall")),
+              -value => 3,
+              -label => 'Firewall (+3 BTS, -3 Opponent WIP)'),
           "</div>\n";
     print "<div id='$player.sec_other'>",
           "<h3>Other Modifiers</h3>",
@@ -1573,7 +1578,6 @@ sub gen_hack_args{
 
     my $action = param("$us.action");
     my $other_action = param("$them.action");
-    my $bts = param("$them.bts") // 0;
     my $program = param("$us.hack_program") // "";
     my $code = $hack_codes->{$program};
 
@@ -1583,8 +1587,7 @@ sub gen_hack_args{
     my $dam = $code->{dam} // 0;
     my $ammo = $code->{effect}{saves} // '1';
     my $ap = $code->{effect}{ap} // 1;
-    my $arm = ceil(abs(param("$them.bts") // 0) * $ap);
-    $dam = max($dam - $arm, 0);
+    my $bts = ceil((param("$them.bts") // 0) * $ap);
 
     # Dodge does not protect against hacking
     if($other_action eq 'dodge' || $other_action eq 'change_face'){
@@ -1616,6 +1619,15 @@ sub gen_hack_args{
         $mod += $misc_mod;
     }
 
+    # Firewall is like cover for hacking.
+    my $firewall = (param("$them.firewall") // 0);
+    if($firewall){
+        push @mod_strings, sprintf('Firewall grants %+d WIP', -$firewall);
+        $mod -= $firewall;
+        push @mod_strings, sprintf('Cover grants opponent %+d BTS', $firewall);
+        $bts += $firewall
+    }
+
     if($mod < -12){
         push @mod_strings, "Modifier capped at -12";
         $mod = -12;
@@ -1626,6 +1638,7 @@ sub gen_hack_args{
     $stat = max($stat + $mod, 0);
     push @mod_strings, "Net WIP is $stat";
 
+    $dam = max($dam - $bts, 0);
     my @dam;
     if($ammo eq '2'){
         @dam = ($dam, $dam);
