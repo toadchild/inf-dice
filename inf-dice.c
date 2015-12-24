@@ -41,8 +41,8 @@ static const char *ammo_labels[] = {
 };
 
 enum tag_t {
-    TAG_A,
-    TAG_B,
+    TAG_SHOCK,
+    TAG_EM,
     TAG_C,
     TAG_D,
     TAG_E,
@@ -53,8 +53,8 @@ enum tag_t {
 
 enum tag_mask_t {
     TAG_MASK_NONE = 0,
-    TAG_MASK_A = TAG_MASK(TAG_A),
-    TAG_MASK_B = TAG_MASK(TAG_B),
+    TAG_MASK_A = TAG_MASK(TAG_SHOCK),
+    TAG_MASK_B = TAG_MASK(TAG_EM),
     TAG_MASK_C = TAG_MASK(TAG_C),
     TAG_MASK_D = TAG_MASK(TAG_D),
     TAG_MASK_E = TAG_MASK(TAG_E),
@@ -62,12 +62,14 @@ enum tag_mask_t {
 };
 
 static const char *tag_labels[] = {
-    "A",
-    "B",
+    "SHOCK",
+    "EM",
     "C",
     "D",
     "E",
 };
+
+#define TAG_LABEL_NONE "NORMAL"
 
 /*
  * Structure for a single die result.
@@ -92,7 +94,8 @@ struct player{
     int template;               // Is this a template weapon
     int num_saves;              // number of saves for this ammo
     int dam[SAVES_MAX];         // damage value
-    int tag[SAVES_MAX];         // tag for each save
+    int tag_mask[SAVES_MAX];    // tag bitmask for each save
+    const char *tag_label[SAVES_MAX];    // string tag name for each save
     enum ammo_t ammo;           // ammo type
 
     struct result d[B_MAX];     // current set of dice being evaluated
@@ -151,21 +154,28 @@ static int64_t print_player_hits(struct player *p, int p_num, int64_t num_rolls)
  * certain number of successes.
  */
 double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
-    double cumul_prob;
     int success;
     double n_success = 0;
+    double tagged_prob[SUCCESS_MAX + 1][NUM_TAGS] = {};
+    double untagged_prob[SUCCESS_MAX + 1] = {};
 
-    cumul_prob = 0.0;
     for(success = SUCCESS_MAX; success > 0; success--){
         for(int mask = 0; mask < TAG_MASK_MAX; mask++){
             if(p->success[success][mask] > 0){
                 double prob = 100.0 * p->success[success][mask] / num_rolls;
-                cumul_prob += prob;
+                untagged_prob[success] += prob;
+                for(int tag = 0; tag < NUM_TAGS; tag++){
+                    if(TAG_MASK(tag) & mask){
+                        tagged_prob[success][tag] += prob;
+                    }
+                }
                 if(prob >= 0.005){
-                    printf("P%d Scores %2d Success(es): %6.2f%%     %2d+ Successes: %6.2f%%", p_num, success, prob, success, cumul_prob);
-                    for(int tag = 0; tag < NUM_TAGS; tag++){
-                        if(mask & TAG_MASK(tag)){
-                            printf(" %s", tag_labels[tag]);
+                    printf("P%d Scores %2d Success(es): %6.2f%%", p_num, success, prob);
+                    if(mask != TAG_MASK_NONE){
+                        for(int tag = 0; tag < NUM_TAGS; tag++){
+                            if(mask & TAG_MASK(tag)){
+                                printf(" %s", tag_labels[tag]);
+                            }
                         }
                     }
                     printf("\n");
@@ -173,6 +183,24 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
 
                 n_success += p->success[success][mask];
             }
+        }
+    }
+
+    double cumul_prob;
+    for(int tag = 0; tag < NUM_TAGS; tag++){
+        cumul_prob = 0;
+        for(success = SUCCESS_MAX; success > 0; success--){
+            if(tagged_prob[success][tag]){
+                cumul_prob += tagged_prob[success][tag];
+                printf("P%d Scores %2d+ Successes:  %6.2f%% %s\n", p_num, success, cumul_prob, tag_labels[tag]);
+            }
+        }
+    }
+    cumul_prob = 0;
+    for(success = SUCCESS_MAX; success > 0; success--){
+        cumul_prob += untagged_prob[success];
+        if(cumul_prob){
+            printf("P%d Scores %2d+ Successes:  %6.2f%%\n", p_num, success, cumul_prob);
         }
     }
     printf("\n");
@@ -284,7 +312,7 @@ static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int cr
             // If we scored a hit, add that save's tag to the mask.
             enum tag_mask_t new_mask = mask;
             if(i){
-                new_mask |= TAG_MASK(p->tag[n]);
+                new_mask |= p->tag_mask[n];
             }
             hit_prob_multi_helper(p, saves, hits, crits, n + 1, successes + i, prob * new_prob, new_mask);
         }
@@ -301,7 +329,7 @@ static void hit_prob_multi(struct player *p, int *saves, int hits, int crits){
     // If there were crits, the damage is tagged with the first damage type.
     enum tag_mask_t mask = TAG_MASK_NONE;
     if(crits){
-        mask = TAG_MASK(p->tag[0]);
+        mask = p->tag_mask[0];
     }
     hit_prob_multi_helper(p, saves, hits, crits, 0, 0, 1.0, mask);
 }
@@ -765,7 +793,7 @@ static void print_player(const struct player *p, int p_num){
     printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
 
     for(i = 0; i < p->num_saves; i++){
-        printf(" DAM[%d] %2d TAG[%d] %s", i, p->dam[i], i, tag_labels[p->tag[i]]);
+        printf(" DAM[%d] %2d TAG[%d] %s", i, p->dam[i], i, p->tag_label[i]);
     }
     printf("\n");
 }
@@ -878,26 +906,21 @@ static void parse_dam(const char **argv, int argc, int *i, struct player *p){
         }
 
         const char *tag_label = argv[(*i)++];
-        switch(tag_label[0]){
-            case 'A':
-                p->tag[save] = TAG_A;
-                break;
-            case 'B':
-                p->tag[save] = TAG_B;
-                break;
-            case 'C':
-                p->tag[save] = TAG_C;
-                break;
-            case 'D':
-                p->tag[save] = TAG_D;
-                break;
-            case 'E':
-                p->tag[save] = TAG_E;
-                break;
-            default:
-                printf("ERROR: P%d TAG[%d] '%s' is unknown. Must be one of A, B, C, D, E.\n", p->player_num, save, tag_label);
+        p->tag_label[save] = tag_label;
+        if(strcmp(tag_label, TAG_LABEL_NONE) == 0){
+            p->tag_mask[save] = TAG_MASK_NONE;
+        }else{
+            int tag;
+            for(tag = 0; tag < NUM_TAGS; tag++){
+                if(strcmp(tag_label, tag_labels[tag]) == 0){
+                    p->tag_mask[save] = TAG_MASK(tag);
+                    break;
+                }
+            }
+            if(tag == NUM_TAGS){
+                printf("ERROR: P%d TAG[%d] '%s' is unknown.\n", p->player_num, save, tag_label);
                 exit(1);
-                break;
+            }
         }
     }
 }
