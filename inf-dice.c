@@ -154,8 +154,9 @@ static void print_tables(struct dice *d){
     double n_success = 0;
     double n2;
 
-    printf("Total Hits: %lld\n", d->num_rolls);
+    printf("Total Rolls: %lld\n", d->num_rolls);
     printf("Actual Rolls Made: %lld\n", d->rolls_made);
+    printf("Savings: %.02f%%\n", 100 - (100.0 * d->rolls_made / d->num_rolls));
     printf("\n");
 
     n_rolls += print_player_hits(&d->p1, 1, d->num_rolls);
