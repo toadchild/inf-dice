@@ -40,6 +40,35 @@ static const char *ammo_labels[] = {
     "NONE",
 };
 
+enum tag_t {
+    TAG_A,
+    TAG_B,
+    TAG_C,
+    TAG_D,
+    TAG_E,
+    NUM_TAGS,
+};
+
+#define TAG_MASK(x) (1 << x)
+
+enum tag_mask_t {
+    TAG_MASK_NONE = 0,
+    TAG_MASK_A = TAG_MASK(TAG_A),
+    TAG_MASK_B = TAG_MASK(TAG_B),
+    TAG_MASK_C = TAG_MASK(TAG_C),
+    TAG_MASK_D = TAG_MASK(TAG_D),
+    TAG_MASK_E = TAG_MASK(TAG_E),
+    TAG_MASK_MAX = TAG_MASK(NUM_TAGS),
+};
+
+static const char *tag_labels[] = {
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+};
+
 /*
  * Structure for a single die result.
  */
@@ -63,6 +92,7 @@ struct player{
     int template;               // Is this a template weapon
     int num_saves;              // number of saves for this ammo
     int dam[SAVES_MAX];         // damage value
+    int tag[SAVES_MAX];         // tag for each save
     enum ammo_t ammo;           // ammo type
 
     struct result d[B_MAX];     // current set of dice being evaluated
@@ -74,7 +104,8 @@ struct player{
     int64_t hit[B_MAX + 1][B_MAX + 1];
 
     // Number of times N successes was inflicted
-    double success[SUCCESS_MAX + 1];
+    // second index is the bitmasked combination of tags present
+    double success[SUCCESS_MAX + 1][TAG_MASK_MAX];
 };
 
 /*
@@ -126,14 +157,22 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
 
     cumul_prob = 0.0;
     for(success = SUCCESS_MAX; success > 0; success--){
-        if(p->success[success] > 0){
-            double prob = 100.0 * p->success[success] / num_rolls;
-            cumul_prob += prob;
-            if(prob >= 0.005){
-                printf("P%d Scores %2d Success(es): %6.2f%%     %2d+ Successes: %6.2f%%\n", p_num, success, prob, success, cumul_prob);
-            }
+        for(int mask = 0; mask < TAG_MASK_MAX; mask++){
+            if(p->success[success][mask] > 0){
+                double prob = 100.0 * p->success[success][mask] / num_rolls;
+                cumul_prob += prob;
+                if(prob >= 0.005){
+                    printf("P%d Scores %2d Success(es): %6.2f%%     %2d+ Successes: %6.2f%%", p_num, success, prob, success, cumul_prob);
+                    for(int tag = 0; tag < NUM_TAGS; tag++){
+                        if(mask & TAG_MASK(tag)){
+                            printf(" %s", tag_labels[tag]);
+                        }
+                    }
+                    printf("\n");
+                }
 
-            n_success += p->success[success];
+                n_success += p->success[success][mask];
+            }
         }
     }
     printf("\n");
@@ -152,7 +191,7 @@ static void print_tables(struct dice *d){
     int64_t n_rolls = 0, n = 0;
     int dam;
     double n_success = 0;
-    double n2;
+    double n_failures;
 
     printf("Total Rolls: %lld\n", d->num_rolls);
     printf("Actual Rolls Made: %lld\n", d->rolls_made);
@@ -177,13 +216,12 @@ static void print_tables(struct dice *d){
 
     n_success += print_player_successes(&d->p1, 1, d->num_rolls);
 
-    n2 = d->p1.success[0] + d->p2.success[0];
-    n_success += n2;
-    printf("No Successes: %6.2f%%\n", 100.0 * n2 / d->num_rolls);
+    n_failures = d->p1.success[0][TAG_MASK_NONE] + d->p2.success[0][TAG_MASK_NONE];
+    printf("No Successes: %6.2f%%\n", 100.0 * n_failures / d->num_rolls);
     printf("\n");
 
     n_success += print_player_successes(&d->p2, 2, d->num_rolls);
-    assert(round(n_success) == d->num_rolls);
+    assert(round(n_success + n_failures) == d->num_rolls);
 }
 
 /*
@@ -234,16 +272,21 @@ static double hit_prob(int successes, int trials, double probability){
     return choose(trials, successes) * pow(probability, successes) * pow(1 - probability, trials - successes);
 }
 
-static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int crits, int n, int successes, double prob){
+static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int crits, int n, int successes, double prob, enum tag_mask_t mask){
     if(n == p->num_saves){
         assert(crits + successes <= SUCCESS_MAX);
-        p->success[crits + successes] += prob * p->hit[hits][crits];
+        p->success[crits + successes][mask] += prob * p->hit[hits][crits];
     }else{
         int i;
         double dam_prob = ((double)p->dam[n]) / ROLL_MAX;
         for(i = 0; i <= saves[n]; i++){
             double new_prob = hit_prob(i, saves[n], dam_prob);
-            hit_prob_multi_helper(p, saves, hits, crits, n + 1, successes + i, prob * new_prob);
+            // If we scored a hit, add that save's tag to the mask.
+            enum tag_mask_t new_mask = mask;
+            if(i){
+                new_mask |= TAG_MASK(p->tag[n]);
+            }
+            hit_prob_multi_helper(p, saves, hits, crits, n + 1, successes + i, prob * new_prob, new_mask);
         }
     }
 }
@@ -255,7 +298,12 @@ static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int cr
  * failed.
  */
 static void hit_prob_multi(struct player *p, int *saves, int hits, int crits){
-    hit_prob_multi_helper(p, saves, hits, crits, 0, 0, 1.0);
+    // If there were crits, the damage is tagged with the first damage type.
+    enum tag_mask_t mask = TAG_MASK_NONE;
+    if(crits){
+        mask = TAG_MASK(p->tag[0]);
+    }
+    hit_prob_multi_helper(p, saves, hits, crits, 0, 0, 1.0, mask);
 }
 
 /*
@@ -270,7 +318,8 @@ static void fire_damage(struct player *p, int hits, int total_hits, int dam, dou
 
     // record damage at bottom of stack or when we hit the cap
     if(hits == 0 || total_hits >= SUCCESS_MAX || depth == 0){
-        p->success[MIN(total_hits, SUCCESS_MAX)] += prob;
+        // TODO: Don't ignore tags when dealing with fire damage.
+        p->success[MIN(total_hits, SUCCESS_MAX)][TAG_MASK_NONE] += prob;
         return;
     }
 
@@ -311,7 +360,7 @@ static void calc_player_successes(struct player *p){
                         // Non-lethal skill (Dodge, Smoke)
                         // There is no saving throw. Number of successes still
                         // matters for smoke.
-                        p->success[crits + hits] += p->hit[hits][crits];
+                        p->success[crits + hits][TAG_MASK_NONE] += p->hit[hits][crits];
                     }else{
                         // Normal - one save per regular hit
                         // Additional saves for crits after the first die
@@ -716,7 +765,7 @@ static void print_player(const struct player *p, int p_num){
     printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
 
     for(i = 0; i < p->num_saves; i++){
-        printf(" DAM[%d] %2d", i, p->dam[i]);
+        printf(" DAM[%d] %2d TAG[%d] %s", i, p->dam[i], i, tag_labels[p->tag[i]]);
     }
     printf("\n");
 }
@@ -780,10 +829,11 @@ static void parse_b(const char *str, struct player *p){
 }
 
 static void parse_dam(const char **argv, int argc, int *i, struct player *p){
-    // Format: N D1 A [D2 A2 [D3 A3]]
+    // Format: N D1 A1 T1 [D2 A2 T2 [D3 A3 T3]]
     // N is number of damage values coming
     // Dn is damage value
     // An is ammo type
+    // Tn is tag
     int save;
 
     char ammo = argv[(*i)++][0];
@@ -814,7 +864,7 @@ static void parse_dam(const char **argv, int argc, int *i, struct player *p){
             break;
     }
 
-    if(*i + p->num_saves > argc){
+    if(*i + p->num_saves * 2 > argc){
         printf("ERROR: Too few damage values for number of saves\n");
         exit(1);
     }
@@ -825,6 +875,29 @@ static void parse_dam(const char **argv, int argc, int *i, struct player *p){
         if(p->dam[save] < 0 || p->dam[save] > DAM_MAX){
             printf("ERROR: P%d DAM[%d] %d must be in the range of 0 to %d\n", p->player_num, save, p->dam[save], DAM_MAX);
             exit(1);
+        }
+
+        const char *tag_label = argv[(*i)++];
+        switch(tag_label[0]){
+            case 'A':
+                p->tag[save] = TAG_A;
+                break;
+            case 'B':
+                p->tag[save] = TAG_B;
+                break;
+            case 'C':
+                p->tag[save] = TAG_C;
+                break;
+            case 'D':
+                p->tag[save] = TAG_D;
+                break;
+            case 'E':
+                p->tag[save] = TAG_E;
+                break;
+            default:
+                printf("ERROR: P%d TAG[%d] '%s' is unknown. Must be one of A, B, C, D, E.\n", p->player_num, save, tag_label);
+                exit(1);
+                break;
         }
     }
 }
