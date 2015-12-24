@@ -1,3 +1,11 @@
+/*
+ * This is an implementation of Infinity dice math that enumerates every
+ * possible combination given the BS and B of both models and tabulates
+ * the outcomes.
+ *
+ * Created by Jonathan Polley.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,14 +39,6 @@ static const char *ammo_labels[] = {
     "FIRE",
     "NONE",
 };
-
-/*
- * This is an implementation of Infinity dice math that enumerates every
- * possible combination given the BS and B of both models and tabulates
- * the outcomes.
- *
- * Created by Jonathan Polley.
- */
 
 /*
  * Structure for a single die result.
