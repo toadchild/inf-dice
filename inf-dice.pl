@@ -36,11 +36,11 @@ sub print_top{
     <div class='content'>
     <h1>Infinity Dice Calculator (N3)</h1>
 <p>
-This is a <b>BETA</b> version of the Infinity Dice Calculator for the 3rd
-Edition of Infinity (N3).  It is incomplete and may still have errors.
+The Infinity Dice Calculator is a statistical tool for the 3rd Edition of
+Infinity (N3).  It is a work in progress and may still have errors.
 Please report any issues to <a href="mailto:inf-dice\@ghostlords.com">
-inf-dice\@ghostlords.com</a>. There is also a <a href="/2e/">2nd Edition
-version</a> of this tool.
+inf-dice\@ghostlords.com</a>. My other Infinity resources may be found
+<a href="http://infinity.ghostlords.com/">here</a>.
 </p>
 <p>
 Use the Model and Action Selection tools below to describe the scenario you
@@ -55,7 +55,7 @@ of other options you have chosen.
 </p>
 <p>
 Once you are satisfied, press
-the button to see the probabilties for this action.
+the button to see the probabilties for this scenario.
 </p>
     </div>
     </div>
