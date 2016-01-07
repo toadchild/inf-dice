@@ -349,7 +349,6 @@ sub print_input_attack_section{
           "</th>",
           "</tr>",
           "<tr>",
-          "<br>",
           "<td id='$player.statline_type'>",
           span_popup_menu(-name => "$player.type"),
           "</td>",
