@@ -1,3 +1,11 @@
+/*
+ * This is an implementation of Infinity dice math that enumerates every
+ * possible combination given the BS and B of both models and tabulates
+ * the outcomes.
+ *
+ * Created by Jonathan Polley.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,14 +39,6 @@ static const char *ammo_labels[] = {
     "FIRE",
     "NONE",
 };
-
-/*
- * This is an implementation of Infinity dice math that enumerates every
- * possible combination given the BS and B of both models and tabulates
- * the outcomes.
- *
- * Created by Jonathan Polley.
- */
 
 /*
  * Structure for a single die result.
@@ -154,8 +154,9 @@ static void print_tables(struct dice *d){
     double n_success = 0;
     double n2;
 
-    printf("Total Hits: %lld\n", d->num_rolls);
+    printf("Total Rolls: %lld\n", d->num_rolls);
     printf("Actual Rolls Made: %lld\n", d->rolls_made);
+    printf("Savings: %.02f%%\n", 100 - (100.0 * d->rolls_made / d->num_rolls));
     printf("\n");
 
     n_rolls += print_player_hits(&d->p1, 1, d->num_rolls);
