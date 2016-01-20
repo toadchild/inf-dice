@@ -25,6 +25,7 @@ Content-Type: text/html; charset=utf-8
         <script type="text/javascript" src="inf-dice.js"></script>
         <script type="text/javascript" src="unit_data.js"></script>
         <script type="text/javascript" src="weapon_data.js"></script>
+        <script type="text/javascript" src="hacking_data.js"></script>
     </head>
     <body onload="init_on_load()">
 EOF
