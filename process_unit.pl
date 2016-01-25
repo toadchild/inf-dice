@@ -8,8 +8,11 @@ use Clone qw(clone);
 use Data::Dumper;
 
 my $json = JSON::PP->new;
+# pretty print output
 $json->pretty(1);
+# output fields in sorted order (minimizes diffs between runs)
 $json->canonical(1);
+# relaxed corectness checking of input
 $json->relaxed(1);
 
 my %default_wtype = (
