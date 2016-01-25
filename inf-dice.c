@@ -69,7 +69,7 @@ static const char *tag_labels[] = {
     "E",
 };
 
-#define TAG_LABEL_NONE "NORMAL"
+#define TAG_LABEL_NONE "NONE"
 
 /*
  * Structure for a single die result.
@@ -160,6 +160,7 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
     double untagged_prob[SUCCESS_MAX + 1] = {};
 
     for(success = SUCCESS_MAX; success > 0; success--){
+        int tagged_output = 0;
         for(int mask = 0; mask < TAG_MASK_MAX; mask++){
             if(p->success[success][mask] > 0){
                 double prob = 100.0 * p->success[success][mask] / num_rolls;
@@ -169,20 +170,19 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
                         tagged_prob[success][tag] += prob;
                     }
                 }
-                if(prob >= 0.005){
-                    printf("P%d Scores %2d Success(es): %6.2f%%", p_num, success, prob);
-                    if(mask != TAG_MASK_NONE){
-                        for(int tag = 0; tag < NUM_TAGS; tag++){
-                            if(mask & TAG_MASK(tag)){
-                                printf(" %s", tag_labels[tag]);
-                            }
-                        }
-                    }
-                    printf("\n");
-                }
 
                 n_success += p->success[success][mask];
             }
+        }
+
+        for(int tag = 0; tag < NUM_TAGS; tag++){
+            double prob = tagged_prob[success][tag];
+            if(prob >= 0.005){
+                printf("P%d Scores %2d Success(es): %6.2f%% %s\n", p_num, success, prob, tag_labels[tag]);
+            }
+        }
+        if(untagged_prob[success] >= 0.005){
+            printf("P%d Scores %2d Success(es): %6.2f%%\n", p_num, success, untagged_prob[success]);
         }
     }
 
