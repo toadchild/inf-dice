@@ -157,6 +157,7 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
     int success;
     double n_success = 0;
     double tagged_prob[SUCCESS_MAX + 1][NUM_TAGS] = {};
+    double tagless_prob[SUCCESS_MAX + 1] = {};
     double untagged_prob[SUCCESS_MAX + 1] = {};
 
     for(success = SUCCESS_MAX; success > 0; success--){
@@ -170,6 +171,9 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
                         tagged_prob[success][tag] += prob;
                     }
                 }
+                if(mask == 0){
+                    tagless_prob[success] += prob;
+                }
 
                 n_success += p->success[success][mask];
             }
@@ -181,12 +185,21 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
                 printf("P%d Scores %2d Success(es): %6.2f%% %s\n", p_num, success, prob, tag_labels[tag]);
             }
         }
+        if(tagless_prob[success] >= 0.005){
+            printf("P%d Scores %2d Success(es): %6.2f%% %s\n", p_num, success, tagless_prob[success], TAG_LABEL_NONE);
+        }
         if(untagged_prob[success] >= 0.005){
             printf("P%d Scores %2d Success(es): %6.2f%%\n", p_num, success, untagged_prob[success]);
         }
     }
 
-    double cumul_prob;
+    double cumul_prob = 0;
+    for(success = SUCCESS_MAX; success > 0; success--){
+        if(tagless_prob[success]){
+            cumul_prob += tagless_prob[success];
+            printf("P%d Scores %2d+ Successes:  %6.2f%% %s\n", p_num, success, cumul_prob, TAG_LABEL_NONE);
+        }
+    }
     for(int tag = 0; tag < NUM_TAGS; tag++){
         cumul_prob = 0;
         for(success = SUCCESS_MAX; success > 0; success--){
