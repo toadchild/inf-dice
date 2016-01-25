@@ -62,26 +62,31 @@ the button to see the probabilties for this action.
 EOF
 }
 
+my $tag_codes = {
+    SHOCK => {fatal => 1, str_resist => 1},
+    'EM' => {fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
+};
+
 my $ammo_codes = {
     Normal => {saves => 1},
-    Shock => {saves => 1, fatal => 1},
-    Swarm => {saves => 1, fatal => 1, save => 'bts'},
+    Shock => {saves => 1, tag => 'SHOCK'},
+    Swarm => {saves => 1, save => 'bts', tag => 'SHOCK'},
     T2 => {saves => 1, dam => 2},
     AP => {saves => 1, ap => 0.5},
     'AP+DA' => {saves => 2, ap => 0.5},
     'AP+EXP' => {saves => 3, ap => 0.5},
-    'AP+Shock' => {saves => 1, ap => 0.5, fatal => 1},
+    'AP+Shock' => {saves => 1, ap => 0.5, tag => 'SHOCK'},
     DA => {saves => 2},
-    'DA+Shock' => {saves => 2, fatal => 1},
+    'DA+Shock' => {saves => 2, tag => 'SHOCK'},
     EXP => {saves => 3},
     Fire => {saves => 'F', fatal_symbiont => 9},
     Monofilament => {saves => 1, fixed_dam => 12, fatal => 9},
     K1 => {saves => 1, fixed_dam => 12},
-    Viral => {saves => 2, save => 'bts', fatal => 1, str_resist => 1, ignore_nwi => 1},
+    Viral => {saves => 2, save => 'bts', tag => 'SHOCK'},
     Nanotech => {saves => 1, save => 'bts'},
     Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'E/M' => {saves => 1, ap => 0.5, save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'E/M2' => {saves => 2, ap => 0.5, save => 'bts', fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'E/M' => {saves => 1, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
+    'E/M2' => {saves => 2, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
     'Zero-V Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
     'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
@@ -90,9 +95,10 @@ my $ammo_codes = {
     'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     'Plasma' => {saves => 2, save => ['arm', 'bts']},
+    'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
+    # XXX the ap should not affect the bts save
+    'AP+E/M' => {saves => 2, ap => 0.5, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
     # Placeholders for unimplemented ammos
-    'N+E/M' => {saves => 1},
-    'AP+E/M' => {saves => 1, ap => 0.5},
     'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
 };
 
@@ -145,10 +151,11 @@ my $immunity_labels = {
 };
 
 my $immunities = {
-    shock => {Shock => 'arm'},
-    bio => {Shock => 'arm', Viral => 'bts'},
+    shock => {Shock => 'arm', SHOCK => 'arm'},
+    bio => {Shock => 'arm', SHOCK => 'arm', Viral => 'bts'},
     total => {
         Shock => 'arm',
+        SHOCK => 'arm',
         AP => 'arm',
         'AP+DA' => 'arm',
         'AP+EXP' => 'arm',
@@ -678,8 +685,7 @@ sub print_player_output{
     my $symbiont = param("p$other.symbiont") // 0;
     my $operator_w = param("p$other.operator") // 0;
     my $action = param("p$player.action") // '';
-    my $marksmanship = param("p$player.marksmanship") // 0;
-    my $disabled_h;
+    my $immune = {};
 
     my $code;
     if($action eq 'hack'){
@@ -693,17 +699,9 @@ sub print_player_output{
     if(!defined $code){
         $code = $ammo_codes->{$ammo};
     }
-    
 
     my $fatal = $code->{fatal} // 0;
     my $dam = $code->{dam} // 1;
-
-    # Marksmanship grants Shock in addition to existing ammo types
-    if($marksmanship > 0){
-        if(($action eq 'bs' || $action eq 'supp') && !$code->{nonlethal} && !$code->{fatal}){
-            $fatal = 1;
-        }
-    }
 
     # pretty printing
     my $format = $code->{format} // '%s inflicts %d or more wounds on %s%s';
@@ -724,10 +722,7 @@ sub print_player_output{
         $unconscious++;
         $dead++;
         # Make Symbiont armor shock-immune.
-        # Might not be 100% correct, but is better than before.
-        if($fatal == 1){
-            $fatal = 0;
-        }
+        $immune->{SHOCK} = 1;
     }
 
     if($operator_w){
@@ -741,24 +736,40 @@ sub print_player_output{
         $dead++;
     }
 
-    if($fatal >= $wounds && !$immunities->{$immunity}{$ammo} && !($w_type eq 'STR' && $code->{str_resist})){
+    if($fatal >= $wounds && !$immunities->{$immunity}{$ammo}){
         # This ammo is instantly fatal, and we are not immune
         $dead = 1;
-    }
-
-    if($code->{ignore_nwi}){
-        $nwi = 0;
     }
 
     if($nwi){
         $unconscious = -1;
     }
 
+    my $cumul_hits = $output->{cumul_hits}{$player};
+    my $hits = $output->{hits}{$player};
+    for my $tag_name (keys %{$output->{tagged_cumul_hits}{$player}}){
+        my $tag = $tag_codes->{$tag_name};
+        if($tag->{fatal} >= $wounds && !$immunities->{$immunity}{$tag_name} && !($w_type eq 'STR' && $tag->{str_resist})){
+            $hits = $output->{tagged_hits}{$player}{NONE};
+            $cumul_hits = $output->{tagged_cumul_hits}{$player}{NONE};
+        }else{
+            $immune->{$tag_name} = 1;
+        }
+    }
+
     print "<h3>$player_labels->{$player}</h3>";
     print "<p>\n";
 
+    # Array of probability that a certain number of wounds were inflicted.
+    # Don't worry about calculating 0 wounds.
+    my $results = {
+        hits => [],
+        cumul_hits => [],
+    };
+    my @labels;
+    my @formats;
     my $max_h = 0;
-    for my $h (sort {$a <=> $b} keys %{$output->{hits}{$player}}){
+    for my $h (sort {$a <=> $b} keys %$hits){
         my $done;
 
         $max_h = $h;
@@ -767,100 +778,102 @@ sub print_player_output{
         if($w >= $dead){
             $label = sprintf " (%s)", $code->{label} // 'Dead';
             $done = 1;
-            if(!$disabled_h){
-                $disabled_h = $h;
-            }
         }elsif($w == $symb_disabled){
             $label = ' (Symbiont Disabled)';
         }elsif($w == $eject){
             $label = ' (Operator Ejected)';
-            if(!$disabled_h){
-                $disabled_h = $h;
-            }
         }elsif($w == $unconscious){
             $label = ' (Unconscious)';
-            if(!$disabled_h){
-                $disabled_h = $h;
-            }
         }elsif($w == $spawn){
             $label = ' (Spawn Embryo)';
-            if(!$disabled_h){
-                $disabled_h = $h;
-            }
         }elsif($operator_w && $w > $eject){
             $label = ' (Operator ' . ($wounds + $operator_w - $w) . ' W)';
         }else{
             $label = ' (' . ($wounds - $w) . " $w_type)";
         }
 
-        printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> ", $output->{cumul_hits}{$player}{$h};
-        printf "$format<br>\n", $name, $h, $other_name, $label;
+        $results->{hits}[$h] = $hits->{$h};
+        $results->{cumul_hits}[$h] = $cumul_hits->{$h};
+        $labels[$h] = $label;
+        $formats[$h] = $format;
+    }
 
-        # Stop once we print a line about them being dead
-        if($done){
-            last;
+    # 1+ hits with shock is instant death
+    for my $tag_name (keys %{$output->{tagged_cumul_hits}{$player}}){
+        my $tag = $tag_codes->{$tag_name};
+        if(!$immune->{$tag_name}){
+            # If the label is something, then they aren't killed
+            my $i;
+            if($tag->{label}){
+                $i = 0;
+                $results->{hits}[$i] = 0;
+                $results->{cumul_hits}[$i] = 0;
+            }else{
+                $i = 1;
+            }
+            $labels[$i] = sprintf " (%s)", $tag->{label} // 'Dead';
+            $results->{hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
+            $results->{cumul_hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
+            if($tag->{format}){
+                $formats[$i] = $tag->{format};
+            }else{
+                $formats[$i] = $format;
+            }
+        }
+    }
+
+    for(my $h = 0; $h < scalar @{$results->{cumul_hits}}; $h++){
+        if(defined $results->{cumul_hits}[$h]){
+            printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> ", $results->{cumul_hits}[$h];
+            printf "$formats[$h]<br>\n", $name, $h, $other_name, $labels[$h];
         }
     }
 
     print "</p>\n";
 
-    return ($max_h, $disabled_h);
+    return $results;
 }
 
 sub print_miss_output{
     my ($output, $text) = @_;
 
     print "<h3>Failures</h3>\n";
-    if($output->{disabled}{1}){
-        printf "<span class='splat hit_chance'>%.2f%%</span> ", $output->{disabled}{1};
-        print "Disabled by first strike<br>\n";
-    }
-    if($output->{disabled}{2}){
-        printf "<span class='splat hit_chance'>%.2f%%</span> ", $output->{disabled}{2};
-        print "Disabled by first strike<br>\n";
-    }
     printf "<span class='miss hit_chance'>%.2f%%</span> $text<br>\n", $output->{hits}{0};
 }
 
 sub print_hitbar_player{
-    my ($output, $sort, $p, $cutoff) = @_;
+    my ($output, $sort, $p, $results) = @_;
 
-    for my $h (sort {$a * $sort <=> $b * $sort} keys %{$output->{hits}{$p}}){
-        my $width = $output->{hits}{$p}{$h};
-        my $label = $h;
-        if($h == $cutoff){
-            $width = $output->{cumul_hits}{$p}{$h};
-            if($width > $output->{hits}{$p}{$h}){
-                $label .= '+';
+    for(my $i = 0; $i < scalar @{$results->{hits}}; $i++){
+        my $h = $i;
+        if($sort < 0){
+            $h = scalar @{$results->{hits}} - $i - 1;
+        }
+        my $width = $results->{hits}[$h];
+        if(defined $width){
+            my $label = $h;
+            if($h == scalar @{$results->{cumul_hits}} - 1){
+                $width = $results->{cumul_hits}[$h];
+                if($width > $results->{hits}[$h]){
+                    $label .= '+';
+                }
             }
-        }elsif($h > $cutoff){
-            next;
-        }
 
-        print "<td style='width: $width%;' class='p$p-hit-$h'>";
-        if($width >= 3.0){
-            print $label;
+            print "<td style='width: $width%;' class='p$p-hit-$h'>";
+            if($width >= 3.0){
+                print $label;
+            }
+            print "</td>\n";
         }
-        print "</td>\n";
     }
 }
 
 sub print_hitbar_output{
-    my ($output, $max_1, $max_2) = @_;
+    my ($output, $hits_1, $hits_2) = @_;
 
     print "<table class='hitbar'><tr>\n";
 
-    print_hitbar_player($output, -1, 1, $max_1);
-
-    if($output->{disabled}{2}){
-        print "<td style='width: $output->{disabled}{2}%;' class='splat'>";
-        if($output->{disabled}{2} >= 25.0){
-            print "Disabled";
-        }elsif($output->{disabled}{2} >= 3.0){
-            print "D";
-        }
-        print "</td>\n";
-    }
+    print_hitbar_player($output, -1, 1, $hits_1);
 
     if($output->{hits}{0}){
         print "<td style='width: $output->{hits}{0}%;' class='miss'>";
@@ -870,17 +883,7 @@ sub print_hitbar_output{
         print "</td>\n";
     }
 
-    if($output->{disabled}{1}){
-        print "<td style='width: $output->{disabled}{1}%;' class='splat'>";
-        if($output->{disabled}{1} >= 25.0){
-            print "Disabled";
-        }elsif($output->{disabled}{1} >= 3.0){
-            print "D";
-        }
-        print "</td>\n";
-    }
-
-    print_hitbar_player($output, 1, 2, $max_2);
+    print_hitbar_player($output, 1, 2, $hits_2);
 
     print "</tr></table>\n"
 }
@@ -922,13 +925,13 @@ sub print_ftf_output{
     print_roll_subtitle();
 
     if($output->{hits}){
-        my ($max_1, $dis_1) = print_player_output($output, 1, 2);
+        my $hits_1 = print_player_output($output, 1, 2);
 
         print_miss_output($output, 'Neither player succeeds');
 
-        my ($max_2, $dis_2) = print_player_output($output, 2, 1);
+        my $hits_2 = print_player_output($output, 2, 1);
 
-        print_hitbar_output($output, $max_1, $max_2);
+        print_hitbar_output($output, $hits_1, $hits_2);
     }
 }
 
@@ -939,12 +942,12 @@ sub print_normal_output{
     print_roll_subtitle();
 
     if($output->{hits}){
-        my ($max_1, $dis_1) = print_player_output($output, 1, 2);
-        my ($max_2, $dis_2) = print_player_output($output, 2, 1);
+        my $hits_1 = print_player_output($output, 1, 2);
+        my $hits_2 = print_player_output($output, 2, 1);
 
         print_miss_output($output, 'No success');
 
-        print_hitbar_output($output, $max_1, $max_2);
+        print_hitbar_output($output, $hits_1, $hits_2);
     }
 }
 
@@ -954,26 +957,26 @@ sub print_simultaneous_output{
     print "<h2>Simultaneous Normal Rolls</h2>\n";
     print_roll_subtitle();
 
-    my ($max_1, $max_2, $dis_1, $dis_2);
+    my ($hits_1, $hits_2);
 
     if($output->{A}{hits}){
-        ($max_1, $dis_1) = print_player_output($output->{A}, 1, 2);
+        $hits_1 = print_player_output($output->{A}, 1, 2);
 
         print_miss_output($output->{A}, 'No success');
     }
 
     if($output->{B}{hits}){
-        ($max_2, $dis_2) = print_player_output($output->{B}, 2, 1);
+        $hits_2 = print_player_output($output->{B}, 2, 1);
 
         print_miss_output($output->{B}, 'No success');
     }
 
     if($output->{A}{hits}){
-        print_hitbar_output($output->{A}, $max_1, 0);
+        print_hitbar_output($output->{A}, $hits_1, undef);
     }
 
     if($output->{B}{hits}){
-        print_hitbar_output($output->{B}, 0, $max_2);
+        print_hitbar_output($output->{B}, undef, $hits_2);
     }
 }
 
@@ -984,7 +987,7 @@ sub print_none_output{
     if($output->{hits}){
         print_miss_output($output->{B}, 'Nothing happens');
 
-        print_hitbar_output($output, 0, 0);
+        print_hitbar_output($output, undef, undef);
     }
 }
 
@@ -1075,9 +1078,10 @@ sub max{
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($ap, $ammo, $cover, $ignore_cover, $save, $dam);
+    my ($ap, $ammo, $cover, $ignore_cover, $save, $dam, $tag);
     my @dam;
     my @arm = ();
+    my @tag = ();
     my $b;
     my ($stat_name, $stat);
     my ($ammo_name, $code, $immunity);
@@ -1115,10 +1119,12 @@ sub gen_attack_args{
         $ap = 1;
         $save = $immunities->{$immunity}{$ammo_name};
         $ammo = 1;
+        $tag = 'NONE';
     }else{
         $ap = $code->{ap} // 1;
         $save = $code->{save} // 'arm';
         $ammo = $code->{saves};
+        $tag = $code->{tag} // 'NONE';
     }
 
     # convert dam into array
@@ -1138,6 +1144,18 @@ sub gen_attack_args{
     }else{
         @arm = (ceil(abs(param("$them.$save") // 0) * $ap)) x scalar @dam;
     }
+
+    # construct a tag array
+    if(ref($tag) eq 'ARRAY'){
+        for my $t (@$tag){
+            push @tag, $t;
+        }
+    }else{
+        @tag = ($tag) x scalar @dam;
+    }
+
+    push @mod_strings, "dam: " . join(' ', @dam);
+    push @mod_strings, "tag: " . join(' ', @tag);
 
     # Monofilament and K1 have fixed damage
     if($code->{fixed_dam}){
@@ -1200,15 +1218,18 @@ sub gen_attack_args{
         }
 
         if($marksmanship >= 1 && $stat_name eq 'BS' && !$code->{nonlethal}){
-            # TODO: track shock effect
-
             if($save eq 'bts'){
                 # Marksmanship L1 adds Shock; makes a second save if first is on BTS
                 $save = [('bts') x scalar @dam, 'arm'];
                 push @dam, $dam[0];
                 push @arm, ceil(abs(param("$them.arm") // 0));
+                push @tag, 'SHOCK';
                 $ammo++;
                 push @mod_strings, sprintf('Marksmanship L1 grants aditional ARM save at DAM %d', $dam[$#dam]);
+            }else{
+                for(my $i = 0; $i < scalar @tag; $i++){
+                    $tag[$i] = 'SHOCK';
+                }
             }
         }
 
@@ -1554,13 +1575,16 @@ sub gen_attack_args{
         push @mod_strings, "Net CC is $stat";
     }
 
+    # @tag_dam contains (damage, tag) pairs.
+    my @tag_dam;
     if(!$code->{alt_save}){
-        for(my $i = 0; $i < scalar @dam; $i++){
-            $dam[$i] = max($dam[$i] - $arm[$i], 0);
+        while(@dam){
+            push @tag_dam, max(shift(@dam) - shift(@arm), 0);
+            push @tag_dam, shift(@tag);
         }
     }else{
         # Adhesive makes a PH saving throw instead of DAM - ARM check
-        @dam = (20 - max(param("$them.$code->{alt_save}") + $code->{alt_save_mod}, 0));
+        @tag_dam = (20 - max(param("$them.$code->{alt_save}") + $code->{alt_save_mod}, 0), @tag);
     }
 
     return (
@@ -1569,7 +1593,7 @@ sub gen_attack_args{
         $stat,
         $b,
         $ammo,
-        @dam,
+        @tag_dam,
     );
 }
 
@@ -1648,6 +1672,7 @@ sub gen_hack_args{
         @dam = ($dam);
     }
 
+    # XXX needs tags
     return (
         $type,
         \@mod_strings,
@@ -1713,6 +1738,7 @@ sub gen_reset_args{
         1,
         '-',
         0,
+        'NONE',
     );
 }
 
@@ -1777,6 +1803,7 @@ sub gen_dodge_args{
         1,
         '-',
         0,
+        'NONE',
     );
 }
 
@@ -1788,6 +1815,7 @@ sub gen_none_args{
         1,
         '-',
         0,
+        'NONE',
     );
 }
 
@@ -1824,9 +1852,18 @@ sub execute_backend{
         $_ =~ s/</&lt;/g;
 
         $output->{raw} .= $_;
-        if(m/^P(.) Scores +(\d+) S[^0-9]*([0-9.]+)%[^\d]*(\d+)\+ S[^0-9]*([0-9.]+)%/){
-            $output->{hits}{$1}{$2} = $3;
-            $output->{cumul_hits}{$1}{$4} = $5;
+        if(m/^P(.) Scores +(\d+) Success\(es\): +([0-9.]+)%(?: (\w+))?/){
+            if($4){
+                $output->{tagged_hits}{$1}{$4}{$2} = $3;
+            }else{
+                $output->{hits}{$1}{$2} = $3;
+            }
+        }elsif(m/^P(.) Scores +(\d+)\+ Successes: +([0-9.]+)%(?: (\w+))?/){
+            if($4){
+                $output->{tagged_cumul_hits}{$1}{$4}{$2} = $3;
+            }else{
+                $output->{cumul_hits}{$1}{$2} = $3;
+            }
         }elsif(m/^No Successes: +([0-9.]+)/){
             $output->{hits}{0} = $1;
         }elsif(m/^ERROR/ || m/Assertion/){

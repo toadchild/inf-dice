@@ -86,7 +86,7 @@ for my $p (@$players){
     $step_b = ($final_b - $b) / $steps;
 
     # solid backgrounds
-    for my $i (1 .. $steps){
+    for my $i (0 .. $steps){
         print ".$p-hit-$i {\n";
         print "    color: $colors->{$p}{text};\n";
         printf "    background-color: #%02x%02x%02x;\n", $r, $g, $b;
