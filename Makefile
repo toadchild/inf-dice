@@ -5,7 +5,7 @@ LDLIBS=-lm -lpthread
 WWWDIR=/var/www/inf-dice/n3
 BINDIR=/usr/local/bin
 
-WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js
+WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js hacking_data.js
 BIN_TARGETS=inf-dice-n3
 
 all: ${WWW_TARGETS} ${BIN_TARGETS}
@@ -36,6 +36,9 @@ unit_data.js: process_unit.pl mayanet_data/Toolbox/*
 weapon_data.js: process_weapon.pl mayanet_data/Toolbox/* dual_weapons.dat dual_ccw.dat \
     poison_ccw.dat
 	./process_weapon.pl
+
+hacking_data.js: process_hacking.pl hacking_implemented.dat mayanet_data/Toolbox/hacking.json
+	./process_hacking.pl
 
 install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice.js inf-dice.css inf-dice.pl ${WWW_TARGETS} ${WWWDIR}

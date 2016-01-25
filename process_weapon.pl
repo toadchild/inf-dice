@@ -174,8 +174,11 @@ for my $name (keys %$dual_weapons){
 
         my $new_weapon = clone($weapon_data->{$name});
 
-        for(my $i = 0; $i < @{$new_weapon->{b}}; $i++){
-            $new_weapon->{b}[$i]++;
+        # B increase is only for non-CC weapons
+        if(!$new_weapon->{att_cc}){
+            for(my $i = 0; $i < @{$new_weapon->{b}}; $i++){
+                $new_weapon->{b}[$i]++;
+            }
         }
         $new_weapon->{name} =~ s/$base_name/$dual_name/;
         $new_weapon->{display_name} =~ s/$base_name/$dual_name/;
