@@ -796,6 +796,10 @@ sub print_player_output{
         $results->{cumul_hits}[$h] = $cumul_hits->{$h};
         $labels[$h] = $label;
         $formats[$h] = $format;
+
+        if($done){
+            last;
+        }
     }
 
     # 1+ hits with shock is instant death
@@ -809,7 +813,7 @@ sub print_player_output{
                 $results->{hits}[$i] = 0;
                 $results->{cumul_hits}[$i] = 0;
             }else{
-                $i = 1;
+                $i = $dead;
             }
             $labels[$i] = sprintf " (%s)", $tag->{label} // 'Dead';
             $results->{hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
