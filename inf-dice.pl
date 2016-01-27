@@ -65,7 +65,8 @@ EOF
 
 my $tag_codes = {
     SHOCK => {fatal => 1, str_resist => 1},
-    'EM' => {fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
+    EM => {fatal => 9, label => 'Disabled', format => '%s hits %3$s%4$s'},
+    NONE => {fatal => 0},
 };
 
 my $ammo_codes = {
@@ -667,9 +668,16 @@ sub print_input{
 sub print_player_output{
     my ($output, $player, $other) = @_;
 
+    # Array of probability that a certain number of wounds were inflicted.
+    # Don't worry about calculating 0 wounds.
+    my $results = {
+        hits => [],
+        cumul_hits => [],
+    };
+
     if(scalar keys %{$output->{hits}{$player}} == 0){
         # empty list, nothing to print
-        return;
+        return $results;
     }
 
     my $label = '';
@@ -760,12 +768,6 @@ sub print_player_output{
     print "<h3>$player_labels->{$player}</h3>";
     print "<p>\n";
 
-    # Array of probability that a certain number of wounds were inflicted.
-    # Don't worry about calculating 0 wounds.
-    my $results = {
-        hits => [],
-        cumul_hits => [],
-    };
     my @labels;
     my @formats;
     my $max_h = 0;
