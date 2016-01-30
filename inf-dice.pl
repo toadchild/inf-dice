@@ -97,9 +97,9 @@ my $ammo_codes = {
     'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     'Plasma' => {saves => 2, save => ['arm', 'bts']},
-    'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
-    # XXX the ap should not affect the bts save
     'AP+E/M' => {saves => 2, ap => 0.5, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
+    # XXX: The BTS save should be at half BTS.
+    'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
     # Placeholders for unimplemented ammos
     'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
 };
@@ -1677,15 +1677,19 @@ sub gen_hack_args{
     }else{
         @dam = ($dam);
     }
+    my @tag_dam;
+    while(@dam){
+        push @tag_dam, shift(@dam);
+        push @tag_dam, 'NONE';
+    }
 
-    # XXX needs tags
     return (
         $type,
         \@mod_strings,
         $stat,
         $b,
         $ammo,
-        @dam,
+        @tag_dam,
     );
 }
 
