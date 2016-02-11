@@ -850,6 +850,10 @@ sub print_miss_output{
 sub print_hitbar_player{
     my ($output, $sort, $p, $results) = @_;
 
+    if(!defined $results->{hits}){
+        return;
+    }
+
     for(my $i = 0; $i < scalar @{$results->{hits}}; $i++){
         my $h = $i;
         if($sort < 0){
