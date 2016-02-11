@@ -39,8 +39,8 @@ sub print_top{
 <p>
 The Infinity Dice Calculator is a statistical tool for the 3rd Edition of
 Infinity (N3).  It is a work in progress and may still have errors.
-Please report any issues to <a href="mailto:inf-dice\@ghostlords.com">
-inf-dice\@ghostlords.com</a>. My other Infinity resources may be found
+Please report any issues to <a href="mailto:infinity\@ghostlords.com">
+infinity\@ghostlords.com</a>. My other Infinity resources may be found
 <a href="http://infinity.ghostlords.com/">here</a>.
 </p>
 <p>
