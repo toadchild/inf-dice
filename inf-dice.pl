@@ -1164,9 +1164,6 @@ sub gen_attack_args{
         @tag = ($tag) x scalar @dam;
     }
 
-    push @mod_strings, "dam: " . join(' ', @dam);
-    push @mod_strings, "tag: " . join(' ', @tag);
-
     # Monofilament and K1 have fixed damage
     if($code->{fixed_dam}){
         map { $_ = 0 } @arm;
