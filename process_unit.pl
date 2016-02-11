@@ -201,6 +201,8 @@ sub has_immunity{
             return 'bio';
         }elsif($spec =~ m/Shock Immunity/){
             return 'shock';
+        }elsif($spec =~ m/Regeneration/){
+            return 'shock';
         }
     }
 
