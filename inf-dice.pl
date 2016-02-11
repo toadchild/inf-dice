@@ -1361,6 +1361,8 @@ sub gen_attack_args{
 
         if(param("$us.intuitive")){
             $stat = (param("$us.wip") // 0) . "*";
+            # Intuitive is FtF roll.
+            $type = 'ftf';
         }else{
             $stat = 'T';
         }
