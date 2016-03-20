@@ -29,7 +29,7 @@ my $poison_ccw = $json->decode($json_text);
 my $all_ammo = {};
 my $weapon_data = {};
 my $file;
-for my $fname (glob "mayanet_data/Toolbox/weapons.json"){
+for my $fname (glob "unit_data/weapons.json"){
     my $json_text;
     open $file, '<', $fname or die "Unable to open file";
     $json_text = <$file>;
