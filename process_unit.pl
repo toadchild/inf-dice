@@ -591,8 +591,8 @@ my $unit_data = {};
 my $file;
 my $json_text;
 
-for my $fname (glob("mayanet_data/Toolbox/*_units.json")){
-    next if $fname eq "mayanet_data/Toolbox/other_units.json";
+for my $fname (glob("unit_data/*_units.json")){
+    next if $fname eq "unit_data/other_units.json";
 
     warn "Parsing $fname\n";
     local $/;

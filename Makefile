@@ -24,20 +24,20 @@ hitbar.css: hitbar.pl
 hex.png: hexgrid.pl
 	./hexgrid.pl 100 hex.png
 
-dual_weapons.dat: process_unit.pl mayanet_data/Toolbox/*
+dual_weapons.dat: process_unit.pl unit_data/*
 	./process_unit.pl
 
-dual_ccw.dat: process_unit.pl mayanet_data/Toolbox/*
+dual_ccw.dat: process_unit.pl unit_data/*
 	./process_unit.pl
 
-unit_data.js: process_unit.pl mayanet_data/Toolbox/*
+unit_data.js: process_unit.pl unit_data/*
 	./process_unit.pl
 
-weapon_data.js: process_weapon.pl mayanet_data/Toolbox/* dual_weapons.dat dual_ccw.dat \
+weapon_data.js: process_weapon.pl unit_data/* dual_weapons.dat dual_ccw.dat \
     poison_ccw.dat
 	./process_weapon.pl
 
-hacking_data.js: process_hacking.pl hacking_implemented.dat mayanet_data/Toolbox/hacking.json
+hacking_data.js: process_hacking.pl hacking_implemented.dat unit_data/hacking.json
 	./process_hacking.pl
 
 install: ${WWW_TARGETS} ${BIN_TARGETS}
@@ -48,4 +48,4 @@ diff:
 	for i in ${WWW_TARGETS}; do diff -u ${WWWDIR} $$i; done
 
 update_data:
-	cd mayanet_data && git pull
+	cd unit_data && git pull

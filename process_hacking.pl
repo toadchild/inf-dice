@@ -21,7 +21,7 @@ my $hacking_implemented = $json->decode($json_text);
 my $all_ammo = {};
 my $weapon_data = {};
 my $file;
-my $fname = "mayanet_data/Toolbox/hacking.json";
+my $fname = "unit_data/hacking.json";
 open $file, '<', $fname or die "Unable to open file";
 $json_text = <$file>;
 my $source_data = $json->decode($json_text);
