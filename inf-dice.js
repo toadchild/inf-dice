@@ -793,6 +793,8 @@ function get_hacking_programs(hd_level){
         hd_data = hacking_devices["EI Hacking Device"];
     }else if(hd_level == 7){
         hd_data = hacking_devices["Hacking Device: UPGRADE: Stop!"];
+    }else if(hd_level == 8){
+        hd_data = hacking_devices["EI Assault Hacking Device: UPGRADE: Goodnight"];
     }
 
     if(hd_data){

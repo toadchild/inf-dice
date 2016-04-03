@@ -250,7 +250,7 @@ my $msv_labels = {
     3 => 'Level 3',
 };
 
-my $hacker = [0, 1, 2, 3, 4, 5, 6, 7];
+my $hacker = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 my $hacker_labels = {
     0 => 'None',
     1 => 'Defensive Hacking Device',
@@ -260,6 +260,7 @@ my $hacker_labels = {
     5 => 'EI Assault Hacking Device',
     6 => 'EI Hacking Device',
     7 => 'Hacking Device: UPGRADE: Stop!',
+    8 => 'EI Assault Hacking Device: UPGRADE: Goodnight',
 };
 
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
