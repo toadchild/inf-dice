@@ -1305,6 +1305,8 @@ sub gen_attack_args{
             # template weapons ignore the ARM bonus of cover
             if(param("$us.template") // 0){
                 push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
+            }elsif($ammo_name eq 'Monofilament'){
+                push @mod_strings, sprintf('Monofilament ignored ARM bonus from cover.');
             }else{
                 push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
                 map { $_ += $cover} @arm;
