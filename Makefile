@@ -5,7 +5,7 @@ LDLIBS=-lm -lpthread
 WWWDIR=/var/www/inf-dice/2e
 BINDIR=/usr/local/bin
 
-WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js .htaccess
+WWW_TARGETS=hitbar.css hex.png unit_data.js weapon_data.js
 BIN_TARGETS=inf-dice-2e
 
 all: ${WWW_TARGETS} ${BIN_TARGETS}
