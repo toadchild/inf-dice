@@ -165,6 +165,8 @@ for my $fname (glob "unit_data/weapons.json"){
 # Increase burst for dual weapons
 for my $name (keys %$dual_weapons){
     next if $name eq 'CrazyKoala';
+    next if $name eq 'MadTrap';
+    next if $name eq 'SymbioBug';
 
     my $base_name = $name;
     my $dual_name = $name . " (2)";

@@ -685,6 +685,8 @@ for my $fname (glob("unit_data/*_units.json")){
             my $alt = flatten_unit($unit, $i);
 
             next if $alt->{name} eq 'CrazyKoala';
+            next if $alt->{name} eq 'MadTrap';
+            next if $alt->{name} eq 'SymbioBug';
 
             warn "        Processing $alt->{name}\n";
 

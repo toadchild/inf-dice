@@ -86,7 +86,8 @@ my $ammo_codes = {
     K1 => {saves => 1, fixed_dam => 12},
     Viral => {saves => 2, save => 'bts', tag => 'SHOCK'},
     Nanotech => {saves => 1, save => 'bts'},
-    Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s', nonlethal => 1},
+    Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
+    Stun => {saves => 2, save => 'bts', fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
     'E/M' => {saves => 1, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'E/M2' => {saves => 2, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
@@ -100,8 +101,6 @@ my $ammo_codes = {
     'AP+E/M' => {saves => 2, ap => 0.5, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
     # XXX: The BTS save should be at half BTS.
     'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
-    # Placeholders for unimplemented ammos
-    'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
 };
 
 my $skill_codes = {
