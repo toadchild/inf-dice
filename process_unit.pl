@@ -28,12 +28,11 @@ my %default_wtype = (
 my $skip_list = {
     "Uxìa McNeill" => 1,
     "Tohaa Diplomatic Delegates" => 1,
-    "Rasyat Diplomatic Division" => 1,
     "Teucer" => 1,
+    "Kazak Spetsnazs" => 1,
 };
 
 my $alternate_names = {
-    "Kazak Spetsnazs (Mimetism)" => "Kazak Spetsnazs (Parachutist)",
 };
 
 my @specialist_profiles = (
@@ -41,6 +40,11 @@ my @specialist_profiles = (
         key => 'msv',
         ability_func => \&has_msv,
         name_func => \&name_msv,
+    },
+    {
+        key => 'ad',
+        ability_func => \&has_ad,
+        name_func => \&name_ad,
     },
     {
         key => 'ch',
@@ -119,6 +123,19 @@ sub name_sapper{
 sub name_marksmanship{
     my ($marks) = @_;
     return " (Marksmanship $marks)";
+}
+
+my $ad_names = {
+    1 => 'Parachutist',
+    2 => 'Airborne Infiltration',
+    3 => 'Inferior Combat Jump',
+    4 => 'Combat Jump',
+    5 => 'Superior Combat Jump',
+};
+
+sub name_ad{
+    my ($ad) = @_;
+    return " ($ad_names->{$ad})";
 }
 
 sub has_spec{
@@ -217,6 +234,8 @@ sub has_camo{
             return 1;
         }elsif($spec =~ m/CH: Camo/){
             return 2;
+        }elsif($spec =~ m/CH: Ambush Camo/){
+            return 2;
         }elsif($spec =~ m/CH: TO Camo/){
             return 3;
         }
@@ -226,17 +245,7 @@ sub has_camo{
 }
 
 sub has_odd{
-    my ($unit) = @_;
-
-    for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/ODD:/){
-            return 1;
-        }elsif($spec =~ m/ODF:/){
-            return 2;
-        }
-    }
-
-    return 0;
+    return has_spec(@_, 'ODD:');
 }
 
 sub has_msv{
@@ -252,13 +261,7 @@ sub has_msv{
 }
 
 sub has_xvisor{
-    if(has_spec(@_, 'X Visor')){
-        return 1;
-    }
-    if(has_spec(@_, 'X-2 Visor')){
-        return 2;
-    }
-    return 0;
+    return has_spec(@_, 'X Visor');
 }
 
 sub has_fo{
@@ -356,6 +359,26 @@ sub has_g_sync{
 
 sub has_g_servant{
     return has_spec(@_, '^G: Servant');
+}
+
+sub has_ad{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Parachutist/){
+            return 1;
+        }elsif($spec =~ m/Airborne Infiltration/){
+            return 2;
+        }elsif($spec =~ m/Inferior Combat Jump/){
+            return 3;
+        }elsif($spec =~ m/Superior Combat Jump/){
+            return 5;
+        }elsif($spec =~ m/Combat Jump/){
+            return 4;
+        }
+    }
+
+    return 0;
 }
 
 my $dual_weapons = {};
@@ -525,6 +548,8 @@ sub parse_unit{
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
     $new_unit->{berserk} = 1 if has_berserk($new_unit);
     $new_unit->{sapper} = 1 if has_sapper($new_unit);
+    $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
+    $new_unit->{odd} = 1 if has_odd($new_unit);
 
     $new_unit->{dependent} = 1 if has_g_sync($new_unit) || has_g_servant($new_unit);
 
@@ -542,9 +567,6 @@ sub parse_unit{
     if($v = has_camo($new_unit)){
         $new_unit->{ch} = $v;
     }
-    if($v = has_odd($new_unit)){
-        $new_unit->{odd} = $v;
-    }
     if($v = has_msv($new_unit)){
         $new_unit->{msv} = $v;
     }
@@ -560,8 +582,8 @@ sub parse_unit{
     if($v = has_symbiont($new_unit, $symbiont_inactive)){
         $new_unit->{symbiont} = $v;
     }
-    if($v = has_xvisor($new_unit)){
-        $new_unit->{xvisor} = $v;
+    if($v = has_ad($new_unit)){
+        $new_unit->{ad} = $v;
     }
 
     # get_weapons goes into the childs list
