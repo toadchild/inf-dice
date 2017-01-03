@@ -189,7 +189,7 @@ sub has_ikohl{
 
     for my $spec (@{$unit->{spec}}){
         # i-Kohl L3
-        if($spec =~ m/i-K[oh][oh]l.*(\d+)/){
+        if($spec =~ m/I-Kohl.*(\d+)/){
             return -3 * $1;
         }
     }
