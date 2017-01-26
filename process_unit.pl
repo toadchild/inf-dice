@@ -25,11 +25,18 @@ my %default_wtype = (
     TAG => 'STR',
 );
 
-my $skip_list = {
+# Profiles to skip; used where all we want are the sub-profiles
+my $skip_base_profile_list = {
     "Uxìa McNeill" => 1,
     "Tohaa Diplomatic Delegates" => 1,
     "Teucer" => 1,
     "Kazak Spetsnazs" => 1,
+};
+
+# Units that need to be totally skipped in their entirety
+my $skip_unit_list = {
+    "ALIVE Anti-establishment Group" => 1,
+    "Kasym Beg (Lieutenant)" => 1,
 };
 
 my $alternate_names = {
@@ -642,6 +649,10 @@ for my $fname (glob("unit_data/*_units.json")){
 
         # Patch some flat_unit names
 
+        # Skip these units
+        if ($skip_unit_list->{$flat_unit->{name}}) {
+            next;
+        }
         # Only keep one kind of Caliban
         if($flat_unit->{name} eq 'Shasvastii Caliban (Seed-Embryo)'){
             $flat_unit->{name} = 'Caliban';
@@ -651,8 +662,8 @@ for my $fname (glob("unit_data/*_units.json")){
             $flat_unit->{name} = 'Shrouded';
         }elsif($flat_unit->{name} =~ m/^Tikbalangs/){
             $flat_unit->{name} = 'Tikbalangs';
-        }elsif($flat_unit->{name} eq 'Kasym Beg (Lieutenant)'){
-            next;
+        }elsif($flat_unit->{name} eq 'Bit & Kiss!') {
+            $flat_unit->{name} = 'Bit';
         }
         $flat_unit->{name} =~ s/^Shasvastii //;
         $flat_unit->{name} =~ s/^Hassassin //;
@@ -669,9 +680,10 @@ for my $fname (glob("unit_data/*_units.json")){
             $unit_data->{$unit->{army}} = [];
         }
 
-        if(!$skip_list->{$new_unit->{name}}){
+        if(!$skip_base_profile_list->{$new_unit->{name}}){
             push @{$unit_data->{$unit->{army}}}, $new_unit;
         }
+
 
         # Check for child units with special skills we care about
         for my $specialist (@specialist_profiles){
