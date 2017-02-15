@@ -808,7 +808,7 @@ function get_hacking_programs(hd_level){
     }else if(hd_level == 14){
         hd_data = hacking_devices["EVO Hacking Device"];
     }else if(hd_level == 15){
-        hd_data = hacking_devices["EVO Hacking Device: UPGRADES: Exile]; Goodnight"];
+        hd_data = hacking_devices["EVO Hacking Device: UPGRADES: Exile, Goodnight"];
     }else if(hd_level == 16){
         hd_data = hacking_devices["Killer Hacking Device"];
     }else if(hd_level == 17){

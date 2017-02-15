@@ -137,10 +137,10 @@ my $hack_codes = {
     # UPGRADE
     'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
     'Stop!' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
-    'Exile' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => '-', format => '%s Isolates %3$s (Fireteam canceled)', fatal => 9}},
-    'Icebreaker' => {mod_att => 0, mod_def => 0, fixed_dam => 12, effect => {saves => '1', format => '%s Immobilizes %3$s', fatal => 9}},
+    'Exile' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, format => '%s Isolates %3$s (Fireteam canceled)', fatal => 9}},
+    'Icebreaker' => {mod_att => 0, mod_def => 0, fixed_dam => 12, effect => {saves => 1, format => '%s Immobilizes %3$s', fatal => 9}},
     'Lightning' => {mod_att => 0, mod_def => -6, dam => 15, effect => {saves => 1, save => 'bts', ap => '0.5'}},
-    'Maestro' => {mod_att => +3, mod_def => -3, dam => 14, effect => {saves => '1', format => '%s Renders %3$s Unconscious', fatal => 9}},
+    'Maestro' => {mod_att => +3, mod_def => -3, dam => 14, effect => {saves => 1, format => '%s Renders %3$s Unconscious', fatal => 9}},
 };
 
 my $ma_codes = {

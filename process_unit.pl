@@ -321,7 +321,7 @@ sub has_hacker{
         if($spec eq 'EVO Hacking Device'){
             return 14;
         }
-        if($spec eq 'EVO Hacking Device: UPGRADES: Exile){ Goodnight'){
+        if($spec eq 'EVO Hacking Device: UPGRADES: Exile, Goodnight'){
             return 15;
         }
         if($spec eq 'Killer Hacking Device'){
