@@ -303,6 +303,42 @@ sub has_hacker{
         if($spec eq 'EI Assault Hacking Device: UPGRADE: Goodnight'){
             return 8;
         }
+        if($spec eq 'Hacking Device: UPGRADE: Expel'){
+            return 9;
+        }
+        if($spec eq 'Hacking Device Plus: UPGRADE: Redrum'){
+            return 10;
+        }
+        if($spec eq 'EI Assault Hacking Device'){
+            return 11;
+        }
+        if($spec eq 'Assault Hacking Device: UPGRADE: Trinity'){
+            return 12;
+        }
+        if($spec eq 'Assault Hacking Device: UPGRADE: Icebreaker'){
+            return 13;
+        }
+        if($spec eq 'EVO Hacking Device'){
+            return 14;
+        }
+        if($spec eq 'EVO Hacking Device: UPGRADES: Exile){ Goodnight'){
+            return 15;
+        }
+        if($spec eq 'Killer Hacking Device'){
+            return 16;
+        }
+        if($spec eq 'Killer Hacking Device: UPGRADE: Maestro'){
+            return 17;
+        }
+        if($spec eq 'Killer Hacking Device: UPGRADE: Lightning'){
+            return 18;
+        }
+        if($spec eq 'EI Killer Hacking Device'){
+            return 19;
+        }
+        if($spec eq 'White Hacking Device'){
+            return 20;
+        }
     }
 
     return 0;

@@ -795,6 +795,30 @@ function get_hacking_programs(hd_level){
         hd_data = hacking_devices["Hacking Device: UPGRADE: Stop!"];
     }else if(hd_level == 8){
         hd_data = hacking_devices["EI Assault Hacking Device: UPGRADE: Goodnight"];
+    }else if(hd_level == 9){
+        hd_data = hacking_devices["Hacking Device: UPGRADE: Expel"];
+    }else if(hd_level == 10){
+        hd_data = hacking_devices["Hacking Device Plus: UPGRADE: Redrum"];
+    }else if(hd_level == 11){
+        hd_data = hacking_devices["EI Assault Hacking Device"];
+    }else if(hd_level == 12){
+        hd_data = hacking_devices["Assault Hacking Device: UPGRADE: Trinity"];
+    }else if(hd_level == 13){
+        hd_data = hacking_devices["Assault Hacking Device: UPGRADE: Icebreaker"];
+    }else if(hd_level == 14){
+        hd_data = hacking_devices["EVO Hacking Device"];
+    }else if(hd_level == 15){
+        hd_data = hacking_devices["EVO Hacking Device: UPGRADES: Exile]; Goodnight"];
+    }else if(hd_level == 16){
+        hd_data = hacking_devices["Killer Hacking Device"];
+    }else if(hd_level == 17){
+        hd_data = hacking_devices["Killer Hacking Device: UPGRADE: Maestro"];
+    }else if(hd_level == 18){
+        hd_data = hacking_devices["Killer Hacking Device: UPGRADE: Lightning"];
+    }else if(hd_level == 19){
+        hd_data = hacking_devices["EI Killer Hacking Device"];
+    }else if(hd_level == 20){
+        hd_data = hacking_devices["White Hacking Device"];
     }
 
     if(hd_data){

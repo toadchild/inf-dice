@@ -124,6 +124,10 @@ my $hack_codes = {
     'Total Control' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 2, save => 'bts', format => '%s Possesses %3$s', fatal => 9}},
     # SWORD-1
     'Brain Blast' => {mod_att => 0, mod_def => 0, dam => 14, effect => {saves => 1, save => 'bts'}},
+    # SWORD-2
+    'Redrum' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
+    'Skullbuster' => {mod_att => 3, mod_def => -3, dam => 16, effect => {saves => 1, save => 'bts', ap=>0.5}},
+    'Trinity' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', tag => 'SHOCK'}},
     # SHIELD-1
     'Exorcism' => {mod_att => 0, mod_def => -3, dam => 18, reset_wip => 11, effect => {saves => 2, save => 'bts', format => '%s Cancels Possession on %3$s', fatal => 9}},
     # SHIELD-2
@@ -133,6 +137,10 @@ my $hack_codes = {
     # UPGRADE
     'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
     'Stop!' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
+    'Exile' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => '-', format => '%s Isolates %3$s (Fireteam canceled)', fatal => 9}},
+    'Icebreaker' => {mod_att => 0, mod_def => 0, fixed_dam => 12, effect => {saves => '1', format => '%s Immobilizes %3$s', fatal => 9}},
+    'Lightning' => {mod_att => 0, mod_def => -6, dam => 15, effect => {saves => 1, save => 'bts', ap => '0.5'}},
+    'Maestro' => {mod_att => +3, mod_def => -3, dam => 14, effect => {saves => '1', format => '%s Renders %3$s Unconscious', fatal => 9}},
 };
 
 my $ma_codes = {
@@ -249,7 +257,7 @@ my $msv_labels = {
     3 => 'Level 3',
 };
 
-my $hacker = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+my $hacker = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 my $hacker_labels = {
     0 => 'None',
     1 => 'Defensive Hacking Device',
@@ -260,6 +268,18 @@ my $hacker_labels = {
     6 => 'EI Hacking Device',
     7 => 'Hacking Device: UPGRADE: Stop!',
     8 => 'EI Assault Hacking Device: UPGRADE: Goodnight',
+    9 => "Hacking Device: UPGRADE: Expel",
+    10 => "Hacking Device Plus: UPGRADE: Redrum",
+    11 => "EI Assault Hacking Device",
+    12 => "Assault Hacking Device: UPGRADE: Trinity",
+    13 => "Assault Hacking Device: UPGRADE: Icebreaker",
+    14 => "EVO Hacking Device",
+    15 => "EVO Hacking Device: UPGRADES: Exile, Goodnight",
+    16 => "Killer Hacking Device",
+    17 => "Killer Hacking Device: UPGRADE: Maestro",
+    18 => "Killer Hacking Device: UPGRADE: Lightning",
+    19 => "EI Killer Hacking Device",
+    20 => "White Hacking Device",
 };
 
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
@@ -1623,6 +1643,7 @@ sub gen_hack_args{
     my $ammo = $code->{effect}{saves} // '1';
     my $ap = $code->{effect}{ap} // 1;
     my $bts = ceil((param("$them.bts") // 0) * $ap);
+    my $tag = $code->{effect}{tag} // 'NONE';
 
     # Dodge does not protect against hacking
     if($other_action eq 'dodge' || $other_action eq 'change_face'){
@@ -1674,6 +1695,10 @@ sub gen_hack_args{
     push @mod_strings, "Net WIP is $stat";
 
     $dam = max($dam - $bts, 0);
+    # Icebreaker ignores BTS
+    if($code->{fixed_dam}){
+        $dam = $code->{fixed_dam};
+    }
     my @dam;
     if($ammo eq '2'){
         @dam = ($dam, $dam);
@@ -1682,10 +1707,11 @@ sub gen_hack_args{
     }else{
         @dam = ($dam);
     }
+
     my @tag_dam;
     while(@dam){
         push @tag_dam, shift(@dam);
-        push @tag_dam, 'NONE';
+        push @tag_dam, $tag;
     }
 
     return (
