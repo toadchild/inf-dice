@@ -18,8 +18,6 @@ open IN, '<', 'hacking_implemented.dat' or die "Unable to open file";
 $json_text = <IN>;
 my $hacking_implemented = $json->decode($json_text);
 
-my $all_ammo = {};
-my $weapon_data = {};
 my $file;
 my $fname = "unit_data/hacking.json";
 open $file, '<', $fname or die "Unable to open file";

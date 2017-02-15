@@ -775,7 +775,7 @@ open $file, '>', 'dual_weapons.dat' or die "Unable to open file";
 print $file $json->encode($dual_weapons);
 
 open $file, '>', 'dual_ccw.dat' or die "Unable to open file";
-print $file $json->encode([keys $dual_ccw]);
+print $file $json->encode([keys %$dual_ccw]);
 
 open $file, '>', 'poison_ccw.dat' or die "Unable to open file";
-print $file $json->encode([keys $poison_ccw]);
+print $file $json->encode([keys %$poison_ccw]);
