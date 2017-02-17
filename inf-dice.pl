@@ -126,7 +126,7 @@ my $hack_codes = {
     'Brain Blast' => {mod_att => 0, mod_def => 0, dam => 14, effect => {saves => 1, save => 'bts'}},
     # SWORD-2
     'Redrum' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
-    'Skullbuster' => {mod_att => 3, mod_def => -3, dam => 16, effect => {saves => 1, save => 'bts', ap=>0.5}},
+    'Skullbuster' => {mod_att => 3, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', ap=>0.5}},
     'Trinity' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', tag => 'SHOCK'}},
     # SHIELD-1
     'Exorcism' => {mod_att => 0, mod_def => -3, dam => 18, reset_wip => 11, effect => {saves => 2, save => 'bts', format => '%s Cancels Possession on %3$s', fatal => 9}},
