@@ -723,17 +723,11 @@ function populate_ma(player, check_params){
 
 function populate_hacker(player, check_params){
     var device_list = document.getElementsByName(player + ".hacker")[0];
-    var program_list = document.getElementsByName(player + ".hack_program")[0];
     var unit = get_unit_data(player);
 
     var selected_device = device_list.value;
     if(check_params){
         selected_device = params[player + ".hacker"];
-    }
-
-    var selected_program = program_list.value;
-    if(check_params){
-        selected_program = params[player + ".hack_program"];
     }
 
     var devices;
@@ -751,11 +745,27 @@ function populate_hacker(player, check_params){
             device_list.options[device_list.length - 1].selected = true;
         }
     }
-    selected_device = device_list.value;
 
-    var master_programs = get_hacking_programs(selected_device);
+    set_hacker(player, check_params);
+}
+
+function set_hacker(player, check_params){
+    var device_list = document.getElementsByName(player + ".hacker")[0];
+    var program_list = document.getElementsByName(player + ".hack_program")[0];
+
+    var selected_device = device_list.value;
+    if(check_params){
+        selected_device = params[player + ".hacker"];
+    }
+
+    var selected_program = program_list.value;
+    if(check_params){
+        selected_program = params[player + ".hack_program"];
+    }
 
     program_list.length = 0;
+
+    var master_programs = get_hacking_programs(selected_device);
 
     for(var i = 0; i < master_programs.length; i++){
         // Skip unimplmented programs
