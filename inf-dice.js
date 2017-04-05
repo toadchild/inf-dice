@@ -721,18 +721,39 @@ function populate_ma(player, check_params){
     }
 }
 
-function set_hacker(player, check_params){
+function populate_hacker(player, check_params){
+    var device_list = document.getElementsByName(player + ".hacker")[0];
     var program_list = document.getElementsByName(player + ".hack_program")[0];
-    var hacker_level = document.getElementsByName(player + ".hacker")[0].value;
     var unit = get_unit_data(player);
+
+    var selected_device = device_list.value;
+    if(check_params){
+        selected_device = params[player + ".hacker"];
+    }
 
     var selected_program = program_list.value;
     if(check_params){
         selected_program = params[player + ".hack_program"];
     }
 
-    var master_programs = [];
-    master_programs = get_hacking_programs(hacker_level);
+    var devices;
+    if(unit){
+        devices = unit.hacker;
+    }else{
+        devices = Object.keys(hacking_devices);
+    }
+
+    device_list.length = 0;
+
+    for(var i = 0; i < devices.length; i++){
+        device_list.options[device_list.length] = new Option(devices[i]);
+        if(selected_device == devices[i]){
+            device_list.options[device_list.length - 1].selected = true;
+        }
+    }
+    selected_device = device_list.value;
+
+    var master_programs = get_hacking_programs(selected_device);
 
     program_list.length = 0;
 
@@ -777,49 +798,7 @@ function set_hack_program(player, check_params){
 
 function get_hacking_programs(hd_level){
     var programs = [];
-    var hd_data;
-
-    if(hd_level == 1){
-        hd_data = hacking_devices["Defensive Hacking Device"];
-    }else if(hd_level == 2){
-        hd_data = hacking_devices["Hacking Device"];
-    }else if(hd_level == 3){
-        hd_data = hacking_devices["Hacking Device Plus"];
-    }else if(hd_level == 4){
-        hd_data = hacking_devices["Assault Hacking Device"];
-    }else if(hd_level == 5){
-        hd_data = hacking_devices["EI Assault Hacking Device"];
-    }else if(hd_level == 6){
-        hd_data = hacking_devices["EI Hacking Device"];
-    }else if(hd_level == 7){
-        hd_data = hacking_devices["Hacking Device: UPGRADE: Stop!"];
-    }else if(hd_level == 8){
-        hd_data = hacking_devices["EI Assault Hacking Device: UPGRADE: Goodnight"];
-    }else if(hd_level == 9){
-        hd_data = hacking_devices["Hacking Device: UPGRADE: Expel"];
-    }else if(hd_level == 10){
-        hd_data = hacking_devices["Hacking Device Plus: UPGRADE: Redrum"];
-    }else if(hd_level == 11){
-        hd_data = hacking_devices["EI Assault Hacking Device"];
-    }else if(hd_level == 12){
-        hd_data = hacking_devices["Assault Hacking Device: UPGRADE: Trinity"];
-    }else if(hd_level == 13){
-        hd_data = hacking_devices["Assault Hacking Device: UPGRADE: Icebreaker"];
-    }else if(hd_level == 14){
-        hd_data = hacking_devices["EVO Hacking Device"];
-    }else if(hd_level == 15){
-        hd_data = hacking_devices["EVO Hacking Device: UPGRADES: Exile, Goodnight"];
-    }else if(hd_level == 16){
-        hd_data = hacking_devices["Killer Hacking Device"];
-    }else if(hd_level == 17){
-        hd_data = hacking_devices["Killer Hacking Device: UPGRADE: Maestro"];
-    }else if(hd_level == 18){
-        hd_data = hacking_devices["Killer Hacking Device: UPGRADE: Lightning"];
-    }else if(hd_level == 19){
-        hd_data = hacking_devices["EI Killer Hacking Device"];
-    }else if(hd_level == 20){
-        hd_data = hacking_devices["White Hacking Device"];
-    }
+    var hd_data = hacking_devices[hd_level];
 
     if(hd_data){
         // Get each program from each group
@@ -1005,7 +984,7 @@ function set_unit(player, check_params){
     populate_actions(player, check_params);
     populate_weapons(player, check_params);
     populate_ma(player, check_params);
-    set_hacker(player, check_params);
+    populate_hacker(player, check_params);
 }
 
 function populate_actions(player, check_params){
@@ -1154,11 +1133,7 @@ function action_hack_filter(unit){
         return 1;
     }
 
-    if(unit["hacker"] >= 0){
-        return 1;
-    }
-
-    return 0;
+    return unit["hacker"].length;
 }
 
 var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];

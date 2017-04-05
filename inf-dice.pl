@@ -257,31 +257,6 @@ my $msv_labels = {
     3 => 'Level 3',
 };
 
-my $hacker = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-my $hacker_labels = {
-    0 => 'None',
-    1 => 'Defensive Hacking Device',
-    2 => 'Hacking Device',
-    3 => 'Hacking Device Plus',
-    4 => 'Assault Hacking Device',
-    5 => 'EI Assault Hacking Device',
-    6 => 'EI Hacking Device',
-    7 => 'Hacking Device: UPGRADE: Stop!',
-    8 => 'EI Assault Hacking Device: UPGRADE: Goodnight',
-    9 => "Hacking Device: UPGRADE: Expel",
-    10 => "Hacking Device Plus: UPGRADE: Redrum",
-    11 => "EI Assault Hacking Device",
-    12 => "Assault Hacking Device: UPGRADE: Trinity",
-    13 => "Assault Hacking Device: UPGRADE: Icebreaker",
-    14 => "EVO Hacking Device",
-    15 => "EVO Hacking Device: UPGRADES: Exile, Goodnight",
-    16 => "Killer Hacking Device",
-    17 => "Killer Hacking Device: UPGRADE: Maestro",
-    18 => "Killer Hacking Device: UPGRADE: Lightning",
-    19 => "EI Killer Hacking Device",
-    20 => "White Hacking Device",
-};
-
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
 my $evo_labels = {
     0 => 'None',
@@ -483,14 +458,6 @@ sub print_input_attack_section{
               -label => "Multispectral Visor",
           ),
           "<br>",
-          span_popup_menu(-name => "$player.hacker",
-              -values => $hacker,
-              -default => param("$player.hacker") // '',
-              -labels => $hacker_labels,
-              -label => "Hacking Device",
-              -onchange => "set_hacker('$player')",
-          ),
-          "<br>",
           span_popup_menu(-name => "$player.marksmanship",
               -values => $marksmanship,
               -default => param("$player.marksmanship") // '',
@@ -615,6 +582,11 @@ sub print_input_attack_section{
 
     print "<div id='$player.sec_hack'>",
           "<h3>Hacking</h3>",
+          span_popup_menu(-name => "$player.hacker",
+              -label => "Hacking Device",
+              -onchange => "set_hacker('$player')",
+          ),
+          "<br>",
           span_popup_menu(-name => "$player.hack_program",
               -label => "Hacking Program",
               -onchange => "set_hack_program('$player')",

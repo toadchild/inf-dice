@@ -279,65 +279,8 @@ sub has_hacker{
     my ($unit) = @_;
 
     for my $spec (@{$unit->{spec}}){
-        if($spec eq 'Defensive Hacking Device'){
-            return 1;
-        }
-        if($spec eq 'Hacking Device'){
-            return 2;
-        }
-        if($spec eq 'Hacking Device Plus'){
-            return 3;
-        }
-        if($spec eq 'Assault Hacking Device'){
-            return 4;
-        }
-        if($spec eq 'EI Assault Hacking Device'){
-            return 5;
-        }
-        if($spec eq 'EI Hacking Device'){
-            return 6;
-        }
-        if($spec eq 'Hacking Device: UPGRADE: Stop!'){
-            return 7;
-        }
-        if($spec eq 'EI Assault Hacking Device: UPGRADE: Goodnight'){
-            return 8;
-        }
-        if($spec eq 'Hacking Device: UPGRADE: Expel'){
-            return 9;
-        }
-        if($spec eq 'Hacking Device Plus: UPGRADE: Redrum'){
-            return 10;
-        }
-        if($spec eq 'EI Assault Hacking Device'){
-            return 11;
-        }
-        if($spec eq 'Assault Hacking Device: UPGRADE: Trinity'){
-            return 12;
-        }
-        if($spec eq 'Assault Hacking Device: UPGRADE: Icebreaker'){
-            return 13;
-        }
-        if($spec eq 'EVO Hacking Device'){
-            return 14;
-        }
-        if($spec eq 'EVO Hacking Device: UPGRADES: Exile, Goodnight'){
-            return 15;
-        }
-        if($spec eq 'Killer Hacking Device'){
-            return 16;
-        }
-        if($spec eq 'Killer Hacking Device: UPGRADE: Maestro'){
-            return 17;
-        }
-        if($spec eq 'Killer Hacking Device: UPGRADE: Lightning'){
-            return 18;
-        }
-        if($spec eq 'EI Killer Hacking Device'){
-            return 19;
-        }
-        if($spec eq 'White Hacking Device'){
-            return 20;
+        if($spec =~ m/Hacking Device/){
+            return $spec;
         }
     }
 
@@ -430,6 +373,7 @@ my $poison_ccw = {};
 sub get_weapons{
     my ($unit, $new_unit, $inherit_weapon, $rider, $ability_func) = @_;
     my $weapons = {};
+    my $hackers = {};
 
     for my $w (@{$unit->{bsw}}){
         $weapons->{$w} = 1;
@@ -444,7 +388,11 @@ sub get_weapons{
         $weapons->{'Flash Pulse'} = 1;
         $weapons->{'Forward Observer'} = 1;
     }
-    
+
+    if(has_hacker($unit)){
+        $hackers->{has_hacker($unit)} = 1;
+    }
+
     if($inherit_weapon){
         CHILD: for my $child (@{$unit->{childs}}){
             # Keep specialists out of normal circulation
@@ -482,7 +430,7 @@ sub get_weapons{
             }
 
             if(has_hacker($child)){
-                $new_unit->{hacker} = has_hacker($child);
+                $hackers->{has_hacker($child)} = 1;
             }
         }
     }
@@ -512,6 +460,7 @@ sub get_weapons{
     }
 
     $new_unit->{weapons} = [sort keys %$weapons];
+    $new_unit->{hacker} = [sort keys %$hackers];
 }
 
 my %unit_type_order = (
@@ -612,9 +561,6 @@ sub parse_unit{
     }
     if($v = has_msv($new_unit)){
         $new_unit->{msv} = $v;
-    }
-    if($v = has_hacker($new_unit) || $new_unit->{hacker}){
-        $new_unit->{hacker} = $v;
     }
     if($v = has_ma($new_unit)){
         $new_unit->{ma} = $v;
