@@ -177,7 +177,7 @@ sub has_symbiont{
     if($inactive){
         return 1;
     }
-    if(has_spec($unit, 'Symbiont Armour')){
+    if(has_spec($unit, 'Symbiont Armor')){
         return 2;
     }
     return 0;

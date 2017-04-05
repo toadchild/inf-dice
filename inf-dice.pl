@@ -741,16 +741,18 @@ sub print_player_output{
     my $eject = -1;
     my $spawn = -1;
 
-    if($symbiont && $code->{fatal_symbiont}){
-        $fatal = $code->{fatal_symbiont};
-    }
-
     if($symbiont == 2){
         $symb_disabled = $wounds;
         $unconscious++;
         $dead++;
+        if($code->{fatal_symbiont}){
+            $fatal = $code->{fatal_symbiont};
+        }
+    }
+
+    if($symbiont){
         # Make Symbiont armor shock-immune.
-        $immune->{SHOCK} = 1;
+        $immunity = 'shock';
     }
 
     if($operator_w){
