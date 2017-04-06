@@ -151,6 +151,13 @@ my $ma_codes = {
     5 => {attack => 0, enemy => -6, damage => 0, burst => 0},
 };
 
+my $guard_codes = {
+    1 => {attack => 0, enemy => -3, damage => 1, burst => 0},
+    2 => {attack => 3, enemy =>  0, damage => 1, burst => 0},
+    3 => {attack => 0, enemy => -3, damage => 2, burst => 0},
+    4 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+};
+
 my $immunity = ['', 'shock', 'bio', 'total'];
 my $immunity_labels = {
     '' => 'None',
@@ -558,6 +565,10 @@ sub print_input_attack_section{
           "<h3>CC Modifiers</h3>",
           span_popup_menu(-name => "$player.ma",
               -label => "Martial Arts",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.guard",
+              -label => "Guard",
           ),
           "<br>",
           span_popup_menu(-name => "$player.gang_up",
@@ -1322,8 +1333,9 @@ sub gen_attack_args{
         # CC modifiers affect us if they are using a CC skill
         if($other_action eq 'cc'){
             my $them_ma = param("$them.ma") // 0;
+            my $them_guard = param("$them.guard") // 0;
 
-            # Penalties from their MA skill
+            # Penalties from their CC skills
             if($them_ma){
                 if(!param("$us.nbw")){
                     if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
@@ -1332,6 +1344,16 @@ sub gen_attack_args{
                     }
                 }else{
                     push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
+                }
+            }
+            if($them_guard){
+                if(!param("$us.nbw")){
+                    if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
+                        push @mod_strings, sprintf('Opponent Guard grants %+d %s', $guard_att, $stat_name);
+                        $mod += $guard_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior';
                 }
             }
         }
@@ -1458,6 +1480,8 @@ sub gen_attack_args{
 
         my $us_ma = param("$us.ma") // 0;
         my $them_ma = param("$them.ma") // 0;
+        my $us_guard = param("$us.guard") // 0;
+        my $them_guard = param("$them.guard") // 0;
 
         # We must have berserk and they must not have NBW
         if(param("$us.has_berserk") && param("$us.berserk")){
@@ -1485,7 +1509,7 @@ sub gen_attack_args{
 
         $b = 1;
 
-        # Bonuses from our MA skill
+        # Bonuses from our CC skills
         if($us_ma){
             if(!param("$them.nbw")){
                 if(my $ma_att = $ma_codes->{$us_ma}{attack}){
@@ -1493,7 +1517,7 @@ sub gen_attack_args{
                     $mod += $ma_att;
                 }
                 if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
-                    if($ph_dam){
+                    if(!$code->{fixed_dam}){
                         push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
                         map { $_ += $ma_dam } @dam;
                     }else{
@@ -1508,16 +1532,46 @@ sub gen_attack_args{
                 push @mod_strings, 'Martial Arts canceled by Natural Born Warrior';
             }
         }
-
-        # Penalties from their MA skill
-        if($other_action eq 'cc' && $them_ma){
-            if(!param("$us.nbw")){
-                if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
-                    push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
-                    $mod += $ma_att;
+        if($us_guard){
+            if(!param("$them.nbw")){
+                if(my $guard_att = $guard_codes->{$us_guard}{attack}){
+                    push @mod_strings, sprintf('Guard grants %+d CC', $guard_att);
+                    $mod += $guard_att;
+                }
+                if(my $guard_dam = $guard_codes->{$us_guard}{damage}){
+                    if(!$code->{fixed_dam}){
+                        push @mod_strings, sprintf('Guard grants %+d DAM', $guard_dam);
+                        map { $_ += $guard_dam } @dam;
+                    }else{
+                        push @mod_strings, sprintf('Guard DAM bonus ignored by %s', param("$us.weapon") // "");
+                    }
                 }
             }else{
-                push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
+                push @mod_strings, 'Guard canceled by Natural Born Warrior';
+            }
+        }
+
+        # Penalties from their MA skill
+        if($other_action eq 'cc'){
+            if($them_ma){
+                if(!param("$us.nbw")){
+                    if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
+                        push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
+                        $mod += $ma_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
+                }
+            }
+            if($them_guard){
+                if(!param("$us.nbw")){
+                    if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
+                        push @mod_strings, sprintf('Opponent Guard grants %+d CC', $guard_att);
+                        $mod += $guard_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior';
+                }
             }
         }
 

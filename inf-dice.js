@@ -721,6 +721,31 @@ function populate_ma(player, check_params){
     }
 }
 
+function populate_guard(player, check_params){
+    var guard_list = document.getElementsByName(player + ".guard")[0];
+    var unit = get_unit_data(player);
+
+    var selected_guard = guard_list.value;
+    if(check_params){
+        selected_guard = params[player + ".guard"];
+    }
+
+    var guard_max = 4;
+    if(unit){
+        guard_max = unit["guard"] || 0;
+    }
+
+    guard_list.length = 0;
+
+    for(var i = 0; i <= guard_max; i++){
+        guard_list.options[i] = new Option(guard_labels[i], i);
+
+        if(i == selected_guard){
+            guard_list.options[i].selected = true;
+        }
+    }
+}
+
 function populate_hacker(player, check_params){
     var device_list = document.getElementsByName(player + ".hacker")[0];
     var unit = get_unit_data(player);
@@ -994,6 +1019,7 @@ function set_unit(player, check_params){
     populate_actions(player, check_params);
     populate_weapons(player, check_params);
     populate_ma(player, check_params);
+    populate_guard(player, check_params);
     populate_hacker(player, check_params);
 }
 
@@ -1216,6 +1242,14 @@ var ma_labels = [
     'Level 3 (+3 Attack, -3 Opp)',
     'Level 4 (+1 Burst)',
     'Level 5 (-6 Opponent)',
+];
+
+var guard_labels = [
+    'None',
+    'Level 1 (-3 Opponent, +1 DAM)',
+    'Level 2 (+3 Attack, +1 DAM)',
+    'Level 3 (-3 Opponent, +2 DAM)',
+    'Level 4 (+3 DAM)',
 ];
 
 var supp_ranges = [

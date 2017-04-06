@@ -311,6 +311,18 @@ sub has_ma{
     return 0;
 }
 
+sub has_guard{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Guard.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
 sub has_nbw{
     return has_spec(@_, 'Natural Born Warrior');
 }
@@ -564,6 +576,9 @@ sub parse_unit{
     }
     if($v = has_ma($new_unit)){
         $new_unit->{ma} = $v;
+    }
+    if($v = has_guard($new_unit)){
+        $new_unit->{guard} = $v;
     }
     if($v = has_marksmanship($new_unit)){
         $new_unit->{marksmanship} = $v;
