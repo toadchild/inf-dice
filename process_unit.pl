@@ -323,6 +323,18 @@ sub has_guard{
     return 0;
 }
 
+sub has_protheion{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Protheion.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
 sub has_nbw{
     return has_spec(@_, 'Natural Born Warrior');
 }
@@ -399,6 +411,10 @@ sub get_weapons{
     if(has_fo($unit)){
         $weapons->{'Flash Pulse'} = 1;
         $weapons->{'Forward Observer'} = 1;
+    }
+
+    if(has_protheion($unit)){
+        $weapons->{'Protheion'} = 1;
     }
 
     if(has_hacker($unit)){
@@ -579,6 +595,9 @@ sub parse_unit{
     }
     if($v = has_guard($new_unit)){
         $new_unit->{guard} = $v;
+    }
+    if($v = has_protheion($new_unit)){
+        $new_unit->{protheion} = $v;
     }
     if($v = has_marksmanship($new_unit)){
         $new_unit->{marksmanship} = $v;

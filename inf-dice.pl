@@ -99,6 +99,7 @@ my $ammo_codes = {
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     'Plasma' => {saves => 2, save => ['arm', 'bts']},
     'AP+E/M' => {saves => 2, ap => 0.5, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
+    Striga => {saves => 1, save => 'bts', format => '%s inflicts %d or more wounds on %s%s - POWER UP (%2$d)'},
     # XXX: The BTS save should be at half BTS.
     'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
 };
@@ -156,6 +157,14 @@ my $guard_codes = {
     2 => {attack => 3, enemy =>  0, damage => 1, burst => 0},
     3 => {attack => 0, enemy => -3, damage => 2, burst => 0},
     4 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+};
+
+my $protheion_codes = {
+    1 => {attack => 3, enemy =>  0, damage => 1, burst => 0},
+    2 => {attack => 0, enemy => -3, damage => 1, burst => 0},
+    3 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+    4 => {attack => 0, enemy =>  0, damage => 0, burst => 1},
+    5 => {attack => 3, enemy => -3, damage => 0, burst => 0},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -569,6 +578,10 @@ sub print_input_attack_section{
           "<br>",
           span_popup_menu(-name => "$player.guard",
               -label => "Guard",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.protheion",
+              -label => "Protheion",
           ),
           "<br>",
           span_popup_menu(-name => "$player.gang_up",
@@ -1090,6 +1103,17 @@ sub max{
     return $a > $b ? $a : $b;
 }
 
+# Protheion requires both a skill and a weapon
+sub check_protheion{
+    my ($player) = @_;
+    my $protheion = param("$player.protheion") // 0;
+    my $ammo_name = param("$player.ammo") // '';
+    if($ammo_name eq 'Striga'){
+        return $protheion;
+    }
+    return 0;
+}
+
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
@@ -1334,6 +1358,7 @@ sub gen_attack_args{
         if($other_action eq 'cc'){
             my $them_ma = param("$them.ma") // 0;
             my $them_guard = param("$them.guard") // 0;
+            my $them_protheion = check_protheion($them);
 
             # Penalties from their CC skills
             if($them_ma){
@@ -1354,6 +1379,16 @@ sub gen_attack_args{
                     }
                 }else{
                     push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior';
+                }
+            }
+            if($them_protheion){
+                if(!param("$us.nbw")){
+                    if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
+                        push @mod_strings, sprintf('Opponent Protheion grants %+d %s', $protheion_att, $stat_name);
+                        $mod += $protheion_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior';
                 }
             }
         }
@@ -1482,6 +1517,8 @@ sub gen_attack_args{
         my $them_ma = param("$them.ma") // 0;
         my $us_guard = param("$us.guard") // 0;
         my $them_guard = param("$them.guard") // 0;
+        my $us_protheion = check_protheion($us);
+        my $them_protheion = check_protheion($them);
 
         # We must have berserk and they must not have NBW
         if(param("$us.has_berserk") && param("$us.berserk")){
@@ -1550,6 +1587,28 @@ sub gen_attack_args{
                 push @mod_strings, 'Guard canceled by Natural Born Warrior';
             }
         }
+        if($us_protheion){
+            if(!param("$them.nbw")){
+                if(my $protheion_att = $protheion_codes->{$us_protheion}{attack}){
+                    push @mod_strings, sprintf('Protheion grants %+d CC', $protheion_att);
+                    $mod += $protheion_att;
+                }
+                if(my $protheion_dam = $protheion_codes->{$us_protheion}{damage}){
+                    if(!$code->{fixed_dam}){
+                        push @mod_strings, sprintf('Protheion grants %+d DAM', $protheion_dam);
+                        map { $_ += $protheion_dam } @dam;
+                    }else{
+                        push @mod_strings, sprintf('Protheion DAM bonus ignored by %s', param("$us.weapon") // "");
+                    }
+                }
+                if(my $protheion_b = $protheion_codes->{$us_protheion}{burst}){
+                    push @mod_strings, sprintf('Protheion grants %+d B', $protheion_b);
+                    $b += $protheion_b;
+                }
+            }else{
+                push @mod_strings, 'Protheion canceled by Natural Born Warrior';
+            }
+        }
 
         # Penalties from their MA skill
         if($other_action eq 'cc'){
@@ -1571,6 +1630,16 @@ sub gen_attack_args{
                     }
                 }else{
                     push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior';
+                }
+            }
+            if($them_protheion){
+                if(!param("$us.nbw")){
+                    if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
+                        push @mod_strings, sprintf('Opponent Protheion grants %+d CC', $protheion_att);
+                        $mod += $protheion_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior';
                 }
             }
         }
@@ -1601,6 +1670,9 @@ sub gen_attack_args{
         }
         if(my $them_ma_b = $ma_codes->{$them_ma}{burst}){
             $them_b_bonus += $them_ma_b;
+        }
+        if(my $them_protheion_b = $protheion_codes->{$them_protheion}{burst}){
+            $them_b_bonus += $them_protheion_b;
         }
         if($other_action eq 'cc' && $us_ma >= 5 && ($them_b_bonus)){
             if(!param("$them.nbw")){
