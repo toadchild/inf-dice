@@ -1211,11 +1211,11 @@ var master_action_list = [
 
 var ma_labels = [
     'None',
-    'Level 1',
-    'Level 2',
-    'Level 3',
-    'Level 4',
-    'Level 5',
+    'Level 1 (-3 Opponent, +1 DAM)',
+    'Level 2 (+3 DAM)',
+    'Level 3 (+3 Attack, -3 Opp)',
+    'Level 4 (+1 Burst)',
+    'Level 5 (-6 Opponent)',
 ];
 
 var supp_ranges = [
