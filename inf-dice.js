@@ -235,7 +235,7 @@ function set_action(player){
 
         // modifiers
         enable_input(player + ".range");
-        disable_input(player + ".link");
+        enable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".motorcycle");
 

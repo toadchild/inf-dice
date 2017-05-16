@@ -1489,6 +1489,11 @@ sub gen_attack_args{
             $type = 'normal';
         }
 
+        if($link_bs){
+            push @mod_strings, sprintf('Link Team grants %+d %s', $link_bs, $stat_name);
+            $mod += $link_bs;
+        }
+
         # Enemy Suppressive Fire
         if($type eq 'ftf' && $other_action eq 'supp'){
             $mod -= 3;
