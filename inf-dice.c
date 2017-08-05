@@ -90,6 +90,7 @@ struct player{
     int stat;                   // target number for rolls
     int crit_val;               // minimum value for a crit
     int crit_boost;             // bonus to die roll for stat > 20
+    int crit_on_one;            // if it also crits on ones
     int burst;                  // number of dice
     int template;               // Is this a template weapon
     int num_saves;              // number of saves for this ammo
@@ -636,7 +637,7 @@ static void annotate_roll(struct player *p, int n){
     if(p->d[n].value <= p->stat){
         p->d[n].is_hit = 1;
 
-        if(p->d[n].value >= p->crit_val){
+        if((p->d[n].value >= p->crit_val) || (p->crit_on_one && p->d[n].value == 1)){
             p->d[n].is_crit = 1;
         }else{
             p->d[n].is_crit = 0;
@@ -807,7 +808,7 @@ static void tabulate(struct player *p1, struct player *p2){
 static void print_player(const struct player *p, int p_num){
     int i;
 
-    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
+    printf("P%d STAT %2d CRIT %2d CRIT_1 %s BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_on_one ? "Y" : "N", p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
 
     for(i = 0; i < p->num_saves; i++){
         printf(" DAM[%d] %2d TAG[%d] %s", i, p->dam[i], i, p->tag_label[i]);
@@ -840,6 +841,12 @@ static void parse_stat(const char *str, struct player *p){
         // If the stat ends in *, no crits are permitted
         if(*end == '*'){
             no_crit = 1;
+            end++;
+        }
+
+        // If the stat ends in !, also crits on a 1
+        if(*end == '!'){
+            p->crit_on_one = 1;
             end++;
         }
 

@@ -1013,6 +1013,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
+        document.getElementsByName(player + ".fatality")[0].value = unit["fatality"] || 0;
         document.getElementsByName(player + ".xvisor")[0].value = unit["xvisor"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];

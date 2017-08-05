@@ -391,6 +391,18 @@ sub has_ad{
     return 0;
 }
 
+sub has_fatality{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Fatality.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
@@ -598,6 +610,9 @@ sub parse_unit{
     }
     if($v = has_protheion($new_unit)){
         $new_unit->{protheion} = $v;
+    }
+    if($v = has_fatality($new_unit)){
+        $new_unit->{fatality} = $v;
     }
     if($v = has_marksmanship($new_unit)){
         $new_unit->{marksmanship} = $v;

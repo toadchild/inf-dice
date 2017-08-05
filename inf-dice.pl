@@ -297,6 +297,13 @@ my $xvisor_labels = {
     2 => 'X-2 Visor',
 };
 
+my $fatality = [0, 1, 2];
+my $fatality_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+};
+
 my $misc_mod = ['+12', '+11', '+10', '+9', '+8', '+7', '+6', '+5', '+4', '+3', '+2', '+1', 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12];
 
 my $factions = [
@@ -506,6 +513,13 @@ sub print_input_attack_section{
               -value => 1,
               -label => 'Sapper',
               -onchange => "set_sapper_foxhole()",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.fatality",
+              -values => $fatality,
+              -default => param("$player.fatality") // '',
+              -labels => $fatality_labels,
+              -label => "Fatality",
           ),
           "</div>\n";
 
@@ -717,6 +731,7 @@ sub print_player_output{
         $code = $hack_codes->{$program}{effect};
         $immunity = '';
         $marksmanship = 0;
+        $fatality = 0;
     }else{
         $code = $skill_codes->{$action};
     }
@@ -1236,6 +1251,8 @@ sub gen_attack_args{
 
         my $marksmanship = param("$us.marksmanship") // 0;
 
+        my $fatality = param("$us.fatality") // 0;
+
         my $camo = param("$them.ch") // 0;
         # Foxhole grants Mimetism
         if($foxhole && $camo == 0){
@@ -1393,6 +1410,16 @@ sub gen_attack_args{
             }
         }
 
+        # Fatality
+        if($fatality >= 1){
+            if(!$code->{fixed_dam} && $stat_name eq 'BS'){
+                push @mod_strings, "Fatality grants +1 DAM";
+                map { $_ += 1 } @dam;
+            }else{
+                push @mod_strings, sprintf('Fatality DAM bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
+
         # Enemy Suppressive Fire
         if($other_action eq 'supp'){
             $mod -= 3;
@@ -1409,12 +1436,21 @@ sub gen_attack_args{
         $stat = max($stat + $mod, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
+        if($fatality >= 2){
+            if($stat_name eq 'BS'){
+                push @mod_strings, "Weapon also crits on a 1";
+                $stat .= "!";
+            }else{
+                push @mod_strings, sprintf('Fatality crit bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
+
     }elsif($action eq 'dtw'){
         # DTW mods
         $type = 'normal';
 
         if(param("$us.intuitive")){
-            $stat = (param("$us.wip") // 0) . "*";
+            $stat = (param("$us.wip") // 0);
             # Intuitive is FtF roll.
             $type = 'ftf';
         }else{
@@ -1990,7 +2026,7 @@ sub execute_backend{
     my (@args) = @_;
     my $output;
 
-    if(!open DICE, '-|', '/usr/local/bin/inf-dice-n3', @args){
+    if(!open DICE, '-|', '/usr/local/bin/inf-dice-secret', @args){
         $output->{error} = 'Unable to execute backend component.';
     }
     while(<DICE>){
@@ -2013,7 +2049,7 @@ sub execute_backend{
         }elsif(m/^No Successes: +([0-9.]+)/){
             $output->{hits}{0} = $1;
         }elsif(m/^ERROR/ || m/Assertion/){
-            my $cmd = join(' ', '/usr/local/bin/inf-dice-n3', @args);
+            my $cmd = join(' ', '/usr/local/bin/inf-dice-secret', @args);
             $output->{error} = $_ . '<br>' . $cmd;
         }
     }
