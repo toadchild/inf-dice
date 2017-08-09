@@ -2026,7 +2026,7 @@ sub execute_backend{
     my (@args) = @_;
     my $output;
 
-    if(!open DICE, '-|', '/usr/local/bin/inf-dice-secret', @args){
+    if(!open DICE, '-|', '/usr/local/bin/inf-dice-n3', @args){
         $output->{error} = 'Unable to execute backend component.';
     }
     while(<DICE>){
@@ -2049,7 +2049,7 @@ sub execute_backend{
         }elsif(m/^No Successes: +([0-9.]+)/){
             $output->{hits}{0} = $1;
         }elsif(m/^ERROR/ || m/Assertion/){
-            my $cmd = join(' ', '/usr/local/bin/inf-dice-secret', @args);
+            my $cmd = join(' ', '/usr/local/bin/inf-dice-n3', @args);
             $output->{error} = $_ . '<br>' . $cmd;
         }
     }
