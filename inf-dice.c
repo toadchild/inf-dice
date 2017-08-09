@@ -443,7 +443,8 @@ static void calc_successes(struct dice *d){
  */
 static void count_player_results(struct player *us, struct player *them, int *hits, int *crits){
     int i;
-    int best;   // offset into them's d array for their best roll
+    int best;      // offset into them's d array for their best roll
+    int best_crit; // offset into them's d array for their best critical roll
 
     *hits = 0;
     *crits = 0;
@@ -451,24 +452,28 @@ static void count_player_results(struct player *us, struct player *them, int *hi
     // Find highest successful roll of other player
     // Use the fact that the array is sorted
     best = 0;
-    for(i = them->burst - 1; i >= 0; i--){
+    best_crit = -1;
+    for(i = 0; i < them->burst; i++){
         if(them->d[i].is_hit){
-            best = i;
-            break;
+            if(them->d[i].is_crit){
+                best_crit = i;
+            }else{
+                best = i;
+            }
         }
+    }
+    if(best_crit >= 0){
+        best = best_crit;
     }
 
     assert(best >= 0 && best < them->burst);
 
-    for(i = us->burst - 1; i >= 0; i--){
+    for(i = 0; i < us->burst; i++){
         if(us->d[i].is_hit){
             if(us->d[i].is_crit){
                 // crit, see if it was canceled
                 if(!(them->d[best].is_crit)){
                     (*crits)++;
-                }else{
-                    // All lower dice will also be canceled
-                    break;
                 }
             }else{
                 // it was a regular hit, see if it was canceled
@@ -477,9 +482,6 @@ static void count_player_results(struct player *us, struct player *them, int *hi
                             (!them->d[best].is_crit &&
                                 (them->d[best].value < us->d[i].value)))){
                     (*hits)++;
-                }else{
-                    // All lower dice will also be canceled
-                    break;
                 }
             }
         }
