@@ -773,8 +773,8 @@ sub print_player_output{
     }
 
     if($shasvastii){
-        $spawn = $dead;
-        $dead++;
+        $spawn = $unconscious;
+        $unconscious = -1;
     }
 
     if($fatal >= $wounds && !$immunities->{$immunity}{$ammo}){
