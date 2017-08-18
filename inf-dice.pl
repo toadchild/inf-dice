@@ -521,6 +521,12 @@ sub print_input_attack_section{
               -labels => $fatality_labels,
               -label => "Fatality",
           ),
+          "<br>",
+          span_checkbox(-name => "$player.remote_presence",
+              -checked => defined(param("$player.remote_presence")),
+              -value => 1,
+              -label => 'G: Remote Presence',
+          ),
           "</div>\n";
 
     print "<div class='action'>
@@ -722,6 +728,7 @@ sub print_player_output{
     my $other_name = param("p$other.unit") // 'Model B';
     my $symbiont = param("p$other.symbiont") // 0;
     my $operator_w = param("p$other.operator") // 0;
+    my $remote_presence = param("p$other.remote_presence") // 0;
     my $action = param("p$player.action") // '';
     my $immune = {};
 
@@ -751,6 +758,7 @@ sub print_player_output{
     my $symb_disabled = -1;
     my $eject = -1;
     my $spawn = -1;
+    my $unconscious_2 = -1;
 
     if($symbiont == 2){
         $symb_disabled = $wounds;
@@ -784,6 +792,14 @@ sub print_player_output{
 
     if($nwi){
         $unconscious = -1;
+        if($w_type eq 'STR' && $remote_presence){
+            $dead++;
+        }
+    }
+
+    if($unconscious != -1 && $w_type eq 'STR' && $remote_presence){
+        $unconscious_2 = $unconscious + 1;
+        $dead++;
     }
 
     my $cumul_hits = $output->{cumul_hits}{$player};
@@ -819,6 +835,8 @@ sub print_player_output{
             $label = ' (Operator Ejected)';
         }elsif($w == $unconscious){
             $label = ' (Unconscious)';
+        }elsif($w == $unconscious_2){
+            $label = ' (Unconscious 2)';
         }elsif($w == $spawn){
             $label = ' (Spawn Embryo)';
         }elsif($operator_w && $w > $eject){

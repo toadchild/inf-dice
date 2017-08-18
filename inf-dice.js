@@ -1022,6 +1022,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".nbw")[0].checked = unit["nbw"];
         document.getElementsByName(player + ".has_berserk")[0].checked = unit["berserk"];
         document.getElementsByName(player + ".sapper")[0].checked = unit["sapper"];
+        document.getElementsByName(player + ".remote_presence")[0].checked = unit["remote_presence"] || 0;
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");

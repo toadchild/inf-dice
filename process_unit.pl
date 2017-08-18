@@ -403,6 +403,10 @@ sub has_fatality{
     return 0;
 }
 
+sub has_remote_presence{
+    return has_spec(@_, 'G: Remote Presence') || has_spec(@_, 'G: Autotool') || has_spec(@_, 'G: Jumper L1');
+}
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
@@ -622,6 +626,9 @@ sub parse_unit{
     }
     if($v = has_ad($new_unit)){
         $new_unit->{ad} = $v;
+    }
+    if($v = has_remote_presence($new_unit)){
+        $new_unit->{remote_presence} = $v;
     }
 
     # get_weapons goes into the childs list
