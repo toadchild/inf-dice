@@ -1192,6 +1192,17 @@ sub gen_attack_args{
         $save = $immunities->{$immunity}{$ammo_name};
         $ammo = 1;
         $tag = 'NONE';
+
+        # Bioimmunity choses the higher of ARM or BTS vs. Shock
+        if($immunity eq 'bio'){
+            if(lc($ammo_name) eq 'shock'){
+                my $arm = param("$them.arm") // 0;
+                my $bts = param("$them.bts") // 0;
+                if($bts > $arm){
+                    $save = 'bts';
+                }
+            }
+        }
     }else{
         $ap = $code->{ap} // 1;
         $save = $code->{save} // 'arm';
