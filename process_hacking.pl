@@ -39,7 +39,8 @@ for my $group (@{$source_data->{"Hacking Program Groups"}}){
 
 my $burst = {};
 for my $program (@{$source_data->{"Hacking Programs"}}){
-    $burst->{$program->{name}} = $program->{burst};
+    $program->{burst} =~ m/(\d+)/;
+    $burst->{$program->{name}} = $1;
 }
 
 open $file, '>', 'hacking_data.js' or die "Unable to open file";
