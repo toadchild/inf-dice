@@ -31,6 +31,7 @@ my $skip_base_profile_list = {
     "Tohaa Diplomatic Delegates" => 1,
     "Teucer" => 1,
     "Kazak Spetsnazs" => 1,
+    "Patroclus" => 1,
 };
 
 # Units that need to be totally skipped in their entirety
@@ -57,6 +58,11 @@ my @specialist_profiles = (
         key => 'ch',
         ability_func => \&has_camo,
         name_func => \&name_camo,
+    },
+    {
+        key => 'odd',
+        ability_func => \&has_odd,
+        name_func => \&name_odd,
     },
     {
         key => 'xvisor',
@@ -104,6 +110,11 @@ my $camo_names = {
 sub name_camo{
     my ($ch) = @_;
     return " ($camo_names->{$ch})";
+}
+
+sub name_odd{
+    my ($ch) = @_;
+    return " (ODD)";
 }
 
 sub name_xvisor{
