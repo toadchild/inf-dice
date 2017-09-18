@@ -405,6 +405,10 @@ sub has_ad{
 sub has_fatality{
     my ($unit) = @_;
 
+    if ($unit->{type} eq 'TAG') {
+        return 1;
+    }
+
     for my $spec (@{$unit->{spec}}){
         if($spec =~ m/Fatality.*(\d)/){
             return $1;
