@@ -559,11 +559,6 @@ sub parse_unit{
         $rider = 1;
     }
 
-    # TAG Pilots don't inherit weapons
-    if(has_pilot($unit)){
-        $inherit_weapon = 0;
-    }
-
     # If the parent has symbiont, this unit has inactive symbiont
     my $symbiont_inactive = 0;
     if(has_symbiont($new_unit)){
@@ -665,6 +660,11 @@ sub flatten_unit{
         }
     }
 
+    # Mark that this profile does not inherit from base.
+    if ($flat_unit->{independent} || has_pilot($flat_unit) || has_g_sync($flat_unit) || has_g_servant($flat_unit)) {
+        $flat_unit->{no_inherit} = 1;
+    }
+
     return $flat_unit;
 }
 
@@ -693,10 +693,7 @@ for my $fname (glob("unit_data/*_units.json")){
         }
 
         # Use the longer ISC names
-        $flat_unit->{short_name} = $flat_unit->{name};
         $flat_unit->{name} = $flat_unit->{isc};
-
-        # Patch some flat_unit names
 
         # Skip these units
         if ($skip_unit_list->{$flat_unit->{name}}) {
@@ -774,7 +771,7 @@ for my $fname (glob("unit_data/*_units.json")){
             warn "        Processing $alt->{name}\n";
 
             my $alt_unit;
-            if(!$alt->{independent}){
+            if(!$alt->{no_inherit}){
                 $alt_unit = clone($new_unit);
                 # It will get hacker again if it picks up a child profile with a hacking device
                 delete $alt_unit->{hacker};
