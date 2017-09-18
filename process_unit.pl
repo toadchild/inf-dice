@@ -778,7 +778,9 @@ for my $fname (glob("unit_data/*_units.json")){
             if(!$alt->{no_inherit}){
                 $alt_unit = clone($new_unit);
                 # It will get hacker again if it picks up a child profile with a hacking device
+                # Really need to clean this up...
                 delete $alt_unit->{hacker};
+                delete $alt_unit->{fatality};
             }else{
                 # Independent models don't inherit from their controller
                 $alt_unit = {};
