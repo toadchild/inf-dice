@@ -708,8 +708,6 @@ for my $fname (glob("unit_data/*_units.json")){
             $flat_unit->{name} = 'Caliban';
         }elsif($flat_unit->{name} =~ m/Caliban/){
             next;
-        }elsif($flat_unit->{name} eq '"The Shrouded"'){
-            $flat_unit->{name} = 'Shrouded';
         }elsif($flat_unit->{name} =~ m/^Tikbalangs/){
             $flat_unit->{name} = 'Tikbalangs';
         }elsif($flat_unit->{name} eq 'Bit & Kiss!') {
