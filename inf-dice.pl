@@ -785,11 +785,6 @@ sub print_player_output{
         $unconscious = -1;
     }
 
-    if($fatal >= $wounds && !$immunities->{$immunity}{$ammo}){
-        # This ammo is instantly fatal, and we are not immune
-        $dead = 1;
-    }
-
     if($nwi){
         $unconscious = -1;
         if($w_type eq 'STR' && $remote_presence){
@@ -800,6 +795,11 @@ sub print_player_output{
     if($unconscious != -1 && $w_type eq 'STR' && $remote_presence){
         $unconscious_2 = $unconscious + 1;
         $dead++;
+    }
+
+    if($fatal >= $wounds && !$immunities->{$immunity}{$ammo}){
+        # This ammo is instantly fatal, and we are not immune
+        $dead = 1;
     }
 
     my $cumul_hits = $output->{cumul_hits}{$player};
