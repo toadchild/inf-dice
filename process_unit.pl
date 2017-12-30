@@ -306,6 +306,10 @@ sub has_pilot{
     return has_spec(@_, "Pilot");
 }
 
+sub has_operator{
+    return has_spec(@_, "Operator");
+}
+
 sub has_specialist{
     return has_spec(@_, "Specialist");
 }
@@ -665,7 +669,7 @@ sub flatten_unit{
     }
 
     # Mark that this profile does not inherit from base.
-    if ($flat_unit->{independent} || has_pilot($flat_unit) || has_g_sync($flat_unit) || has_g_servant($flat_unit)) {
+    if ($flat_unit->{independent} || has_pilot($flat_unit) || has_g_sync($flat_unit) || has_g_servant($flat_unit) || has_operator($flat_unit)) {
         $flat_unit->{no_inherit} = 1;
     }
 
