@@ -317,6 +317,7 @@ my $factions = [
     'Combined Army',
     'Haqqislam',
     'Mercenary',
+    'Non-Aligned Armies',
     'Nomads',
     'PanOceania',
     'Tohaa',
