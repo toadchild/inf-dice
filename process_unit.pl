@@ -70,11 +70,6 @@ my @specialist_profiles = (
         name_func => \&name_xvisor,
     },
     {
-        key => 'specialist',
-        ability_func => \&has_specialist,
-        name_func => \&name_specialist,
-    },
-    {
         key => 'ma',
         ability_func => \&has_ma,
         name_func => \&name_ma,
@@ -119,10 +114,6 @@ sub name_odd{
 
 sub name_xvisor{
     return " (X Visor)";
-}
-
-sub name_specialist{
-    return " (Specialist)";
 }
 
 sub name_ma{
@@ -308,10 +299,6 @@ sub has_pilot{
 
 sub has_operator{
     return has_spec(@_, "Operator");
-}
-
-sub has_specialist{
-    return has_spec(@_, "Specialist");
 }
 
 sub has_ma{
