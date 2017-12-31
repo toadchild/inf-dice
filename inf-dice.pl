@@ -1701,6 +1701,11 @@ sub gen_attack_args{
                 push @mod_strings, 'Natural Born Warrior B canceled by Natural Born Warrior A';
             }
         }
+        # Special case for D-Charges; -3 to CC roll
+        if (param("$us.weapon") eq 'D-Charges (CC Mode)') {
+            $mod -= 3;
+            push @mod_strings, 'D-Charges grant -3 to CC';
+        }
 
         # Penalties from their MA skill
         if($other_action eq 'cc'){
