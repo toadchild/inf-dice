@@ -771,6 +771,31 @@ function populate_protheion(player, check_params){
     }
 }
 
+function populate_nbw(player, check_params){
+    var nbw_list = document.getElementsByName(player + ".nbw")[0];
+    var unit = get_unit_data(player);
+
+    var selected_nbw = nbw_list.value;
+    if(check_params){
+        selected_nbw = params[player + ".nbw"];
+    }
+
+    var nbw_max = 0;
+    if(unit && unit["nbw"]){
+        nbw_max = 2;
+    }
+
+    nbw_list.length = 0;
+
+    for(var i = 0; i <= nbw_max; i++){
+        nbw_list.options[i] = new Option(nbw_labels[i], i);
+
+        if(i == selected_nbw){
+            nbw_list.options[i].selected = true;
+        }
+    }
+}
+
 function populate_hacker(player, check_params){
     var device_list = document.getElementsByName(player + ".hacker")[0];
     var unit = get_unit_data(player);
@@ -1019,7 +1044,6 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
         document.getElementsByName(player + ".motorcycle")[0].checked = unit["motorcycle"];
-        document.getElementsByName(player + ".nbw")[0].checked = unit["nbw"];
         document.getElementsByName(player + ".has_berserk")[0].checked = unit["berserk"];
         document.getElementsByName(player + ".sapper")[0].checked = unit["sapper"];
         document.getElementsByName(player + ".remote_presence")[0].checked = unit["remote_presence"] || 0;
@@ -1048,6 +1072,7 @@ function set_unit(player, check_params){
     populate_ma(player, check_params);
     populate_guard(player, check_params);
     populate_protheion(player, check_params);
+    populate_nbw(player, check_params);
     populate_hacker(player, check_params);
 }
 
@@ -1287,6 +1312,12 @@ var protheion_labels = [
     'Level 3 (+3 DAM)',
     'Level 4 (+1 Burst)',
     'Level 5 (+3 Attack, -3 Opponent)',
+];
+
+var nbw_labels = [
+    'None',
+    'Mode A (Cancels CC Skills)',
+    'Mode B (+3 Attack, +1 DAM)',
 ];
 
 var supp_ranges = [
