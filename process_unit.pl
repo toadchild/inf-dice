@@ -409,6 +409,18 @@ sub has_fatality{
     return 0;
 }
 
+sub has_full_auto{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Full Auto.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
 sub has_remote_presence{
     return has_spec(@_, 'G: Remote Presence') || has_spec(@_, 'G: Autotool') || has_spec(@_, 'G: Jumper L1');
 }
@@ -619,6 +631,9 @@ sub parse_unit{
     if($v = has_fatality($new_unit)){
         $new_unit->{fatality} = $v;
     }
+    if($v = has_full_auto($new_unit)){
+        $new_unit->{full_auto} = $v;
+    }
     if($v = has_marksmanship($new_unit)){
         $new_unit->{marksmanship} = $v;
     }
@@ -703,6 +718,21 @@ for my $fname (glob("unit_data/*_units.json")){
             $flat_unit->{name} = 'Tikbalangs';
         }elsif($flat_unit->{name} eq 'Bit & Kiss!') {
             $flat_unit->{name} = 'Bit';
+        }elsif($flat_unit->{id} == 9018) {
+            # Skip extra ABH
+            next;
+        }elsif($flat_unit->{id} == 9003) {
+            # Skip extra druze
+            next;
+        }elsif($flat_unit->{id} == 9034) {
+            # Skip extra Bashi
+            next;
+        }elsif($flat_unit->{id} == 9037) {
+            # Skip extra Saito
+            next;
+        }elsif($flat_unit->{id} == 9040) {
+            # Skip spec-ops special Brawler
+            next;
         }
         $flat_unit->{name} =~ s/^Shasvastii //;
         $flat_unit->{name} =~ s/^Hassassin //;

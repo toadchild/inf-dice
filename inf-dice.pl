@@ -309,6 +309,13 @@ my $fatality_labels = {
     2 => 'Level 2',
 };
 
+my $full_auto = [0, 1, 2];
+my $full_auto_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+};
+
 my $misc_mod = ['+12', '+11', '+10', '+9', '+8', '+7', '+6', '+5', '+4', '+3', '+2', '+1', 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12];
 
 my $factions = [
@@ -519,6 +526,13 @@ sub print_input_attack_section{
               -default => param("$player.fatality") // '',
               -labels => $fatality_labels,
               -label => "Fatality",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.full_auto",
+              -values => $full_auto,
+              -default => param("$player.full_auto") // '',
+              -labels => $full_auto_labels,
+              -label => "Full Auto",
           ),
           "<br>",
           span_checkbox(-name => "$player.remote_presence",
@@ -1285,6 +1299,9 @@ sub gen_attack_args{
 
         my $fatality = param("$us.fatality") // 0;
 
+        my $full_auto = param("$us.full_auto") // 0;
+        my $them_full_auto = param("$them.full_auto") // 0;
+
         my $camo = param("$them.ch") // 0;
         # Foxhole grants Mimetism
         if($foxhole && $camo == 0){
@@ -1452,6 +1469,27 @@ sub gen_attack_args{
             }
         }
 
+        # Full Auto
+        # Only applies burst bonus on active turn shooting
+        if($full_auto >= 1 && $action eq 'bs'){
+            if ($us eq 'p1') {
+                if (!$link_b) {
+                    push @mod_strings, 'Full Auto grants +1 B';
+                    $b += 1;
+                } else {
+                    push @mod_strings, 'Full Auto B bonus does not stack with fireteams';
+                }
+            } else {
+                push @mod_strings, 'Full Auto B bonus only applies to the active turn';
+            }
+        }
+
+        # Full Auto L2 defensive bonus
+        if($other_action eq 'bs' && $them_full_auto >= 2){
+            $mod -= 3;
+            push @mod_strings, "Opponent Full Auto grants -3 $stat_name";
+        }
+
         # Enemy Suppressive Fire
         if($other_action eq 'supp'){
             $mod -= 3;
@@ -1522,6 +1560,7 @@ sub gen_attack_args{
         $stat_name = lc(param("$us.stat") // 'bs');
         $stat = param("$us.$stat_name") // 0;
         $stat_name = uc($stat_name);
+        my $them_full_auto = param("$them.full_auto") // 0;
         my $mod = 0;
 
         push @mod_strings, "Base $stat_name of $stat";
@@ -1562,6 +1601,12 @@ sub gen_attack_args{
             $mod += $link_bs;
         }
 
+        # Full Auto L2 defensive bonus
+        if($type eq 'ftf' && $other_action eq 'bs' && $them_full_auto >= 2){
+            $mod -= 3;
+            push @mod_strings, "Opponent Full Auto grants -3 $stat_name";
+        }
+
         # Enemy Suppressive Fire
         if($type eq 'ftf' && $other_action eq 'supp'){
             $mod -= 3;
@@ -1593,6 +1638,7 @@ sub gen_attack_args{
         my $us_protheion = check_protheion($us);
         my $them_protheion = check_protheion($them);
         my $us_nbw = param("$us.nbw") // 0;
+        my $them_full_auto = param("$them.full_auto") // 0;
 
         # We must have berserk and they must not have NBW
         if(param("$us.has_berserk") && param("$us.berserk")){
@@ -1784,6 +1830,12 @@ sub gen_attack_args{
         if($misc_mod){
             push @mod_strings, sprintf('Additional modifier grants %+d CC', $misc_mod);
             $mod += $misc_mod;
+        }
+
+        # Full Auto L2 defensive bonus
+        if($other_action eq 'bs' && $them_full_auto >= 2){
+            $mod -= 3;
+            push @mod_strings, "Opponent Full Auto grants -3 CC";
         }
 
         # Enemy Suppressive Fire
