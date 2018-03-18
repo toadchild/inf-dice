@@ -98,10 +98,9 @@ my $ammo_codes = {
     'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     'Plasma' => {saves => 2, save => ['arm', 'bts']},
-    'AP+E/M' => {saves => 2, ap => 0.5, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
+    'AP+E/M' => {saves => 2, ap => 0.5, save => ['bts', 'arm'], tag => ['EM', 'NONE']},
     Striga => {saves => 1, save => 'bts', format => '%s inflicts %d or more wounds on %s%s - POWER UP (%2$d)'},
-    # XXX: The BTS save should be at half BTS.
-    'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
+    'N+E/M' => {saves => 2, ap => [0.5, 1], save => ['bts', 'arm'], tag => ['EM', 'NONE']},
 };
 
 my $skill_codes = {
@@ -1238,8 +1237,15 @@ sub gen_attack_args{
 
     # also convert arm to array
     if(ref($save) eq 'ARRAY'){
-        for my $s (@$save){
-            push @arm, ceil(abs(param("$them.$s") // 0) * $ap);
+        for(my $s = 0; $s < @$save; $s++){
+            my $save_stat = $save->[$s];
+            my $save_ap;
+            if (ref($ap) eq 'ARRAY') {
+                $save_ap = $ap->[$s];
+            } else {
+                $save_ap = $ap;
+            }
+            push @arm, ceil(abs(param("$them.$save_stat") // 0) * $save_ap);
         }
     }else{
         @arm = (ceil(abs(param("$them.$save") // 0) * $ap)) x scalar @dam;
