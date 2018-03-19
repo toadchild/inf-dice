@@ -819,7 +819,7 @@ static void print_player(const struct player *p, int p_num){
 }
 
 static void usage(const char *program){
-    printf("Usage: %s <STAT 1> <B 1> <AMMO 1> <DAM 1> <...> <STAT 2> <B 2> <AMMO 2> <AMMO 2> <...>\n", program);
+    printf("Usage: %s <STAT 1> <B 1> <SAVES 1> <DAM 1> <TAG 1> <...> <STAT 2> <B 2> <SAVES 2> <DAM 2> <TAG 2> <...>\n", program);
     exit(0);
 }
 
@@ -883,10 +883,9 @@ static void parse_b(const char *str, struct player *p){
 }
 
 static void parse_dam(const char **argv, int argc, int *i, struct player *p){
-    // Format: N D1 A1 T1 [D2 A2 T2 [D3 A3 T3]]
+    // Format: N D1 T1 [D2 T2 [D3 T3]]
     // N is number of damage values coming
     // Dn is damage value
-    // An is ammo type
     // Tn is tag
     int save;
 
