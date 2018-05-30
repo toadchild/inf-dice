@@ -40,6 +40,8 @@ my $skip_unit_list = {
     9003 => 1,  # Druze (generic merc)
     9034 => 1,  # Bashi (non-specialist)
     9037 => 1,  # Saito (non-specialist)
+    9006 => 1,  # Generic Kempei
+    9064 => 1,  # Duo Anaconda
 };
 
 my $alternate_names = {
@@ -683,6 +685,7 @@ sub flatten_unit{
 my $unit_data = {};
 my $file;
 my $json_text;
+my $unit_names = {};
 
 for my $fname (glob("unit_data/*_units.json")){
     next if $fname eq "unit_data/other_units.json";
@@ -737,10 +740,15 @@ for my $fname (glob("unit_data/*_units.json")){
 
         if(!exists $unit_data->{$unit->{army}}){
             $unit_data->{$unit->{army}} = [];
+            $unit_names->{$unit->{army}} = {};
         }
 
         if(!$skip_base_profile_list->{$new_unit->{name}}){
             push @{$unit_data->{$unit->{army}}}, $new_unit;
+            if (exists $unit_names->{$unit->{army}}->{$new_unit->{name}}) {
+                die "Duplicate unit named $new_unit->{name}";
+            }
+            $unit_names->{$unit->{army}}->{$new_unit->{name}} = 1;
         }
 
 
@@ -769,6 +777,10 @@ for my $fname (glob("unit_data/*_units.json")){
                     }
 
                     push @{$unit_data->{$unit->{army}}}, $child_unit;
+                    if (exists $unit_names->{$unit->{army}}->{$child_unit->{name}}) {
+                        die "Duplicate unit named $child_unit->{name}";
+                    }
+                    $unit_names->{$unit->{army}}->{$child_unit->{name}} = 1;
                 }
             }
         }
