@@ -27,7 +27,6 @@ my %default_wtype = (
 
 # Profiles to skip; used where all we want are the sub-profiles
 my $skip_base_profile_list = {
-    "Uxìa McNeill" => 1,
     "Teucer" => 1,
     "Kazak Spetsnazs" => 1,
     "Patroclus" => 1,
