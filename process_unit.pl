@@ -28,7 +28,6 @@ my %default_wtype = (
 # Profiles to skip; used where all we want are the sub-profiles
 my $skip_base_profile_list = {
     "Uxìa McNeill" => 1,
-    "Tohaa Diplomatic Delegates" => 1,
     "Teucer" => 1,
     "Kazak Spetsnazs" => 1,
     "Patroclus" => 1,
@@ -36,8 +35,11 @@ my $skip_base_profile_list = {
 
 # Units that need to be totally skipped in their entirety
 my $skip_unit_list = {
-    "ALIVE Anti-establishment Group" => 1,
-    "Kasym Beg (Lieutenant)" => 1,
+    4023 => 1,  # Kasym Beg Lieutenant
+    9018 => 1,  # ABH
+    9003 => 1,  # Druze (generic merc)
+    9034 => 1,  # Bashi (non-specialist)
+    9037 => 1,  # Saito (non-specialist)
 };
 
 my $alternate_names = {
@@ -685,14 +687,21 @@ my $json_text;
 for my $fname (glob("unit_data/*_units.json")){
     next if $fname eq "unit_data/other_units.json";
 
-    warn "Parsing $fname\n";
     local $/;
     open $file, '<', $fname or die "Unable to open file";
     $json_text = <$file>;
     my $source_data = $json->decode($json_text);
 
     for my $unit (@$source_data){
-        warn "    Processing $unit->{isc}\n";
+        # Skip anything marked as oboslete
+        if ($unit->{obsolete}) {
+            next;
+        }
+
+        # Skip these units
+        if ($skip_unit_list->{$unit->{id}}) {
+            next;
+        }
 
         # handle multi-profile units
         my $flat_unit = flatten_unit($unit);
@@ -705,10 +714,6 @@ for my $fname (glob("unit_data/*_units.json")){
         # Use the longer ISC names
         $flat_unit->{name} = $flat_unit->{isc};
 
-        # Skip these units
-        if ($skip_unit_list->{$flat_unit->{name}}) {
-            next;
-        }
         # Only keep one kind of Caliban
         if($flat_unit->{name} eq 'Shasvastii Caliban (Seed-Embryo)'){
             $flat_unit->{name} = 'Caliban';
@@ -718,21 +723,6 @@ for my $fname (glob("unit_data/*_units.json")){
             $flat_unit->{name} = 'Tikbalangs';
         }elsif($flat_unit->{name} eq 'Bit & Kiss!') {
             $flat_unit->{name} = 'Bit';
-        }elsif($flat_unit->{id} == 9018) {
-            # Skip extra ABH
-            next;
-        }elsif($flat_unit->{id} == 9003) {
-            # Skip extra druze
-            next;
-        }elsif($flat_unit->{id} == 9034) {
-            # Skip extra Bashi
-            next;
-        }elsif($flat_unit->{id} == 9037) {
-            # Skip extra Saito
-            next;
-        }elsif($flat_unit->{id} == 9040) {
-            # Skip spec-ops special Brawler
-            next;
         }
         $flat_unit->{name} =~ s/^Shasvastii //;
         $flat_unit->{name} =~ s/^Hassassin //;
@@ -790,8 +780,6 @@ for my $fname (glob("unit_data/*_units.json")){
             next if $alt->{name} eq 'CrazyKoala';
             next if $alt->{name} eq 'MadTrap';
             next if $alt->{name} eq 'SymbioBug';
-
-            warn "        Processing $alt->{name}\n";
 
             my $alt_unit;
             if(!$alt->{no_inherit}){

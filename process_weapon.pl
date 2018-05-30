@@ -172,8 +172,6 @@ for my $name (keys %$dual_weapons){
     my $dual_name = $name . " (2)";
 
     while($name){
-        warn "Dualizing $name\n";
-
         my $new_weapon = clone($weapon_data->{$name});
 
         # B increase is only for non-CC weapons
