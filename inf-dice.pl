@@ -1680,7 +1680,7 @@ sub gen_attack_args{
                     $mod += $ma_att;
                 }
                 if(my $ma_dam = $ma_codes->{$us_ma}{damage}){
-                    if(!$code->{fixed_dam}){
+                    if($ph_dam){
                         push @mod_strings, sprintf('Martial Arts grants %+d DAM', $ma_dam);
                         map { $_ += $ma_dam } @dam;
                     }else{
@@ -1702,7 +1702,7 @@ sub gen_attack_args{
                     $mod += $guard_att;
                 }
                 if(my $guard_dam = $guard_codes->{$us_guard}{damage}){
-                    if(!$code->{fixed_dam}){
+                    if($ph_dam){
                         push @mod_strings, sprintf('Guard grants %+d DAM', $guard_dam);
                         map { $_ += $guard_dam } @dam;
                     }else{
@@ -1720,7 +1720,7 @@ sub gen_attack_args{
                     $mod += $protheion_att;
                 }
                 if(my $protheion_dam = $protheion_codes->{$us_protheion}{damage}){
-                    if(!$code->{fixed_dam}){
+                    if($ph_dam){
                         push @mod_strings, sprintf('Protheion grants %+d DAM', $protheion_dam);
                         map { $_ += $protheion_dam } @dam;
                     }else{
@@ -1742,7 +1742,7 @@ sub gen_attack_args{
                     $mod += $nbw_att;
                 }
                 if(my $nbw_dam = $nbw_codes->{$us_nbw}{damage}){
-                    if(!$code->{fixed_dam}){
+                    if($ph_dam){
                         push @mod_strings, sprintf('Natural Born Warrior B grants %+d DAM', $nbw_dam);
                         map { $_ += $nbw_dam } @dam;
                     }else{
