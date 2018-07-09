@@ -30,6 +30,7 @@ my $skip_base_profile_list = {
     "Teucer" => 1,
     "Kazak Spetsnazs" => 1,
     "Patroclus" => 1,
+    "Raoul Spector, Mercenary Operative (Irregular)" => 1,
 };
 
 # Units that need to be totally skipped in their entirety
