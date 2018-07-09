@@ -101,6 +101,7 @@ my $ammo_codes = {
     'AP+E/M' => {saves => 2, ap => 0.5, save => ['bts', 'arm'], tag => ['EM', 'NONE']},
     Striga => {saves => 1, save => 'bts', format => '%s inflicts %d or more wounds on %s%s - POWER UP (%2$d)'},
     'N+E/M' => {saves => 2, ap => [0.5, 1], save => ['bts', 'arm'], tag => ['EM', 'NONE']},
+    'N+E/M2' => {saves => 3, ap => [0.5, 0.5, 1], save => ['bts', 'bts', 'arm'], tag => ['EM', 'EM', 'NONE']},
 };
 
 my $skill_codes = {
