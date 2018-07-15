@@ -46,9 +46,6 @@ my $skip_unit_list = {
     5055 => 1,  # Tunguska Stemlper
 };
 
-my $alternate_names = {
-};
-
 my @specialist_profiles = (
     {
         key => 'msv',
@@ -97,9 +94,24 @@ my @specialist_profiles = (
     },
 );
 
+sub specialist_code {
+    my ($child) = @_;
+    my @codes;
+    for my $specialist (@specialist_profiles){
+        if (my $ability = $specialist->{ability_func}($child)) {
+            push @codes, $specialist->{name_func}($ability);
+        }
+    }
+
+    if (!@codes) {
+        return undef;
+    }
+    return ' (' . join(', ', @codes) . ')';
+}
+
 sub name_msv{
     my ($msv) = @_;
-    return " (MSV $msv)";
+    return "MSV $msv";
 }
 
 my $camo_names = {
@@ -110,34 +122,34 @@ my $camo_names = {
 
 sub name_camo{
     my ($ch) = @_;
-    return " ($camo_names->{$ch})";
+    return $camo_names->{$ch};
 }
 
 sub name_odd{
     my ($ch) = @_;
-    return " (ODD)";
+    return 'ODD';
 }
 
 sub name_xvisor{
-    return " (X Visor)";
+    return 'X Visor';
 }
 
 sub name_ma{
     my ($ma) = @_;
-    return " (MA $ma)";
+    return "MA $ma";
 }
 
 sub name_nbw{
-    return " (Natural Born Warrior)";
+    return 'Natural Born Warrior';
 }
 
 sub name_sapper{
-    return " (Sapper)";
+    return 'Sapper';
 }
 
 sub name_marksmanship{
     my ($marks) = @_;
-    return " (Marksmanship $marks)";
+    return "Marksmanship $marks";
 }
 
 my $ad_names = {
@@ -150,7 +162,7 @@ my $ad_names = {
 
 sub name_ad{
     my ($ad) = @_;
-    return " ($ad_names->{$ad})";
+    return $ad_names->{$ad};
 }
 
 sub has_spec{
@@ -436,7 +448,7 @@ my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
 sub get_weapons{
-    my ($unit, $new_unit, $inherit_weapon, $rider, $ability_func) = @_;
+    my ($unit, $new_unit, $inherit_weapon, $rider, $code) = @_;
     my $weapons = {};
     my $hackers = {};
 
@@ -458,26 +470,21 @@ sub get_weapons{
         $weapons->{'Protheion'} = 1;
     }
 
-    if(my @devices = has_hacker($unit)){
-        for my $device (@devices) {
-            $hackers->{$device} = 1;
-        }
+    for my $device (has_hacker($unit)) {
+        $hackers->{$device} = 1;
     }
 
     if($inherit_weapon){
-        CHILD: for my $child (@{$unit->{childs}}){
-            # Keep specialists out of normal circulation
-            if(!$ability_func){
-                for my $specialist (@specialist_profiles){
-                    if($specialist->{ability_func}($child)){
-                        next CHILD;
-                    }
-                }
-            }
-
-            # select only the special children otherwise
-            if($ability_func && !&$ability_func($child)){
+        for my $child (@{$unit->{childs}}){
+            # Select only matching specialist/non-specialist profiles
+            my $child_code = specialist_code($child);
+            if(!$code && $child_code) {
                 next;
+            }
+            if($code) {
+                if (!$child_code || $code ne $child_code){
+                    next;
+                }
             }
 
             # only read in each child once
@@ -500,10 +507,8 @@ sub get_weapons{
                 $weapons->{$w} = 1;
             }
 
-            if(my @devices = has_hacker($child)){
-                for my $device (@devices) {
-                    $hackers->{$device} = 1;
-                }
+            for my $device (has_hacker($child)) {
+                $hackers->{$device} = 1;
             }
         }
     }
@@ -563,7 +568,7 @@ sub unit_sort{
 }
 
 sub parse_unit{
-    my ($new_unit, $unit, $ability_func) = @_;
+    my ($new_unit, $unit, $code) = @_;
 
     # Seed Embryos do not inherit their parent profile's weapons
     my ($inherit_weapon, $inherit_shasvastii) = (1, 0);
@@ -659,7 +664,7 @@ sub parse_unit{
     }
 
     # get_weapons goes into the childs list
-    get_weapons($unit, $new_unit, $inherit_weapon, $rider, $ability_func);
+    get_weapons($unit, $new_unit, $inherit_weapon, $rider, $code);
 }
 
 sub flatten_unit{
@@ -760,35 +765,34 @@ for my $fname (glob("unit_data/*_units.json")){
 
 
         # Check for child units with special skills we care about
-        for my $specialist (@specialist_profiles){
-            my $ability = $new_unit->{$specialist->{key}};
+        my $child_codes = {};
+        for my $child (@{$unit->{childs}}){
+            next if $child->{_processed};
 
-            for my $child (@{$unit->{childs}}){
-                next if $child->{_processed};
-                if(!$ability && ($ability = $specialist->{ability_func}($child))){
-                    my $child_unit = clone($new_unit);
+            if (my $code = specialist_code($child)) {
+                # If we've already done this combination of abilities, move on
+                next if ($child_codes->{$code});
+                $child_codes->{$code} = 1;
 
-                    # It will get hacker again if it picks up a child profile with a hacking device
-                    delete $child_unit->{hacker};
+                my $child_unit = clone($new_unit);
 
-                    # stats replace if present, otherwise inherit
-                    $child->{spec} = [@{$flat_unit->{spec}}, @{$child->{spec}}];
-                    $child->{bsw} = [@{$flat_unit->{bsw}}, @{$child->{bsw}}];
-                    $child->{ccw} = [@{$flat_unit->{ccw}}, @{$child->{ccw}}];
-                    $child->{childs} = $flat_unit->{childs};
-                    parse_unit($child_unit, $child, $specialist->{ability_func});
+                # It will get hacker again if it picks up a child profile with a hacking device
+                delete $child_unit->{hacker};
 
-                    $child_unit->{name} = $new_unit->{name} . $specialist->{name_func}($ability);
-                    if($alternate_names->{$child_unit->{name}}){
-                        $child_unit->{name} = $alternate_names->{$child_unit->{name}};
-                    }
+                # stats replace if present, otherwise inherit
+                $child->{spec} = [@{$flat_unit->{spec}}, @{$child->{spec}}];
+                $child->{bsw} = [@{$flat_unit->{bsw}}, @{$child->{bsw}}];
+                $child->{ccw} = [@{$flat_unit->{ccw}}, @{$child->{ccw}}];
+                $child->{childs} = $flat_unit->{childs};
+                parse_unit($child_unit, $child, $code);
 
-                    push @{$unit_data->{$unit->{army}}}, $child_unit;
-                    if (exists $unit_names->{$unit->{army}}->{$child_unit->{name}}) {
-                        die "Duplicate unit named $child_unit->{name}";
-                    }
-                    $unit_names->{$unit->{army}}->{$child_unit->{name}} = 1;
+                $child_unit->{name} = $new_unit->{name} . $code;
+
+                push @{$unit_data->{$unit->{army}}}, $child_unit;
+                if (exists $unit_names->{$unit->{army}}->{$child_unit->{name}}) {
+                    die "Duplicate unit named $child_unit->{name}";
                 }
+                $unit_names->{$unit->{army}}->{$child_unit->{name}} = 1;
             }
         }
 
