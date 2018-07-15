@@ -15,6 +15,9 @@ $json->canonical(1);
 # relaxed corectness checking of input
 $json->relaxed(1);
 
+my $unit_data = {};
+my $unit_names = {};
+
 my %default_wtype = (
     LI => 'W',
     MI => 'W',
@@ -694,10 +697,41 @@ sub flatten_unit{
     return $flat_unit;
 }
 
-my $unit_data = {};
+sub add_special_children {
+    my ($unit, $new_unit) = @_;
+
+    my $child_codes = {};
+    for my $child (@{$unit->{childs}}){
+        next if $child->{_processed};
+
+        if (my $code = specialist_code($child)) {
+            # If we've already done this combination of abilities, move on
+            next if ($child_codes->{$code});
+            $child_codes->{$code} = 1;
+
+            my $child_unit = clone($new_unit);
+
+            # It will get hacker again if it picks up a child profile with a hacking device
+            delete $child_unit->{hacker};
+
+            # stats replace if present, otherwise inherit
+            $child->{spec} = [@{$unit->{spec}}, @{$child->{spec}}];
+            $child->{childs} = $unit->{childs};
+            parse_unit($child_unit, $child, $code);
+
+            $child_unit->{name} = $new_unit->{name} . $code;
+
+            push @{$unit_data->{$unit->{army}}}, $child_unit;
+            if (exists $unit_names->{$unit->{army}}->{$child_unit->{name}}) {
+                die "Duplicate unit named $child_unit->{name}";
+            }
+            $unit_names->{$unit->{army}}->{$child_unit->{name}} = 1;
+        }
+    }
+}
+
 my $file;
 my $json_text;
-my $unit_names = {};
 
 for my $fname (glob("unit_data/*_units.json")){
     next if $fname eq "unit_data/other_units.json";
@@ -763,38 +797,8 @@ for my $fname (glob("unit_data/*_units.json")){
             $unit_names->{$unit->{army}}->{$new_unit->{name}} = 1;
         }
 
-
         # Check for child units with special skills we care about
-        my $child_codes = {};
-        for my $child (@{$unit->{childs}}){
-            next if $child->{_processed};
-
-            if (my $code = specialist_code($child)) {
-                # If we've already done this combination of abilities, move on
-                next if ($child_codes->{$code});
-                $child_codes->{$code} = 1;
-
-                my $child_unit = clone($new_unit);
-
-                # It will get hacker again if it picks up a child profile with a hacking device
-                delete $child_unit->{hacker};
-
-                # stats replace if present, otherwise inherit
-                $child->{spec} = [@{$flat_unit->{spec}}, @{$child->{spec}}];
-                $child->{bsw} = [@{$flat_unit->{bsw}}, @{$child->{bsw}}];
-                $child->{ccw} = [@{$flat_unit->{ccw}}, @{$child->{ccw}}];
-                $child->{childs} = $flat_unit->{childs};
-                parse_unit($child_unit, $child, $code);
-
-                $child_unit->{name} = $new_unit->{name} . $code;
-
-                push @{$unit_data->{$unit->{army}}}, $child_unit;
-                if (exists $unit_names->{$unit->{army}}->{$child_unit->{name}}) {
-                    die "Duplicate unit named $child_unit->{name}";
-                }
-                $unit_names->{$unit->{army}}->{$child_unit->{name}} = 1;
-            }
-        }
+        add_special_children($flat_unit, $new_unit);
 
         # Check for alternate profiles
         for(my $i = 1; $i < scalar @{$flat_unit->{profiles}}; $i++){
@@ -841,6 +845,9 @@ for my $fname (glob("unit_data/*_units.json")){
             if($unit_data->{$unit->{army}}[-1]{name} ne $alt_unit->{name}){
                 push @{$unit_data->{$unit->{army}}}, $alt_unit;
             }
+
+            # Check for child units with special skills we care about
+            add_special_children($alt, $alt_unit);
         }
     }
 }
