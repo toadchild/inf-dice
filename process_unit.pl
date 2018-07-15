@@ -42,6 +42,8 @@ my $skip_unit_list = {
     9037 => 1,  # Saito (non-specialist)
     9006 => 1,  # Generic Kempei
     9064 => 1,  # Duo Anaconda
+    5056 => 1,  # Tunguska Tsyklon
+    5055 => 1,  # Tunguska Stemlper
 };
 
 my $alternate_names = {
@@ -283,14 +285,15 @@ sub has_fo{
 
 sub has_hacker{
     my ($unit) = @_;
+    my @devices;
 
     for my $spec (@{$unit->{spec}}){
         if($spec =~ m/Hacking Device/){
-            return $spec;
+            push @devices, $spec;
         }
     }
 
-    return 0;
+    return @devices;
 }
 
 sub has_motorcycle{
@@ -455,8 +458,10 @@ sub get_weapons{
         $weapons->{'Protheion'} = 1;
     }
 
-    if(has_hacker($unit)){
-        $hackers->{has_hacker($unit)} = 1;
+    if(my @devices = has_hacker($unit)){
+        for my $device (@devices) {
+            $hackers->{$device} = 1;
+        }
     }
 
     if($inherit_weapon){
@@ -495,8 +500,10 @@ sub get_weapons{
                 $weapons->{$w} = 1;
             }
 
-            if(has_hacker($child)){
-                $hackers->{has_hacker($child)} = 1;
+            if(my @devices = has_hacker($child)){
+                for my $device (@devices) {
+                    $hackers->{$device} = 1;
+                }
             }
         }
     }
