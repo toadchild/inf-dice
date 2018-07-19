@@ -91,7 +91,7 @@ my $ammo_codes = {
     'E/M' => {saves => 1, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'E/M2' => {saves => 2, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
-    'Zero-V Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
+    'Eclipse' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Eclipse', nonlethal => 1},
     'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
     'Dep. Repeater' => {saves => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
     'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
@@ -1416,7 +1416,7 @@ sub gen_attack_args{
         }
 
         # Smoke provides no defense against non-lof skills
-        if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
+        if($ammo_name eq 'Smoke' || $ammo_name eq 'Eclipse'){
             if($other_code->{no_lof}){
                 $type = 'normal';
             }
@@ -1592,7 +1592,7 @@ sub gen_attack_args{
         $b = (param("$us.b") // 1);
 
         # Smoke provides no defense against non-lof skills
-        if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
+        if($ammo_name eq 'Smoke' || $ammo_name eq 'Eclipse'){
             if($other_code->{no_lof}){
                 $type = 'normal';
             }
