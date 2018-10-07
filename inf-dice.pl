@@ -882,12 +882,16 @@ sub print_player_output{
                 $i = 0;
                 $results->{hits}[$i] = 0;
                 $results->{cumul_hits}[$i] = 0;
+                $results->{cumul_hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
             }else{
                 $i = $dead;
+                # Add results to all preceding spots to keep correct cumulative count
+                for (my $j = 1; $j <= $i; $j++) {
+                    $results->{cumul_hits}[$j] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
+                }
             }
             $labels[$i] = sprintf " (%s)", $tag->{label} // 'Dead';
             $results->{hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
-            $results->{cumul_hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
             if($tag->{format}){
                 $formats[$i] = $tag->{format};
             }else{
