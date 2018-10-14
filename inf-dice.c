@@ -849,6 +849,10 @@ static void parse_stat(const char *str, struct player *p){
         // If the stat ends in !, also crits on a 1
         if(*end == '!'){
             p->crit_on_one = 1;
+            // If we're critting on 1, make sure stat is at least 1
+            if (p->stat < 1) {
+                p->stat = 1;
+            }
             end++;
         }
 

@@ -95,6 +95,11 @@ my @specialist_profiles = (
         ability_func => \&has_marksmanship,
         name_func => \&name_marksmanship,
     },
+    {
+        key => 'surprise',
+        ability_func => \&has_surprise_2,
+        name_func => \&name_surprise_2,
+    },
 );
 
 sub specialist_code {
@@ -447,6 +452,59 @@ sub has_remote_presence{
     return has_spec(@_, 'G: Remote Presence') || has_spec(@_, 'G: Autotool') || has_spec(@_, 'G: Jumper L1');
 }
 
+sub has_surprise {
+    my ($unit) = @_;
+
+    # named skill is most important; check first
+    if (has_surprise_2($unit)) {
+        return 2;
+    }
+
+    # camo better than mimetism
+    if (has_camo($unit) > 1) {
+        return 1;
+    }
+
+    for my $spec (@{$unit->{spec}}){
+        # hacking device with cybermask
+        if($spec =~ m/Hacking Device Plus/){
+            return 1;
+        }
+        if($spec =~ m/Killer Hacking Device/){
+            return 1;
+        }
+        if($spec =~ m/Cybermask/){
+            return 1;
+        }
+
+        # holorpojector L2
+        if ($spec eq 'Holoprojector L2') {
+            return 1;
+        }
+
+        # impersonation
+        if ($spec =~ m/Impersonation/) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_surprise_2 {
+    my ($unit) = @_;
+
+    # named skill is most important; check first
+    if (has_spec($unit, 'Surprise Shot L2')) {
+        return 2;
+    }
+}
+
+sub name_surprise_2{
+    return "Surprise Shot L2";
+}
+
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
@@ -664,6 +722,9 @@ sub parse_unit{
     }
     if($v = has_remote_presence($new_unit)){
         $new_unit->{remote_presence} = $v;
+    }
+    if ($v = has_surprise($new_unit)) {
+        $new_unit->{surprise} = $v;
     }
 
     # get_weapons goes into the childs list
