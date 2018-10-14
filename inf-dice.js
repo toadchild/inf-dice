@@ -167,6 +167,42 @@ function set_sapper_foxhole(){
     }
 }
 
+function set_surprise(){
+    var action_1 = document.getElementsByName("p1.action")[0].value;
+    var action_2 = document.getElementsByName("p2.action")[0].value;
+
+    var surprise_1 = document.getElementsByName("p1.surprise")[0].value;
+    var surprise_2 = document.getElementsByName("p2.surprise")[0].value;
+
+    if (surprise_1 > 0) {
+        if (action_1 == "bs"){
+           enable_input("p1.surprise_shot");
+        }else{
+            disable_input("p1.surprise_shot");
+        }
+        enable_input("p1.surprise_attack");
+        enable_input("p1.surprise_hack");
+    } else {
+        disable_input("p1.surprise_shot");
+        disable_input("p1.surprise_attack");
+        disable_input("p1.surprise_hack");
+    }
+
+    if (surprise_2 > 0) {
+        if (action_2 == "bs"){
+           enable_input("p2.surprise_shot");
+        }else{
+            disable_input("p2.surprise_shot");
+        }
+        enable_input("p2.surprise_attack");
+        enable_input("p2.surprise_hack");
+    } else {
+        disable_input("p2.surprise_shot");
+        disable_input("p2.surprise_attack");
+        disable_input("p2.surprise_hack");
+    }
+}
+
 function set_berserk(){
     var action_1 = document.getElementsByName("p1.action")[0].value;
     var action_2 = document.getElementsByName("p2.action")[0].value;
@@ -477,6 +513,7 @@ function set_action(player){
 
     set_sapper_foxhole();
     set_berserk();
+    set_surprise();
 
     populate_weapons(player);
 }
@@ -1040,6 +1077,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
         document.getElementsByName(player + ".fatality")[0].value = unit["fatality"] || 0;
         document.getElementsByName(player + ".full_auto")[0].value = unit["full_auto"] || 0;
+        document.getElementsByName(player + ".surprise")[0].value = unit["surprise"] || 0;
         document.getElementsByName(player + ".xvisor")[0].value = unit["xvisor"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];

@@ -316,6 +316,13 @@ my $full_auto_labels = {
     2 => 'Level 2',
 };
 
+my $surprise = [0, 1, 2];
+my $surprise_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+};
+
 my $misc_mod = ['+12', '+11', '+10', '+9', '+8', '+7', '+6', '+5', '+4', '+3', '+2', '+1', 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12];
 
 my $factions = [
@@ -535,6 +542,13 @@ sub print_input_attack_section{
               -label => "Full Auto",
           ),
           "<br>",
+          span_popup_menu(-name => "$player.surprise",
+              -values => $surprise,
+              -default => param("$player.surprise") // '',
+              -labels => $surprise_labels,
+              -label => "Has Surprise Shot/Attack Skills",
+          ),
+          "<br>",
           span_checkbox(-name => "$player.remote_presence",
               -checked => defined(param("$player.remote_presence")),
               -value => 1,
@@ -601,7 +615,12 @@ sub print_input_attack_section{
               -labels => $viz_labels,
               -label => "Visibility Penalty",
           ),
-          "</div>";
+          "<br>",
+          span_checkbox(-name => "$player.surprise_shot",
+              -checked => defined(param("$player.surprise_shot")),
+              -value => 1,
+              -label => 'Surprise Shot'),
+          "</div>\n";
 
     print "<div id='$player.sec_cc'>",
           "<h3>CC Modifiers</h3>",
@@ -639,6 +658,11 @@ sub print_input_attack_section{
               -checked => defined(param("$player.berserk")),
               -value => 3,
               -label => 'Berserk (+6 CC, Normal Rolls)'),
+          "<br>",
+          span_checkbox(-name => "$player.surprise_attack",
+              -checked => defined(param("$player.surprise_attack")),
+              -value => 1,
+              -label => 'Surprise Attack'),
           "</div>\n";
 
     print "<div id='$player.sec_hack'>",
@@ -656,6 +680,11 @@ sub print_input_attack_section{
           span_popup_menu(-name => "$player.hack_b",
               -label => "B",
           ),
+          "<br>",
+          span_checkbox(-name => "$player.surprise_hack",
+              -checked => defined(param("$player.surprise_hack")),
+              -value => 1,
+              -label => 'Surprise Shot'),
           "</div>\n";
 
     print "<div id='$player.sec_defense'>",
@@ -1168,6 +1197,31 @@ sub check_protheion{
     return 0;
 }
 
+sub get_surprise_mod {
+    my ($them) = @_;
+    my $surprise = 0;
+    my $surprise_level = param("$them.surprise");
+    my $other_action = param("$them.action");
+
+    if ($surprise_level) {
+        if ($other_action eq 'bs') {
+            if (param("$them.surprise_shot")) {
+                $surprise = -3 * $surprise_level;
+            }
+        } elsif ($other_action eq 'hack') {
+            if (param("$them.surprise_hack")) {
+                $surprise = -3 * $surprise_level;
+            }
+        } elsif ($other_action eq 'cc') {
+            if (param("$them.surprise_attack")) {
+                $surprise = -6;
+            }
+        }
+    }
+
+    return $surprise;
+}
+
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
@@ -1293,6 +1347,9 @@ sub gen_attack_args{
     if(!defined $other_code){
         $other_code = $ammo_codes->{param("$them.ammo") // 'Normal'};
     }
+
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
 
     if($action eq 'bs' || $action eq 'supp'){
         # BS mods
@@ -1499,6 +1556,12 @@ sub gen_attack_args{
         if($other_action eq 'bs' && $them_full_auto >= 2){
             $mod -= 3;
             push @mod_strings, "Opponent Full Auto grants -3 $stat_name";
+        }
+
+        # Surprise shot/attack
+        if($type eq 'ftf' && $surprise){
+            $mod += $surprise;
+            push @mod_strings, sprintf('Surprise grants %d %s', $surprise, $stat_name);
         }
 
         # Enemy Suppressive Fire
@@ -1849,6 +1912,12 @@ sub gen_attack_args{
             push @mod_strings, "Opponent Full Auto grants -3 CC";
         }
 
+        # Surprise shot/attack
+        if($type eq 'ftf' && $surprise){
+            $mod += $surprise;
+            push @mod_strings, sprintf('Surprise grants %d CC', $surprise);
+        }
+
         # Enemy Suppressive Fire
         if($other_action eq 'supp'){
             $mod -= 3;
@@ -1944,6 +2013,13 @@ sub gen_hack_args{
         $bts += $firewall
     }
 
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+    if($type eq 'ftf' && $surprise){
+        $mod += $surprise;
+        push @mod_strings, sprintf('Surprise grants %d WIP', $surprise);
+    }
+
     if($mod < -12){
         push @mod_strings, "Modifier capped at -12";
         $mod = -12;
@@ -2022,6 +2098,13 @@ sub gen_reset_args{
         $stat += $misc_mod;
     }
 
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+    if($type eq 'ftf' && $surprise){
+        $mod += $surprise;
+        push @mod_strings, sprintf('Surprise grants %d WIP', $surprise);
+    }
+
     if($mod < -12){
         push @mod_strings, "Modifier capped at -12";
         $mod = -12;
@@ -2092,6 +2175,13 @@ sub gen_dodge_args{
     if($misc_mod){
         push @mod_strings, sprintf('Additional modifier grants %+d PH', $misc_mod);
         $stat += $misc_mod;
+    }
+
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+    if($type eq 'ftf' && $surprise){
+        $stat += $surprise;
+        push @mod_strings, sprintf('Surprise grants %d PH', $surprise);
     }
 
     $stat = max($stat, 0);
