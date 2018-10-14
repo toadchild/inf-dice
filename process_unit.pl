@@ -486,6 +486,12 @@ sub has_surprise {
         if ($spec =~ m/Impersonation/) {
             return 1;
         }
+
+        # limited camo
+        if ($spec eq 'CH: Limited Camouflage') {
+            return 1;
+        }
+
     }
 
     return 0;
@@ -570,6 +576,10 @@ sub get_weapons{
 
             for my $device (has_hacker($child)) {
                 $hackers->{$device} = 1;
+            }
+
+            if (my $surprise = has_surprise($child)) {
+                $new_unit->{surprise} = $surprise;
             }
         }
     }
@@ -774,6 +784,7 @@ sub add_special_children {
 
             # It will get hacker again if it picks up a child profile with a hacking device
             delete $child_unit->{hacker};
+            delete $child_unit->{surprise};
 
             # stats replace if present, otherwise inherit
             $child->{spec} = [@{$unit->{spec}}, @{$child->{spec}}];
