@@ -1441,8 +1441,9 @@ sub gen_attack_args{
         }
 
         # Regular Smoke is useless against MSV2+
-        if($msv >= 2){
-            if((param("$them.ammo") // '') eq 'Smoke'){
+        if ((param("$us.ammo") // '') eq 'Smoke') {
+            my $them_msv = param("$them.msv") // 0;
+            if($them_msv >= 2){
                 push @mod_strings, "MSV ignores Smoke";
                 $type = 'normal';
             }
