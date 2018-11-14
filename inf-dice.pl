@@ -26,6 +26,10 @@ Content-Type: text/html; charset=utf-8
         <script type="text/javascript" src="unit_data.js"></script>
         <script type="text/javascript" src="weapon_data.js"></script>
         <script type="text/javascript" src="hacking_data.js"></script>
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://ghostlords.com/favicon-144.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://ghostlords.com/favicon-152.png" />
+        <link rel="icon" type="image/png" href="http://ghostlords.com/favicon-32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="http://ghostlords.com/favicon-16.png" sizes="16x16" />
     </head>
     <body onload="init_on_load()">
 EOF
