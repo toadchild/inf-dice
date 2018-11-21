@@ -100,6 +100,11 @@ my @specialist_profiles = (
         ability_func => \&has_surprise_2,
         name_func => \&name_surprise_2,
     },
+    {
+        key => 'fataility',
+        ability_func => \&has_fatality,
+        name_func => \&name_fatality,
+    },
 );
 
 sub specialist_code {
@@ -423,7 +428,7 @@ sub has_ad{
 sub has_fatality{
     my ($unit) = @_;
 
-    if ($unit->{type} eq 'TAG') {
+    if ($unit->{type} && $unit->{type} eq 'TAG') {
         return 1;
     }
 
@@ -434,6 +439,11 @@ sub has_fatality{
     }
 
     return 0;
+}
+
+sub name_fatality{
+    my ($fatality) = @_;
+    return "Fatality L$fatality";
 }
 
 sub has_full_auto{
