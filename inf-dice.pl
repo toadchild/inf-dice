@@ -1382,12 +1382,29 @@ sub gen_attack_args{
 
         $camo *= $ignore_cover;
 
-        if($cover){
-            if($marksmanship < 2){
-                push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
-                $mod -= $cover;
-            }else{
-                push @mod_strings, sprintf('Marksmanship L2 negates Cover modifier to %s', $stat_name);
+
+        if ($cover) {
+            if (param("$them.motorcycle") // 0) {
+                push @mod_strings, sprintf('Motorcycle cannot benefit from Cover');
+            } elsif (param("$them.impetuous") // 0) {
+                push @mod_strings, sprintf('Impetuous cannot benefit from Cover');
+            } else {
+                if ($marksmanship == 2) {
+                    push @mod_strings, sprintf('Marksmanship L2 negates Cover modifier to %s', $stat_name);
+                } else {
+                    push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
+                    $mod -= $cover;
+                }
+
+                # template weapons ignore the ARM bonus of cover
+                if (param("$us.template") // 0) {
+                    push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
+                } elsif ($ammo_name eq 'Monofilament') {
+                    push @mod_strings, sprintf('Monofilament ignores ARM bonus from cover.');
+                } else {
+                    push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
+                    map { $_ += $cover} @arm;
+                }
             }
         }
 
@@ -1467,18 +1484,6 @@ sub gen_attack_args{
         if($link_b){
             push @mod_strings, sprintf('Link Team grants %+d B', $link_b);
             $b += $link_b;
-        }
-
-        if($cover){
-            # template weapons ignore the ARM bonus of cover
-            if(param("$us.template") // 0){
-                push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
-            }elsif($ammo_name eq 'Monofilament'){
-                push @mod_strings, sprintf('Monofilament ignored ARM bonus from cover.');
-            }else{
-                push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
-                map { $_ += $cover} @arm;
-            }
         }
 
         # Smoke provides no defense against non-lof skills
