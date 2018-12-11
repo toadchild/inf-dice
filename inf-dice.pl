@@ -145,7 +145,7 @@ my $hack_codes = {
     'Exile' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, format => '%s Isolates %3$s (Fireteam canceled)', fatal => 9}},
     'Icebreaker' => {mod_att => 0, mod_def => 0, fixed_dam => 12, effect => {saves => 1, format => '%s Immobilizes %3$s', fatal => 9}},
     'Lightning' => {mod_att => 0, mod_def => -6, dam => 15, effect => {saves => 1, save => 'bts', ap => '0.5'}},
-    'Maestro' => {mod_att => +3, mod_def => -3, dam => 14, effect => {saves => 1, format => '%s Renders %3$s Unconscious', fatal => 9}},
+    'Maestro' => {mod_att => +3, mod_def => -3, dam => 14, effect => {saves => 1, format => '%s Renders %3$s Unconscious', fatal => 9, ap => 0.5}},
 };
 
 my $ma_codes = {
