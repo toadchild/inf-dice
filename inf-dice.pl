@@ -140,7 +140,7 @@ my $hack_codes = {
     # SHIELD-3
     'Zero Pain' => {mod_att => 0, mod_def => 0, dam => 0, effect => {saves => '-', save => 'bts', format => '%s Defends vs. %3$s', fatal => 9}},
     # UPGRADE
-    'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
+    'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 17, effect => {saves => 2, save => 'bts'}},
     'Stop!' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
     'Exile' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, format => '%s Isolates %3$s (Fireteam canceled)', fatal => 9}},
     'Icebreaker' => {mod_att => 0, mod_def => 0, fixed_dam => 12, effect => {saves => 1, format => '%s Immobilizes %3$s', fatal => 9}},
