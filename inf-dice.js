@@ -167,6 +167,42 @@ function set_sapper_foxhole(){
     }
 }
 
+function set_surprise(){
+    var action_1 = document.getElementsByName("p1.action")[0].value;
+    var action_2 = document.getElementsByName("p2.action")[0].value;
+
+    var surprise_1 = document.getElementsByName("p1.surprise")[0].value;
+    var surprise_2 = document.getElementsByName("p2.surprise")[0].value;
+
+    if (surprise_1 > 0) {
+        if (action_1 == "bs"){
+           enable_input("p1.surprise_shot");
+        }else{
+            disable_input("p1.surprise_shot");
+        }
+        enable_input("p1.surprise_attack");
+        enable_input("p1.surprise_hack");
+    } else {
+        disable_input("p1.surprise_shot");
+        disable_input("p1.surprise_attack");
+        disable_input("p1.surprise_hack");
+    }
+
+    if (surprise_2 > 0) {
+        if (action_2 == "bs"){
+           enable_input("p2.surprise_shot");
+        }else{
+            disable_input("p2.surprise_shot");
+        }
+        enable_input("p2.surprise_attack");
+        enable_input("p2.surprise_hack");
+    } else {
+        disable_input("p2.surprise_shot");
+        disable_input("p2.surprise_attack");
+        disable_input("p2.surprise_hack");
+    }
+}
+
 function set_berserk(){
     var action_1 = document.getElementsByName("p1.action")[0].value;
     var action_2 = document.getElementsByName("p2.action")[0].value;
@@ -235,7 +271,7 @@ function set_action(player){
 
         // modifiers
         enable_input(player + ".range");
-        disable_input(player + ".link");
+        enable_input(player + ".link");
         disable_input(player + ".viz");
         disable_input(player + ".motorcycle");
 
@@ -477,6 +513,7 @@ function set_action(player){
 
     set_sapper_foxhole();
     set_berserk();
+    set_surprise();
 
     populate_weapons(player);
 }
@@ -721,20 +758,126 @@ function populate_ma(player, check_params){
     }
 }
 
-function set_hacker(player, check_params){
-    var program_list = document.getElementsByName(player + ".hack_program")[0];
-    var hacker_level = document.getElementsByName(player + ".hacker")[0].value;
+function populate_guard(player, check_params){
+    var guard_list = document.getElementsByName(player + ".guard")[0];
     var unit = get_unit_data(player);
+
+    var selected_guard = guard_list.value;
+    if(check_params){
+        selected_guard = params[player + ".guard"];
+    }
+
+    var guard_max = 4;
+    if(unit){
+        guard_max = unit["guard"] || 0;
+    }
+
+    guard_list.length = 0;
+
+    for(var i = 0; i <= guard_max; i++){
+        guard_list.options[i] = new Option(guard_labels[i], i);
+
+        if(i == selected_guard){
+            guard_list.options[i].selected = true;
+        }
+    }
+}
+
+function populate_protheion(player, check_params){
+    var protheion_list = document.getElementsByName(player + ".protheion")[0];
+    var unit = get_unit_data(player);
+
+    var selected_protheion = protheion_list.value;
+    if(check_params){
+        selected_protheion = params[player + ".protheion"];
+    }
+
+    var protheion_max = 5;
+    if(unit){
+        protheion_max = unit["protheion"] || 0;
+    }
+
+    protheion_list.length = 0;
+
+    for(var i = 0; i <= protheion_max; i++){
+        protheion_list.options[i] = new Option(protheion_labels[i], i);
+
+        if(i == selected_protheion){
+            protheion_list.options[i].selected = true;
+        }
+    }
+}
+
+function populate_nbw(player, check_params){
+    var nbw_list = document.getElementsByName(player + ".nbw")[0];
+    var unit = get_unit_data(player);
+
+    var selected_nbw = nbw_list.value;
+    if(check_params){
+        selected_nbw = params[player + ".nbw"];
+    }
+
+    var nbw_max = 0;
+    if(unit && unit["nbw"]){
+        nbw_max = 2;
+    }
+
+    nbw_list.length = 0;
+
+    for(var i = 0; i <= nbw_max; i++){
+        nbw_list.options[i] = new Option(nbw_labels[i], i);
+
+        if(i == selected_nbw){
+            nbw_list.options[i].selected = true;
+        }
+    }
+}
+
+function populate_hacker(player, check_params){
+    var device_list = document.getElementsByName(player + ".hacker")[0];
+    var unit = get_unit_data(player);
+
+    var selected_device = device_list.value;
+    if(check_params){
+        selected_device = params[player + ".hacker"];
+    }
+
+    var devices;
+    if(unit){
+        devices = unit.hacker;
+    }else{
+        devices = Object.keys(hacking_devices);
+    }
+
+    device_list.length = 0;
+
+    for(var i = 0; i < devices.length; i++){
+        device_list.options[device_list.length] = new Option(devices[i]);
+        if(selected_device == devices[i]){
+            device_list.options[device_list.length - 1].selected = true;
+        }
+    }
+
+    set_hacker(player, check_params);
+}
+
+function set_hacker(player, check_params){
+    var device_list = document.getElementsByName(player + ".hacker")[0];
+    var program_list = document.getElementsByName(player + ".hack_program")[0];
+
+    var selected_device = device_list.value;
+    if(check_params){
+        selected_device = params[player + ".hacker"];
+    }
 
     var selected_program = program_list.value;
     if(check_params){
         selected_program = params[player + ".hack_program"];
     }
 
-    var master_programs = [];
-    master_programs = get_hacking_programs(hacker_level);
-
     program_list.length = 0;
+
+    var master_programs = get_hacking_programs(selected_device);
 
     for(var i = 0; i < master_programs.length; i++){
         // Skip unimplmented programs
@@ -777,23 +920,7 @@ function set_hack_program(player, check_params){
 
 function get_hacking_programs(hd_level){
     var programs = [];
-    var hd_data;
-
-    if(hd_level == 1){
-        hd_data = hacking_devices["Defensive Hacking Device"];
-    }else if(hd_level == 2){
-        hd_data = hacking_devices["Hacking Device"];
-    }else if(hd_level == 3){
-        hd_data = hacking_devices["Hacking Device Plus"];
-    }else if(hd_level == 4){
-        hd_data = hacking_devices["Assault Hacking Device"];
-    }else if(hd_level == 5){
-        hd_data = hacking_devices["EI Assault Hacking Device"];
-    }else if(hd_level == 6){
-        hd_data = hacking_devices["EI Hacking Device"];
-    }else if(hd_level == 7){
-        hd_data = hacking_devices["Hacking Device: UPGRADE: Stop!"];
-    }
+    var hd_data = hacking_devices[hd_level];
 
     if(hd_data){
         // Get each program from each group
@@ -948,14 +1075,17 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
+        document.getElementsByName(player + ".fatality")[0].value = unit["fatality"] || 0;
+        document.getElementsByName(player + ".full_auto")[0].value = unit["full_auto"] || 0;
+        document.getElementsByName(player + ".surprise")[0].value = unit["surprise"] || 0;
         document.getElementsByName(player + ".xvisor")[0].value = unit["xvisor"] || 0;
 
         document.getElementsByName(player + ".nwi")[0].checked = unit["nwi"];
         document.getElementsByName(player + ".shasvastii")[0].checked = unit["shasvastii"];
         document.getElementsByName(player + ".motorcycle")[0].checked = unit["motorcycle"];
-        document.getElementsByName(player + ".nbw")[0].checked = unit["nbw"];
         document.getElementsByName(player + ".has_berserk")[0].checked = unit["berserk"];
         document.getElementsByName(player + ".sapper")[0].checked = unit["sapper"];
+        document.getElementsByName(player + ".remote_presence")[0].checked = unit["remote_presence"] || 0;
     }else{
         // If they selected custom unit
         enable_display(player + ".attributes");
@@ -979,7 +1109,10 @@ function set_unit(player, check_params){
     populate_actions(player, check_params);
     populate_weapons(player, check_params);
     populate_ma(player, check_params);
-    set_hacker(player, check_params);
+    populate_guard(player, check_params);
+    populate_protheion(player, check_params);
+    populate_nbw(player, check_params);
+    populate_hacker(player, check_params);
 }
 
 function populate_actions(player, check_params){
@@ -1128,18 +1261,14 @@ function action_hack_filter(unit){
         return 1;
     }
 
-    if(unit["hacker"] >= 0){
-        return 1;
-    }
-
-    return 0;
+    return unit["hacker"].length;
 }
 
 var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
 var stats = ["BS", "PH", "WIP"];
 var w_types = ["W", "STR"];
 var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];
-var bts_list = [0, -3, -6, -9];
+var bts_list = [0, 3, 6, 9];
 var ranges = ["+6", "+3", "0", "-3", "-6"];
 var stat_max = 22;
 var arm_max = 10;
@@ -1200,11 +1329,34 @@ var master_action_list = [
 
 var ma_labels = [
     'None',
-    'Level 1',
-    'Level 2',
-    'Level 3',
-    'Level 4',
-    'Level 5',
+    'Level 1 (-3 Opponent, +1 DAM)',
+    'Level 2 (+3 DAM)',
+    'Level 3 (+3 Attack, -3 Opp)',
+    'Level 4 (+1 Burst)',
+    'Level 5 (-6 Opponent)',
+];
+
+var guard_labels = [
+    'None',
+    'Level 1 (-3 Opponent, +1 DAM)',
+    'Level 2 (+3 Attack, +1 DAM)',
+    'Level 3 (-3 Opponent, +2 DAM)',
+    'Level 4 (+3 DAM)',
+];
+
+var protheion_labels = [
+    'None',
+    'Level 1 (+3 Attack, +1 DAM)',
+    'Level 2 (-3 Opponent, +1 DAM)',
+    'Level 3 (+3 DAM)',
+    'Level 4 (+1 Burst)',
+    'Level 5 (+3 Attack, -3 Opponent)',
+];
+
+var nbw_labels = [
+    'None',
+    'Mode A (Cancels CC Skills)',
+    'Mode B (+3 Attack, +1 DAM)',
 ];
 
 var supp_ranges = [

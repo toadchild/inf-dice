@@ -26,6 +26,10 @@ Content-Type: text/html; charset=utf-8
         <script type="text/javascript" src="unit_data.js"></script>
         <script type="text/javascript" src="weapon_data.js"></script>
         <script type="text/javascript" src="hacking_data.js"></script>
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://ghostlords.com/favicon-144.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://ghostlords.com/favicon-152.png" />
+        <link rel="icon" type="image/png" href="http://ghostlords.com/favicon-32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="http://ghostlords.com/favicon-16.png" sizes="16x16" />
     </head>
     <body onload="init_on_load()">
 EOF
@@ -86,22 +90,22 @@ my $ammo_codes = {
     K1 => {saves => 1, fixed_dam => 12},
     Viral => {saves => 2, save => 'bts', tag => 'SHOCK'},
     Nanotech => {saves => 1, save => 'bts'},
-    Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Blinded', format => '%s hits %3$s%4$s', nonlethal => 1},
+    Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
+    Stun => {saves => 2, save => 'bts', fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
     'E/M' => {saves => 1, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'E/M2' => {saves => 2, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
     'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
-    'Zero-V Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Zero-V Smoke', nonlethal => 1},
+    'Eclipse' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Eclipse', nonlethal => 1},
     'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
     'Dep. Repeater' => {saves => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
     'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
     'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     'Plasma' => {saves => 2, save => ['arm', 'bts']},
-    'AP+E/M' => {saves => 2, ap => 0.5, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
-    # XXX: The BTS save should be at half BTS.
-    'N+E/M' => {saves => 2, save => ['arm', 'bts'], tag => ['NONE', 'EM']},
-    # Placeholders for unimplemented ammos
-    'Stun' => {saves => 1, save => 'bts', nonlethal => 1},
+    'AP+E/M' => {saves => 2, ap => 0.5, save => ['bts', 'arm'], tag => ['EM', 'NONE']},
+    Striga => {saves => 1, save => 'bts', format => '%s inflicts %d or more wounds on %s%s - POWER UP (%2$d)'},
+    'N+E/M' => {saves => 2, ap => [0.5, 1], save => ['bts', 'arm'], tag => ['EM', 'NONE']},
+    'N+E/M2' => {saves => 3, ap => [0.5, 0.5, 1], save => ['bts', 'bts', 'arm'], tag => ['EM', 'EM', 'NONE']},
 };
 
 my $skill_codes = {
@@ -125,6 +129,10 @@ my $hack_codes = {
     'Total Control' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 2, save => 'bts', format => '%s Possesses %3$s', fatal => 9}},
     # SWORD-1
     'Brain Blast' => {mod_att => 0, mod_def => 0, dam => 14, effect => {saves => 1, save => 'bts'}},
+    # SWORD-2
+    'Redrum' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
+    'Skullbuster' => {mod_att => 3, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', ap=>0.5}},
+    'Trinity' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, save => 'bts', tag => 'SHOCK'}},
     # SHIELD-1
     'Exorcism' => {mod_att => 0, mod_def => -3, dam => 18, reset_wip => 11, effect => {saves => 2, save => 'bts', format => '%s Cancels Possession on %3$s', fatal => 9}},
     # SHIELD-2
@@ -132,8 +140,12 @@ my $hack_codes = {
     # SHIELD-3
     'Zero Pain' => {mod_att => 0, mod_def => 0, dam => 0, effect => {saves => '-', save => 'bts', format => '%s Defends vs. %3$s', fatal => 9}},
     # UPGRADE
-    'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 16, effect => {saves => 2, save => 'bts'}},
+    'Sucker Punch' => {mod_att => 0, mod_def => -3, dam => 17, effect => {saves => 2, save => 'bts'}},
     'Stop!' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, ap => 0.5, save => 'bts', format => '%s Immobilizes %3$s for 2 Turns', fatal => 9}},
+    'Exile' => {mod_att => 0, mod_def => 0, dam => 16, effect => {saves => 1, format => '%s Isolates %3$s (Fireteam canceled)', fatal => 9}},
+    'Icebreaker' => {mod_att => 0, mod_def => 0, fixed_dam => 12, effect => {saves => 1, format => '%s Immobilizes %3$s', fatal => 9}},
+    'Lightning' => {mod_att => 0, mod_def => -6, dam => 15, effect => {saves => 1, save => 'bts', ap => '0.5'}},
+    'Maestro' => {mod_att => +3, mod_def => -3, dam => 14, effect => {saves => 1, format => '%s Renders %3$s Unconscious', fatal => 9, ap => 0.5}},
 };
 
 my $ma_codes = {
@@ -142,6 +154,26 @@ my $ma_codes = {
     3 => {attack => 3, enemy => -3, damage => 0, burst => 0},
     4 => {attack => 0, enemy =>  0, damage => 0, burst => 1},
     5 => {attack => 0, enemy => -6, damage => 0, burst => 0},
+};
+
+my $guard_codes = {
+    1 => {attack => 0, enemy => -3, damage => 1, burst => 0},
+    2 => {attack => 3, enemy =>  0, damage => 1, burst => 0},
+    3 => {attack => 0, enemy => -3, damage => 2, burst => 0},
+    4 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+};
+
+my $protheion_codes = {
+    1 => {attack => 3, enemy =>  0, damage => 1, burst => 0},
+    2 => {attack => 0, enemy => -3, damage => 1, burst => 0},
+    3 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+    4 => {attack => 0, enemy =>  0, damage => 0, burst => 1},
+    5 => {attack => 3, enemy => -3, damage => 0, burst => 0},
+};
+
+my $nbw_codes = {
+    1 => {attack => 0, enemy => 0, damage => 0, burst => 0},
+    2 => {attack => 3, enemy => 0, damage => 1, burst => 0},
 };
 
 my $immunity = ['', 'shock', 'bio', 'total'];
@@ -250,18 +282,6 @@ my $msv_labels = {
     3 => 'Level 3',
 };
 
-my $hacker = [0, 1, 2, 3, 4, 5, 6, 7];
-my $hacker_labels = {
-    0 => 'None',
-    1 => 'Defensive Hacking Device',
-    2 => 'Hacking Device',
-    3 => 'Hacking Device Plus',
-    4 => 'Assault Hacking Device',
-    5 => 'EI Assault Hacking Device',
-    6 => 'EI Hacking Device',
-    7 => 'Hacking Device: UPGRADE: Stop!',
-};
-
 my $evo = [0, 'ice', 'cap', 'sup_1', 'sup_2', 'sup_3'];
 my $evo_labels = {
     0 => 'None',
@@ -286,6 +306,27 @@ my $xvisor_labels = {
     2 => 'X-2 Visor',
 };
 
+my $fatality = [0, 1, 2];
+my $fatality_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+};
+
+my $full_auto = [0, 1, 2];
+my $full_auto_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+};
+
+my $surprise = [0, 1, 2];
+my $surprise_labels = {
+    0 => 'None',
+    1 => 'Level 1',
+    2 => 'Level 2',
+};
+
 my $misc_mod = ['+12', '+11', '+10', '+9', '+8', '+7', '+6', '+5', '+4', '+3', '+2', '+1', 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12];
 
 my $factions = [
@@ -293,8 +334,8 @@ my $factions = [
     'Ariadna',
     'Combined Army',
     'Haqqislam',
-    'Mercenary',
     'Nomads',
+    'Non-Aligned Armies',
     'PanOceania',
     'Tohaa',
     'Yu Jing',
@@ -463,14 +504,6 @@ sub print_input_attack_section{
               -label => "Multispectral Visor",
           ),
           "<br>",
-          span_popup_menu(-name => "$player.hacker",
-              -values => $hacker,
-              -default => param("$player.hacker") // '',
-              -labels => $hacker_labels,
-              -label => "Hacking Device",
-              -onchange => "set_hacker('$player')",
-          ),
-          "<br>",
           span_popup_menu(-name => "$player.marksmanship",
               -values => $marksmanship,
               -default => param("$player.marksmanship") // '',
@@ -486,12 +519,6 @@ sub print_input_attack_section{
               -onchange => "set_xvisor('$player')",
           ),
           "<br>",
-          span_checkbox(-name => "$player.nbw",
-              -checked => defined(param("$player.nbw")),
-              -value => 1,
-              -label => 'Natural Born Warrior',
-          ),
-          "<br>",
           span_checkbox(-name => "$player.has_berserk",
               -checked => defined(param("$player.has_berserk")),
               -value => 1,
@@ -503,6 +530,33 @@ sub print_input_attack_section{
               -value => 1,
               -label => 'Sapper',
               -onchange => "set_sapper_foxhole()",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.fatality",
+              -values => $fatality,
+              -default => param("$player.fatality") // '',
+              -labels => $fatality_labels,
+              -label => "Fatality",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.full_auto",
+              -values => $full_auto,
+              -default => param("$player.full_auto") // '',
+              -labels => $full_auto_labels,
+              -label => "Full Auto",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.surprise",
+              -values => $surprise,
+              -default => param("$player.surprise") // '',
+              -labels => $surprise_labels,
+              -label => "Has Surprise Shot/Attack Skills",
+          ),
+          "<br>",
+          span_checkbox(-name => "$player.remote_presence",
+              -checked => defined(param("$player.remote_presence")),
+              -value => 1,
+              -label => 'G: Remote Presence',
           ),
           "</div>\n";
 
@@ -565,12 +619,29 @@ sub print_input_attack_section{
               -labels => $viz_labels,
               -label => "Visibility Penalty",
           ),
-          "</div>";
+          "<br>",
+          span_checkbox(-name => "$player.surprise_shot",
+              -checked => defined(param("$player.surprise_shot")),
+              -value => 1,
+              -label => 'Surprise Shot'),
+          "</div>\n";
 
     print "<div id='$player.sec_cc'>",
           "<h3>CC Modifiers</h3>",
           span_popup_menu(-name => "$player.ma",
               -label => "Martial Arts",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.guard",
+              -label => "Guard",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.protheion",
+              -label => "Protheion",
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.nbw",
+              -label => "Natural Born Warrior",
           ),
           "<br>",
           span_popup_menu(-name => "$player.gang_up",
@@ -591,10 +662,20 @@ sub print_input_attack_section{
               -checked => defined(param("$player.berserk")),
               -value => 3,
               -label => 'Berserk (+6 CC, Normal Rolls)'),
+          "<br>",
+          span_checkbox(-name => "$player.surprise_attack",
+              -checked => defined(param("$player.surprise_attack")),
+              -value => 1,
+              -label => 'Surprise Attack'),
           "</div>\n";
 
     print "<div id='$player.sec_hack'>",
           "<h3>Hacking</h3>",
+          span_popup_menu(-name => "$player.hacker",
+              -label => "Hacking Device",
+              -onchange => "set_hacker('$player')",
+          ),
+          "<br>",
           span_popup_menu(-name => "$player.hack_program",
               -label => "Hacking Program",
               -onchange => "set_hack_program('$player')",
@@ -603,6 +684,11 @@ sub print_input_attack_section{
           span_popup_menu(-name => "$player.hack_b",
               -label => "B",
           ),
+          "<br>",
+          span_checkbox(-name => "$player.surprise_hack",
+              -checked => defined(param("$player.surprise_hack")),
+              -value => 1,
+              -label => 'Surprise Shot'),
           "</div>\n";
 
     print "<div id='$player.sec_defense'>",
@@ -692,6 +778,7 @@ sub print_player_output{
     my $other_name = param("p$other.unit") // 'Model B';
     my $symbiont = param("p$other.symbiont") // 0;
     my $operator_w = param("p$other.operator") // 0;
+    my $remote_presence = param("p$other.remote_presence") // 0;
     my $action = param("p$player.action") // '';
     my $immune = {};
 
@@ -701,6 +788,7 @@ sub print_player_output{
         $code = $hack_codes->{$program}{effect};
         $immunity = '';
         $marksmanship = 0;
+        $fatality = 0;
     }else{
         $code = $skill_codes->{$action};
     }
@@ -720,17 +808,20 @@ sub print_player_output{
     my $symb_disabled = -1;
     my $eject = -1;
     my $spawn = -1;
-
-    if($symbiont && $code->{fatal_symbiont}){
-        $fatal = $code->{fatal_symbiont};
-    }
+    my $unconscious_2 = -1;
 
     if($symbiont == 2){
         $symb_disabled = $wounds;
         $unconscious++;
         $dead++;
+        if($code->{fatal_symbiont}){
+            $fatal = $code->{fatal_symbiont};
+        }
+    }
+
+    if($symbiont){
         # Make Symbiont armor shock-immune.
-        $immune->{SHOCK} = 1;
+        $immunity = 'shock';
     }
 
     if($operator_w){
@@ -740,17 +831,25 @@ sub print_player_output{
     }
 
     if($shasvastii){
-        $spawn = $dead;
+        $spawn = $unconscious;
+        $unconscious = -1;
+    }
+
+    if($nwi){
+        $unconscious = -1;
+        if($w_type eq 'STR' && $remote_presence){
+            $dead++;
+        }
+    }
+
+    if($unconscious != -1 && $w_type eq 'STR' && $remote_presence){
+        $unconscious_2 = $unconscious + 1;
         $dead++;
     }
 
     if($fatal >= $wounds && !$immunities->{$immunity}{$ammo}){
         # This ammo is instantly fatal, and we are not immune
         $dead = 1;
-    }
-
-    if($nwi){
-        $unconscious = -1;
     }
 
     my $cumul_hits = $output->{cumul_hits}{$player};
@@ -786,6 +885,8 @@ sub print_player_output{
             $label = ' (Operator Ejected)';
         }elsif($w == $unconscious){
             $label = ' (Unconscious)';
+        }elsif($w == $unconscious_2){
+            $label = ' (Unconscious 2)';
         }elsif($w == $spawn){
             $label = ' (Spawn Embryo)';
         }elsif($operator_w && $w > $eject){
@@ -814,12 +915,16 @@ sub print_player_output{
                 $i = 0;
                 $results->{hits}[$i] = 0;
                 $results->{cumul_hits}[$i] = 0;
+                $results->{cumul_hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
             }else{
                 $i = $dead;
+                # Add results to all preceding spots to keep correct cumulative count
+                for (my $j = 1; $j <= $i; $j++) {
+                    $results->{cumul_hits}[$j] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
+                }
             }
             $labels[$i] = sprintf " (%s)", $tag->{label} // 'Dead';
             $results->{hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
-            $results->{cumul_hits}[$i] += $output->{tagged_cumul_hits}{$player}{$tag_name}{1};
             if($tag->{format}){
                 $formats[$i] = $tag->{format};
             }else{
@@ -1085,6 +1190,42 @@ sub max{
     return $a > $b ? $a : $b;
 }
 
+# Protheion requires both a skill and a weapon
+sub check_protheion{
+    my ($player) = @_;
+    my $protheion = param("$player.protheion") // 0;
+    my $ammo_name = param("$player.ammo") // '';
+    if($ammo_name eq 'Striga'){
+        return $protheion;
+    }
+    return 0;
+}
+
+sub get_surprise_mod {
+    my ($them) = @_;
+    my $surprise = 0;
+    my $surprise_level = param("$them.surprise");
+    my $other_action = param("$them.action");
+
+    if ($surprise_level) {
+        if ($other_action eq 'bs') {
+            if (param("$them.surprise_shot")) {
+                $surprise = -3 * $surprise_level;
+            }
+        } elsif ($other_action eq 'hack') {
+            if (param("$them.surprise_hack")) {
+                $surprise = -3 * $surprise_level;
+            }
+        } elsif ($other_action eq 'cc') {
+            if (param("$them.surprise_attack")) {
+                $surprise = -6;
+            }
+        }
+    }
+
+    return $surprise;
+}
+
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
@@ -1130,6 +1271,17 @@ sub gen_attack_args{
         $save = $immunities->{$immunity}{$ammo_name};
         $ammo = 1;
         $tag = 'NONE';
+
+        # Bioimmunity choses the higher of ARM or BTS vs. Shock
+        if($immunity eq 'bio'){
+            if(lc($ammo_name) eq 'shock'){
+                my $arm = param("$them.arm") // 0;
+                my $bts = param("$them.bts") // 0;
+                if($bts > $arm){
+                    $save = 'bts';
+                }
+            }
+        }
     }else{
         $ap = $code->{ap} // 1;
         $save = $code->{save} // 'arm';
@@ -1148,8 +1300,15 @@ sub gen_attack_args{
 
     # also convert arm to array
     if(ref($save) eq 'ARRAY'){
-        for my $s (@$save){
-            push @arm, ceil(abs(param("$them.$s") // 0) * $ap);
+        for(my $s = 0; $s < @$save; $s++){
+            my $save_stat = $save->[$s];
+            my $save_ap;
+            if (ref($ap) eq 'ARRAY') {
+                $save_ap = $ap->[$s];
+            } else {
+                $save_ap = $ap;
+            }
+            push @arm, ceil(abs(param("$them.$save_stat") // 0) * $save_ap);
         }
     }else{
         @arm = (ceil(abs(param("$them.$save") // 0) * $ap)) x scalar @dam;
@@ -1193,6 +1352,9 @@ sub gen_attack_args{
         $other_code = $ammo_codes->{param("$them.ammo") // 'Normal'};
     }
 
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+
     if($action eq 'bs' || $action eq 'supp'){
         # BS mods
         $type = 'ftf';
@@ -1207,6 +1369,11 @@ sub gen_attack_args{
 
         my $marksmanship = param("$us.marksmanship") // 0;
 
+        my $fatality = param("$us.fatality") // 0;
+
+        my $full_auto = param("$us.full_auto") // 0;
+        my $them_full_auto = param("$them.full_auto") // 0;
+
         my $camo = param("$them.ch") // 0;
         # Foxhole grants Mimetism
         if($foxhole && $camo == 0){
@@ -1215,12 +1382,29 @@ sub gen_attack_args{
 
         $camo *= $ignore_cover;
 
-        if($cover){
-            if($marksmanship < 2){
-                push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
-                $mod -= $cover;
-            }else{
-                push @mod_strings, sprintf('Marksmanship L2 negates Cover modifier to %s', $stat_name);
+
+        if ($cover) {
+            if (param("$them.motorcycle") // 0) {
+                push @mod_strings, sprintf('Motorcycle cannot benefit from Cover');
+            } elsif (param("$them.impetuous") // 0) {
+                push @mod_strings, sprintf('Impetuous cannot benefit from Cover');
+            } else {
+                if ($marksmanship == 2) {
+                    push @mod_strings, sprintf('Marksmanship L2 negates Cover modifier to %s', $stat_name);
+                } else {
+                    push @mod_strings, sprintf('Cover grants %+d %s', -$cover, $stat_name);
+                    $mod -= $cover;
+                }
+
+                # template weapons ignore the ARM bonus of cover
+                if (param("$us.template") // 0) {
+                    push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
+                } elsif ($ammo_name eq 'Monofilament') {
+                    push @mod_strings, sprintf('Monofilament ignores ARM bonus from cover.');
+                } else {
+                    push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
+                    map { $_ += $cover} @arm;
+                }
             }
         }
 
@@ -1274,8 +1458,9 @@ sub gen_attack_args{
         }
 
         # Regular Smoke is useless against MSV2+
-        if($msv >= 2){
-            if((param("$them.ammo") // '') eq 'Smoke'){
+        if ((param("$us.ammo") // '') eq 'Smoke') {
+            my $them_msv = param("$them.msv") // 0;
+            if($them_msv >= 2){
                 push @mod_strings, "MSV ignores Smoke";
                 $type = 'normal';
             }
@@ -1301,18 +1486,8 @@ sub gen_attack_args{
             $b += $link_b;
         }
 
-        if($cover){
-            # template weapons ignore the ARM bonus of cover
-            if(param("$us.template") // 0){
-                push @mod_strings, sprintf('Template weapon ignores ARM bonus from cover');
-            }else{
-                push @mod_strings, sprintf('Cover grants opponent %+d ARM', $cover);
-                map { $_ += $cover} @arm;
-            }
-        }
-
         # Smoke provides no defense against non-lof skills
-        if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
+        if($ammo_name eq 'Smoke' || $ammo_name eq 'Eclipse'){
             if($other_code->{no_lof}){
                 $type = 'normal';
             }
@@ -1326,18 +1501,77 @@ sub gen_attack_args{
         # CC modifiers affect us if they are using a CC skill
         if($other_action eq 'cc'){
             my $them_ma = param("$them.ma") // 0;
+            my $them_guard = param("$them.guard") // 0;
+            my $them_protheion = check_protheion($them);
 
-            # Penalties from their MA skill
+            # Penalties from their CC skills
             if($them_ma){
-                if(!param("$us.nbw")){
+                if(param("$us.nbw") != 1){
                     if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
                         push @mod_strings, sprintf('Opponent Martial Arts grants %+d %s', $ma_att, $stat_name);
                         $mod += $ma_att;
                     }
                 }else{
-                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
+                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior A';
                 }
             }
+            if($them_guard){
+                if(param("$us.nbw") != 1){
+                    if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
+                        push @mod_strings, sprintf('Opponent Guard grants %+d %s', $guard_att, $stat_name);
+                        $mod += $guard_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior A';
+                }
+            }
+            if($them_protheion){
+                if(param("$us.nbw") != 1){
+                    if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
+                        push @mod_strings, sprintf('Opponent Protheion grants %+d %s', $protheion_att, $stat_name);
+                        $mod += $protheion_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior A';
+                }
+            }
+        }
+
+        # Fatality
+        if($fatality >= 1){
+            if(!$code->{fixed_dam} && $stat_name eq 'BS'){
+                push @mod_strings, "Fatality grants +1 DAM";
+                map { $_ += 1 } @dam;
+            }else{
+                push @mod_strings, sprintf('Fatality DAM bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
+
+        # Full Auto
+        # Only applies burst bonus on active turn shooting
+        if($full_auto >= 1 && $action eq 'bs'){
+            if ($us eq 'p1') {
+                if (!$link_b) {
+                    push @mod_strings, 'Full Auto grants +1 B';
+                    $b += 1;
+                } else {
+                    push @mod_strings, 'Full Auto B bonus does not stack with fireteams';
+                }
+            } else {
+                push @mod_strings, 'Full Auto B bonus only applies to the active turn';
+            }
+        }
+
+        # Full Auto L2 defensive bonus
+        if($other_action eq 'bs' && $them_full_auto >= 2){
+            $mod -= 3;
+            push @mod_strings, "Opponent Full Auto grants -3 $stat_name";
+        }
+
+        # Surprise shot/attack
+        if($type eq 'ftf' && $surprise){
+            $mod += $surprise;
+            push @mod_strings, sprintf('Surprise grants %d %s', $surprise, $stat_name);
         }
 
         # Enemy Suppressive Fire
@@ -1356,12 +1590,21 @@ sub gen_attack_args{
         $stat = max($stat + $mod, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
+        if($fatality >= 2){
+            if($stat_name eq 'BS'){
+                push @mod_strings, "Weapon also crits on a 1";
+                $stat .= "!";
+            }else{
+                push @mod_strings, sprintf('Fatality crit bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
+
     }elsif($action eq 'dtw'){
         # DTW mods
         $type = 'normal';
 
         if(param("$us.intuitive")){
-            $stat = (param("$us.wip") // 0) . "*";
+            $stat = (param("$us.wip") // 0);
             # Intuitive is FtF roll.
             $type = 'ftf';
         }else{
@@ -1401,6 +1644,7 @@ sub gen_attack_args{
         $stat_name = lc(param("$us.stat") // 'bs');
         $stat = param("$us.$stat_name") // 0;
         $stat_name = uc($stat_name);
+        my $them_full_auto = param("$them.full_auto") // 0;
         my $mod = 0;
 
         push @mod_strings, "Base $stat_name of $stat";
@@ -1425,7 +1669,7 @@ sub gen_attack_args{
         $b = (param("$us.b") // 1);
 
         # Smoke provides no defense against non-lof skills
-        if($ammo_name eq 'Smoke' || $ammo_name eq 'Zero-V Smoke'){
+        if($ammo_name eq 'Smoke' || $ammo_name eq 'Eclipse'){
             if($other_code->{no_lof}){
                 $type = 'normal';
             }
@@ -1434,6 +1678,17 @@ sub gen_attack_args{
         # Some weapons aren't attacks
         if($code->{not_attack}){
             $type = 'normal';
+        }
+
+        if($link_bs){
+            push @mod_strings, sprintf('Link Team grants %+d %s', $link_bs, $stat_name);
+            $mod += $link_bs;
+        }
+
+        # Full Auto L2 defensive bonus
+        if($type eq 'ftf' && $other_action eq 'bs' && $them_full_auto >= 2){
+            $mod -= 3;
+            push @mod_strings, "Opponent Full Auto grants -3 $stat_name";
         }
 
         # Enemy Suppressive Fire
@@ -1462,15 +1717,21 @@ sub gen_attack_args{
 
         my $us_ma = param("$us.ma") // 0;
         my $them_ma = param("$them.ma") // 0;
+        my $us_guard = param("$us.guard") // 0;
+        my $them_guard = param("$them.guard") // 0;
+        my $us_protheion = check_protheion($us);
+        my $them_protheion = check_protheion($them);
+        my $us_nbw = param("$us.nbw") // 0;
+        my $them_full_auto = param("$them.full_auto") // 0;
 
         # We must have berserk and they must not have NBW
         if(param("$us.has_berserk") && param("$us.berserk")){
-            if(!param("$them.nbw")){
+            if(param("$them.nbw") != 1){
                 $mod += 6;
                 $type = 'normal';
                 push @mod_strings, 'Berserk grants +6 CC';
             }else{
-                push @mod_strings, 'Berserk canceled by Natural Born Warrior';
+                push @mod_strings, 'Berserk canceled by Natural Born Warrior A';
             }
         }
 
@@ -1489,9 +1750,9 @@ sub gen_attack_args{
 
         $b = 1;
 
-        # Bonuses from our MA skill
+        # Bonuses from our CC skills
         if($us_ma){
-            if(!param("$them.nbw")){
+            if(param("$them.nbw") != 1){
                 if(my $ma_att = $ma_codes->{$us_ma}{attack}){
                     push @mod_strings, sprintf('Martial Arts grants %+d CC', $ma_att);
                     $mod += $ma_att;
@@ -1509,19 +1770,104 @@ sub gen_attack_args{
                     $b += $ma_b;
                 }
             }else{
-                push @mod_strings, 'Martial Arts canceled by Natural Born Warrior';
+                push @mod_strings, 'Martial Arts canceled by Natural Born Warrior A';
             }
+        }
+        if($us_guard){
+            if(param("$them.nbw") != 1){
+                if(my $guard_att = $guard_codes->{$us_guard}{attack}){
+                    push @mod_strings, sprintf('Guard grants %+d CC', $guard_att);
+                    $mod += $guard_att;
+                }
+                if(my $guard_dam = $guard_codes->{$us_guard}{damage}){
+                    if($ph_dam){
+                        push @mod_strings, sprintf('Guard grants %+d DAM', $guard_dam);
+                        map { $_ += $guard_dam } @dam;
+                    }else{
+                        push @mod_strings, sprintf('Guard DAM bonus ignored by %s', param("$us.weapon") // "");
+                    }
+                }
+            }else{
+                push @mod_strings, 'Guard canceled by Natural Born Warrior A';
+            }
+        }
+        if($us_protheion){
+            if(param("$them.nbw") != 1){
+                if(my $protheion_att = $protheion_codes->{$us_protheion}{attack}){
+                    push @mod_strings, sprintf('Protheion grants %+d CC', $protheion_att);
+                    $mod += $protheion_att;
+                }
+                if(my $protheion_dam = $protheion_codes->{$us_protheion}{damage}){
+                    if($ph_dam){
+                        push @mod_strings, sprintf('Protheion grants %+d DAM', $protheion_dam);
+                        map { $_ += $protheion_dam } @dam;
+                    }else{
+                        push @mod_strings, sprintf('Protheion DAM bonus ignored by %s', param("$us.weapon") // "");
+                    }
+                }
+                if(my $protheion_b = $protheion_codes->{$us_protheion}{burst}){
+                    push @mod_strings, sprintf('Protheion grants %+d B', $protheion_b);
+                    $b += $protheion_b;
+                }
+            }else{
+                push @mod_strings, 'Protheion canceled by Natural Born Warrior A';
+            }
+        }
+        if($us_nbw){
+            if(param("$them.nbw") != 1){
+                if(my $nbw_att = $nbw_codes->{$us_nbw}{attack}){
+                    push @mod_strings, sprintf('Natural Born Warrior B grants %+d CC', $nbw_att);
+                    $mod += $nbw_att;
+                }
+                if(my $nbw_dam = $nbw_codes->{$us_nbw}{damage}){
+                    if($ph_dam){
+                        push @mod_strings, sprintf('Natural Born Warrior B grants %+d DAM', $nbw_dam);
+                        map { $_ += $nbw_dam } @dam;
+                    }else{
+                        push @mod_strings, sprintf('Natural Born Warrior B DAM bonus ignored by %s', param("$us.weapon") // "");
+                    }
+                }
+            }else{
+                push @mod_strings, 'Natural Born Warrior B canceled by Natural Born Warrior A';
+            }
+        }
+        # Special case for D-Charges; -3 to CC roll
+        if (param("$us.weapon") eq 'D-Charges (CC Mode)') {
+            $mod -= 3;
+            push @mod_strings, 'D-Charges grant -3 to CC';
         }
 
         # Penalties from their MA skill
-        if($other_action eq 'cc' && $them_ma){
-            if(!param("$us.nbw")){
-                if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
-                    push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
-                    $mod += $ma_att;
+        if($other_action eq 'cc'){
+            if($them_ma){
+                if(param("$us.nbw") != 1){
+                    if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
+                        push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
+                        $mod += $ma_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior A';
                 }
-            }else{
-                push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior';
+            }
+            if($them_guard){
+                if(param("$us.nbw") != 1){
+                    if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
+                        push @mod_strings, sprintf('Opponent Guard grants %+d CC', $guard_att);
+                        $mod += $guard_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior A';
+                }
+            }
+            if($them_protheion){
+                if(param("$us.nbw") != 1){
+                    if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
+                        push @mod_strings, sprintf('Opponent Protheion grants %+d CC', $protheion_att);
+                        $mod += $protheion_att;
+                    }
+                }else{
+                    push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior A';
+                }
             }
         }
 
@@ -1552,12 +1898,15 @@ sub gen_attack_args{
         if(my $them_ma_b = $ma_codes->{$them_ma}{burst}){
             $them_b_bonus += $them_ma_b;
         }
+        if(my $them_protheion_b = $protheion_codes->{$them_protheion}{burst}){
+            $them_b_bonus += $them_protheion_b;
+        }
         if($other_action eq 'cc' && $us_ma >= 5 && ($them_b_bonus)){
-            if(!param("$them.nbw")){
+            if(param("$them.nbw") != 1){
                 push @mod_strings, sprintf('Martial Arts grants %+d B', $them_b_bonus);
                 $b += $them_b_bonus;
             }else{
-                push @mod_strings, 'Martial Arts 5 B bonus canceled by Natural Born Warrior';
+                push @mod_strings, 'Martial Arts 5 B bonus canceled by Natural Born Warrior A';
             }
         }
 
@@ -1565,6 +1914,18 @@ sub gen_attack_args{
         if($misc_mod){
             push @mod_strings, sprintf('Additional modifier grants %+d CC', $misc_mod);
             $mod += $misc_mod;
+        }
+
+        # Full Auto L2 defensive bonus
+        if($other_action eq 'bs' && $them_full_auto >= 2){
+            $mod -= 3;
+            push @mod_strings, "Opponent Full Auto grants -3 CC";
+        }
+
+        # Surprise shot/attack
+        if($type eq 'ftf' && $surprise){
+            $mod += $surprise;
+            push @mod_strings, sprintf('Surprise grants %d CC', $surprise);
         }
 
         # Enemy Suppressive Fire
@@ -1621,6 +1982,7 @@ sub gen_hack_args{
     my $ammo = $code->{effect}{saves} // '1';
     my $ap = $code->{effect}{ap} // 1;
     my $bts = ceil((param("$them.bts") // 0) * $ap);
+    my $tag = $code->{effect}{tag} // 'NONE';
 
     # Dodge does not protect against hacking
     if($other_action eq 'dodge' || $other_action eq 'change_face'){
@@ -1661,6 +2023,13 @@ sub gen_hack_args{
         $bts += $firewall
     }
 
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+    if($type eq 'ftf' && $surprise){
+        $mod += $surprise;
+        push @mod_strings, sprintf('Surprise grants %d WIP', $surprise);
+    }
+
     if($mod < -12){
         push @mod_strings, "Modifier capped at -12";
         $mod = -12;
@@ -1672,6 +2041,10 @@ sub gen_hack_args{
     push @mod_strings, "Net WIP is $stat";
 
     $dam = max($dam - $bts, 0);
+    # Icebreaker ignores BTS
+    if($code->{fixed_dam}){
+        $dam = $code->{fixed_dam};
+    }
     my @dam;
     if($ammo eq '2'){
         @dam = ($dam, $dam);
@@ -1680,10 +2053,11 @@ sub gen_hack_args{
     }else{
         @dam = ($dam);
     }
+
     my @tag_dam;
     while(@dam){
         push @tag_dam, shift(@dam);
-        push @tag_dam, 'NONE';
+        push @tag_dam, $tag;
     }
 
     return (
@@ -1732,6 +2106,13 @@ sub gen_reset_args{
     if($misc_mod){
         push @mod_strings, sprintf('Additional modifier grants %+d WIP', $misc_mod);
         $stat += $misc_mod;
+    }
+
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+    if($type eq 'ftf' && $surprise){
+        $mod += $surprise;
+        push @mod_strings, sprintf('Surprise grants %d WIP', $surprise);
     }
 
     if($mod < -12){
@@ -1804,6 +2185,13 @@ sub gen_dodge_args{
     if($misc_mod){
         push @mod_strings, sprintf('Additional modifier grants %+d PH', $misc_mod);
         $stat += $misc_mod;
+    }
+
+    # surprise shot/attack mod
+    my $surprise = get_surprise_mod($them);
+    if($type eq 'ftf' && $surprise){
+        $stat += $surprise;
+        push @mod_strings, sprintf('Surprise grants %d PH', $surprise);
     }
 
     $stat = max($stat, 0);

@@ -90,6 +90,7 @@ struct player{
     int stat;                   // target number for rolls
     int crit_val;               // minimum value for a crit
     int crit_boost;             // bonus to die roll for stat > 20
+    int crit_on_one;            // if it also crits on ones
     int burst;                  // number of dice
     int template;               // Is this a template weapon
     int num_saves;              // number of saves for this ammo
@@ -442,7 +443,8 @@ static void calc_successes(struct dice *d){
  */
 static void count_player_results(struct player *us, struct player *them, int *hits, int *crits){
     int i;
-    int best;   // offset into them's d array for their best roll
+    int best;      // offset into them's d array for their best roll
+    int best_crit; // offset into them's d array for their best critical roll
 
     *hits = 0;
     *crits = 0;
@@ -450,24 +452,28 @@ static void count_player_results(struct player *us, struct player *them, int *hi
     // Find highest successful roll of other player
     // Use the fact that the array is sorted
     best = 0;
-    for(i = them->burst - 1; i >= 0; i--){
+    best_crit = -1;
+    for(i = 0; i < them->burst; i++){
         if(them->d[i].is_hit){
-            best = i;
-            break;
+            if(them->d[i].is_crit){
+                best_crit = i;
+            }else{
+                best = i;
+            }
         }
+    }
+    if(best_crit >= 0){
+        best = best_crit;
     }
 
     assert(best >= 0 && best < them->burst);
 
-    for(i = us->burst - 1; i >= 0; i--){
+    for(i = 0; i < us->burst; i++){
         if(us->d[i].is_hit){
             if(us->d[i].is_crit){
                 // crit, see if it was canceled
                 if(!(them->d[best].is_crit)){
                     (*crits)++;
-                }else{
-                    // All lower dice will also be canceled
-                    break;
                 }
             }else{
                 // it was a regular hit, see if it was canceled
@@ -476,9 +482,6 @@ static void count_player_results(struct player *us, struct player *them, int *hi
                             (!them->d[best].is_crit &&
                                 (them->d[best].value < us->d[i].value)))){
                     (*hits)++;
-                }else{
-                    // All lower dice will also be canceled
-                    break;
                 }
             }
         }
@@ -636,7 +639,7 @@ static void annotate_roll(struct player *p, int n){
     if(p->d[n].value <= p->stat){
         p->d[n].is_hit = 1;
 
-        if(p->d[n].value >= p->crit_val){
+        if((p->d[n].value >= p->crit_val) || (p->crit_on_one && p->d[n].value == 1)){
             p->d[n].is_crit = 1;
         }else{
             p->d[n].is_crit = 0;
@@ -807,7 +810,7 @@ static void tabulate(struct player *p1, struct player *p2){
 static void print_player(const struct player *p, int p_num){
     int i;
 
-    printf("P%d STAT %2d CRIT %2d BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
+    printf("P%d STAT %2d CRIT %2d CRIT_1 %s BOOST %2d B %d TEMPLATE %d AMMO %s", p_num, p->stat, p->crit_val, p->crit_on_one ? "Y" : "N", p->crit_boost, p->burst, p->template, ammo_labels[p->ammo]);
 
     for(i = 0; i < p->num_saves; i++){
         printf(" DAM[%d] %2d TAG[%d] %s", i, p->dam[i], i, p->tag_label[i]);
@@ -816,7 +819,7 @@ static void print_player(const struct player *p, int p_num){
 }
 
 static void usage(const char *program){
-    printf("Usage: %s <STAT 1> <B 1> <AMMO 1> <DAM 1> <...> <STAT 2> <B 2> <AMMO 2> <AMMO 2> <...>\n", program);
+    printf("Usage: %s <STAT 1> <B 1> <SAVES 1> <DAM 1> <TAG 1> <...> <STAT 2> <B 2> <SAVES 2> <DAM 2> <TAG 2> <...>\n", program);
     exit(0);
 }
 
@@ -840,6 +843,16 @@ static void parse_stat(const char *str, struct player *p){
         // If the stat ends in *, no crits are permitted
         if(*end == '*'){
             no_crit = 1;
+            end++;
+        }
+
+        // If the stat ends in !, also crits on a 1
+        if(*end == '!'){
+            p->crit_on_one = 1;
+            // If we're critting on 1, make sure stat is at least 1
+            if (p->stat < 1) {
+                p->stat = 1;
+            }
             end++;
         }
 
@@ -874,10 +887,9 @@ static void parse_b(const char *str, struct player *p){
 }
 
 static void parse_dam(const char **argv, int argc, int *i, struct player *p){
-    // Format: N D1 A1 T1 [D2 A2 T2 [D3 A3 T3]]
+    // Format: N D1 T1 [D2 T2 [D3 T3]]
     // N is number of damage values coming
     // Dn is damage value
-    // An is ammo type
     // Tn is tag
     int save;
 

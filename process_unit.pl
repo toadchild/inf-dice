@@ -15,6 +15,9 @@ $json->canonical(1);
 # relaxed corectness checking of input
 $json->relaxed(1);
 
+my $unit_data = {};
+my $unit_names = {};
+
 my %default_wtype = (
     LI => 'W',
     MI => 'W',
@@ -25,15 +28,25 @@ my %default_wtype = (
     TAG => 'STR',
 );
 
-my $skip_list = {
-    "Uxìa McNeill" => 1,
-    "Tohaa Diplomatic Delegates" => 1,
-    "Rasyat Diplomatic Division" => 1,
+# Profiles to skip; used where all we want are the sub-profiles
+my $skip_base_profile_list = {
     "Teucer" => 1,
+    "Kazak Spetsnazs" => 1,
+    "Patroclus" => 1,
+    "Raoul Spector, Mercenary Operative (Irregular)" => 1,
 };
 
-my $alternate_names = {
-    "Kazak Spetsnazs (Mimetism)" => "Kazak Spetsnazs (Parachutist)",
+# Units that need to be totally skipped in their entirety
+my $skip_unit_list = {
+    4023 => 1,  # Kasym Beg Lieutenant
+    9018 => 1,  # ABH
+    9003 => 1,  # Druze (generic merc)
+    9034 => 1,  # Bashi (non-specialist)
+    9037 => 1,  # Saito (non-specialist)
+    9006 => 1,  # Generic Kempei
+    9064 => 1,  # Duo Anaconda
+    5056 => 1,  # Tunguska Tsyklon
+    5055 => 1,  # Tunguska Stemlper
 };
 
 my @specialist_profiles = (
@@ -43,19 +56,24 @@ my @specialist_profiles = (
         name_func => \&name_msv,
     },
     {
+        key => 'ad',
+        ability_func => \&has_ad,
+        name_func => \&name_ad,
+    },
+    {
         key => 'ch',
         ability_func => \&has_camo,
         name_func => \&name_camo,
     },
     {
+        key => 'odd',
+        ability_func => \&has_odd,
+        name_func => \&name_odd,
+    },
+    {
         key => 'xvisor',
         ability_func => \&has_xvisor,
         name_func => \&name_xvisor,
-    },
-    {
-        key => 'specialist',
-        ability_func => \&has_specialist,
-        name_func => \&name_specialist,
     },
     {
         key => 'ma',
@@ -77,11 +95,36 @@ my @specialist_profiles = (
         ability_func => \&has_marksmanship,
         name_func => \&name_marksmanship,
     },
+    {
+        key => 'surprise',
+        ability_func => \&has_surprise_2,
+        name_func => \&name_surprise_2,
+    },
+    {
+        key => 'fataility',
+        ability_func => \&has_fatality,
+        name_func => \&name_fatality,
+    },
 );
+
+sub specialist_code {
+    my ($child) = @_;
+    my @codes;
+    for my $specialist (@specialist_profiles){
+        if (my $ability = $specialist->{ability_func}($child)) {
+            push @codes, $specialist->{name_func}($ability);
+        }
+    }
+
+    if (!@codes) {
+        return undef;
+    }
+    return ' (' . join(', ', @codes) . ')';
+}
 
 sub name_msv{
     my ($msv) = @_;
-    return " (MSV $msv)";
+    return "MSV $msv";
 }
 
 my $camo_names = {
@@ -92,33 +135,47 @@ my $camo_names = {
 
 sub name_camo{
     my ($ch) = @_;
-    return " ($camo_names->{$ch})";
+    return $camo_names->{$ch};
+}
+
+sub name_odd{
+    my ($ch) = @_;
+    return 'ODD';
 }
 
 sub name_xvisor{
-    return " (X Visor)";
-}
-
-sub name_specialist{
-    return " (Specialist)";
+    return 'X Visor';
 }
 
 sub name_ma{
     my ($ma) = @_;
-    return " (MA $ma)";
+    return "MA $ma";
 }
 
 sub name_nbw{
-    return " (Natural Born Warrior)";
+    return 'Natural Born Warrior';
 }
 
 sub name_sapper{
-    return " (Sapper)";
+    return 'Sapper';
 }
 
 sub name_marksmanship{
     my ($marks) = @_;
-    return " (Marksmanship $marks)";
+    return "Marksmanship $marks";
+}
+
+my $ad_names = {
+    1 => 'Parachutist',
+    2 => 'Airborne Infiltration',
+    3 => 'Inferior Combat Jump',
+    4 => 'Combat Jump',
+    5 => 'Superior Combat Jump',
+};
+
+sub name_ad{
+    my ($ad) = @_;
+    return $ad_names->{$ad};
 }
 
 sub has_spec{
@@ -172,7 +229,7 @@ sub has_ikohl{
 
     for my $spec (@{$unit->{spec}}){
         # i-Kohl L3
-        if($spec =~ m/i-K[oh][oh]l.*(\d+)/){
+        if($spec =~ m/I-Kohl.*(\d+)/){
             return -3 * $1;
         }
     }
@@ -217,6 +274,8 @@ sub has_camo{
             return 1;
         }elsif($spec =~ m/CH: Camo/){
             return 2;
+        }elsif($spec =~ m/CH: Ambush Camo/){
+            return 2;
         }elsif($spec =~ m/CH: TO Camo/){
             return 3;
         }
@@ -226,17 +285,7 @@ sub has_camo{
 }
 
 sub has_odd{
-    my ($unit) = @_;
-
-    for my $spec (@{$unit->{spec}}){
-        if($spec =~ m/ODD:/){
-            return 1;
-        }elsif($spec =~ m/ODF:/){
-            return 2;
-        }
-    }
-
-    return 0;
+    return has_spec(@_, 'ODD:');
 }
 
 sub has_msv{
@@ -252,13 +301,7 @@ sub has_msv{
 }
 
 sub has_xvisor{
-    if(has_spec(@_, 'X Visor')){
-        return 1;
-    }
-    if(has_spec(@_, 'X-2 Visor')){
-        return 2;
-    }
-    return 0;
+    return has_spec(@_, 'X Visor');
 }
 
 sub has_fo{
@@ -267,32 +310,15 @@ sub has_fo{
 
 sub has_hacker{
     my ($unit) = @_;
+    my @devices;
 
     for my $spec (@{$unit->{spec}}){
-        if($spec eq 'Defensive Hacking Device'){
-            return 1;
-        }
-        if($spec eq 'Hacking Device'){
-            return 2;
-        }
-        if($spec eq 'Hacking Device Plus'){
-            return 3;
-        }
-        if($spec eq 'Assault Hacking Device'){
-            return 4;
-        }
-        if($spec eq 'EI Assault Hacking Device'){
-            return 5;
-        }
-        if($spec eq 'EI Hacking Device'){
-            return 6;
-        }
-        if($spec eq 'Hacking Device: UPGRADE: Stop!'){
-            return 7;
+        if($spec =~ m/Hacking Device/){
+            push @devices, $spec;
         }
     }
 
-    return 0;
+    return @devices;
 }
 
 sub has_motorcycle{
@@ -303,8 +329,8 @@ sub has_pilot{
     return has_spec(@_, "Pilot");
 }
 
-sub has_specialist{
-    return has_spec(@_, "Specialist");
+sub has_operator{
+    return has_spec(@_, "Operator");
 }
 
 sub has_ma{
@@ -312,6 +338,30 @@ sub has_ma{
 
     for my $spec (@{$unit->{spec}}){
         if($spec =~ m/Martial.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_guard{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Guard.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_protheion{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Protheion.*(\d)/){
             return $1;
         }
     }
@@ -355,12 +405,129 @@ sub has_g_servant{
     return has_spec(@_, '^G: Servant');
 }
 
+sub has_ad{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Parachutist/){
+            return 1;
+        }elsif($spec =~ m/Airborne Infiltration/){
+            return 2;
+        }elsif($spec =~ m/Inferior Combat Jump/){
+            return 3;
+        }elsif($spec =~ m/Superior Combat Jump/){
+            return 5;
+        }elsif($spec =~ m/Combat Jump/){
+            return 4;
+        }
+    }
+
+    return 0;
+}
+
+sub has_fatality{
+    my ($unit) = @_;
+
+    if ($unit->{type} && $unit->{type} eq 'TAG') {
+        return 1;
+    }
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Fatality.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
+sub name_fatality{
+    my ($fatality) = @_;
+    return "Fatality L$fatality";
+}
+
+sub has_full_auto{
+    my ($unit) = @_;
+
+    for my $spec (@{$unit->{spec}}){
+        if($spec =~ m/Full Auto.*(\d)/){
+            return $1;
+        }
+    }
+
+    return 0;
+}
+
+sub has_remote_presence{
+    return has_spec(@_, 'G: Remote Presence') || has_spec(@_, 'G: Autotool') || has_spec(@_, 'G: Jumper L1');
+}
+
+sub has_surprise {
+    my ($unit) = @_;
+
+    # named skill is most important; check first
+    if (has_surprise_2($unit)) {
+        return 2;
+    }
+
+    # camo better than mimetism
+    if (has_camo($unit) > 1) {
+        return 1;
+    }
+
+    for my $spec (@{$unit->{spec}}){
+        # hacking device with cybermask
+        if($spec =~ m/Hacking Device Plus/){
+            return 1;
+        }
+        if($spec =~ m/Killer Hacking Device/){
+            return 1;
+        }
+        if($spec =~ m/Cybermask/){
+            return 1;
+        }
+
+        # holorpojector L2
+        if ($spec eq 'Holoprojector L2') {
+            return 1;
+        }
+
+        # impersonation
+        if ($spec =~ m/Impersonation/) {
+            return 1;
+        }
+
+        # limited camo
+        if ($spec eq 'CH: Limited Camouflage') {
+            return 1;
+        }
+
+    }
+
+    return 0;
+}
+
+sub has_surprise_2 {
+    my ($unit) = @_;
+
+    # named skill is most important; check first
+    if (has_spec($unit, 'Surprise Shot L2')) {
+        return 2;
+    }
+}
+
+sub name_surprise_2{
+    return "Surprise Shot L2";
+}
+
+
 my $dual_weapons = {};
 my $dual_ccw = {};
 my $poison_ccw = {};
 sub get_weapons{
-    my ($unit, $new_unit, $inherit_weapon, $rider, $ability_func) = @_;
+    my ($unit, $new_unit, $inherit_weapon, $rider, $code) = @_;
     my $weapons = {};
+    my $hackers = {};
 
     for my $w (@{$unit->{bsw}}){
         $weapons->{$w} = 1;
@@ -375,21 +542,26 @@ sub get_weapons{
         $weapons->{'Flash Pulse'} = 1;
         $weapons->{'Forward Observer'} = 1;
     }
-    
-    if($inherit_weapon){
-        CHILD: for my $child (@{$unit->{childs}}){
-            # Keep specialists out of normal circulation
-            if(!$ability_func){
-                for my $specialist (@specialist_profiles){
-                    if($specialist->{ability_func}($child)){
-                        next CHILD;
-                    }
-                }
-            }
 
-            # select only the special children otherwise
-            if($ability_func && !&$ability_func($child)){
+    if(has_protheion($unit)){
+        $weapons->{'Protheion'} = 1;
+    }
+
+    for my $device (has_hacker($unit)) {
+        $hackers->{$device} = 1;
+    }
+
+    if($inherit_weapon){
+        for my $child (@{$unit->{childs}}){
+            # Select only matching specialist/non-specialist profiles
+            my $child_code = specialist_code($child);
+            if(!$code && $child_code) {
                 next;
+            }
+            if($code) {
+                if (!$child_code || $code ne $child_code){
+                    next;
+                }
             }
 
             # only read in each child once
@@ -412,8 +584,12 @@ sub get_weapons{
                 $weapons->{$w} = 1;
             }
 
-            if(has_hacker($child)){
-                $new_unit->{hacker} = has_hacker($child);
+            for my $device (has_hacker($child)) {
+                $hackers->{$device} = 1;
+            }
+
+            if (my $surprise = has_surprise($child)) {
+                $new_unit->{surprise} = $surprise;
             }
         }
     }
@@ -443,6 +619,7 @@ sub get_weapons{
     }
 
     $new_unit->{weapons} = [sort keys %$weapons];
+    $new_unit->{hacker} = [sort keys %$hackers];
 }
 
 my %unit_type_order = (
@@ -472,7 +649,7 @@ sub unit_sort{
 }
 
 sub parse_unit{
-    my ($new_unit, $unit, $ability_func) = @_;
+    my ($new_unit, $unit, $code) = @_;
 
     # Seed Embryos do not inherit their parent profile's weapons
     my ($inherit_weapon, $inherit_shasvastii) = (1, 0);
@@ -484,11 +661,6 @@ sub parse_unit{
     my $rider = 0;
     if(has_motorcycle($new_unit)){
         $rider = 1;
-    }
-
-    # TAG Pilots don't inherit weapons
-    if(has_pilot($unit)){
-        $inherit_weapon = 0;
     }
 
     # If the parent has symbiont, this unit has inactive symbiont
@@ -522,6 +694,8 @@ sub parse_unit{
     $new_unit->{nbw} = 1 if has_nbw($new_unit);
     $new_unit->{berserk} = 1 if has_berserk($new_unit);
     $new_unit->{sapper} = 1 if has_sapper($new_unit);
+    $new_unit->{xvisor} = 1 if has_xvisor($new_unit);
+    $new_unit->{odd} = 1 if has_odd($new_unit);
 
     $new_unit->{dependent} = 1 if has_g_sync($new_unit) || has_g_servant($new_unit);
 
@@ -539,17 +713,23 @@ sub parse_unit{
     if($v = has_camo($new_unit)){
         $new_unit->{ch} = $v;
     }
-    if($v = has_odd($new_unit)){
-        $new_unit->{odd} = $v;
-    }
     if($v = has_msv($new_unit)){
         $new_unit->{msv} = $v;
     }
-    if($v = has_hacker($new_unit) || $new_unit->{hacker}){
-        $new_unit->{hacker} = $v;
-    }
     if($v = has_ma($new_unit)){
         $new_unit->{ma} = $v;
+    }
+    if($v = has_guard($new_unit)){
+        $new_unit->{guard} = $v;
+    }
+    if($v = has_protheion($new_unit)){
+        $new_unit->{protheion} = $v;
+    }
+    if($v = has_fatality($new_unit)){
+        $new_unit->{fatality} = $v;
+    }
+    if($v = has_full_auto($new_unit)){
+        $new_unit->{full_auto} = $v;
     }
     if($v = has_marksmanship($new_unit)){
         $new_unit->{marksmanship} = $v;
@@ -557,12 +737,18 @@ sub parse_unit{
     if($v = has_symbiont($new_unit, $symbiont_inactive)){
         $new_unit->{symbiont} = $v;
     }
-    if($v = has_xvisor($new_unit)){
-        $new_unit->{xvisor} = $v;
+    if($v = has_ad($new_unit)){
+        $new_unit->{ad} = $v;
+    }
+    if($v = has_remote_presence($new_unit)){
+        $new_unit->{remote_presence} = $v;
+    }
+    if ($v = has_surprise($new_unit)) {
+        $new_unit->{surprise} = $v;
     }
 
     # get_weapons goes into the childs list
-    get_weapons($unit, $new_unit, $inherit_weapon, $rider, $ability_func);
+    get_weapons($unit, $new_unit, $inherit_weapon, $rider, $code);
 }
 
 sub flatten_unit{
@@ -584,24 +770,69 @@ sub flatten_unit{
         }
     }
 
+    # Mark that this profile does not inherit from base.
+    if ($flat_unit->{independent} || has_pilot($flat_unit) || has_g_sync($flat_unit) || has_g_servant($flat_unit) || has_operator($flat_unit)) {
+        $flat_unit->{no_inherit} = 1;
+    }
+
     return $flat_unit;
 }
 
-my $unit_data = {};
+sub add_special_children {
+    my ($unit, $new_unit) = @_;
+
+    my $child_codes = {};
+    for my $child (@{$unit->{childs}}){
+        next if $child->{_processed};
+
+        if (my $code = specialist_code($child)) {
+            # If we've already done this combination of abilities, move on
+            next if ($child_codes->{$code});
+            $child_codes->{$code} = 1;
+
+            my $child_unit = clone($new_unit);
+
+            # It will get hacker again if it picks up a child profile with a hacking device
+            delete $child_unit->{hacker};
+            delete $child_unit->{surprise};
+
+            # stats replace if present, otherwise inherit
+            $child->{spec} = [@{$unit->{spec}}, @{$child->{spec}}];
+            $child->{childs} = $unit->{childs};
+            parse_unit($child_unit, $child, $code);
+
+            $child_unit->{name} = $new_unit->{name} . $code;
+
+            push @{$unit_data->{$unit->{army}}}, $child_unit;
+            if (exists $unit_names->{$unit->{army}}->{$child_unit->{name}}) {
+                die "Duplicate unit named $child_unit->{name}";
+            }
+            $unit_names->{$unit->{army}}->{$child_unit->{name}} = 1;
+        }
+    }
+}
+
 my $file;
 my $json_text;
 
 for my $fname (glob("unit_data/*_units.json")){
     next if $fname eq "unit_data/other_units.json";
 
-    warn "Parsing $fname\n";
     local $/;
     open $file, '<', $fname or die "Unable to open file";
     $json_text = <$file>;
     my $source_data = $json->decode($json_text);
 
     for my $unit (@$source_data){
-        warn "    Processing $unit->{isc}\n";
+        # Skip anything marked as oboslete
+        if ($unit->{obsolete}) {
+            next;
+        }
+
+        # Skip these units
+        if ($skip_unit_list->{$unit->{id}}) {
+            next;
+        }
 
         # handle multi-profile units
         my $flat_unit = flatten_unit($unit);
@@ -612,22 +843,17 @@ for my $fname (glob("unit_data/*_units.json")){
         }
 
         # Use the longer ISC names
-        $flat_unit->{short_name} = $flat_unit->{name};
         $flat_unit->{name} = $flat_unit->{isc};
-
-        # Patch some flat_unit names
 
         # Only keep one kind of Caliban
         if($flat_unit->{name} eq 'Shasvastii Caliban (Seed-Embryo)'){
             $flat_unit->{name} = 'Caliban';
         }elsif($flat_unit->{name} =~ m/Caliban/){
             next;
-        }elsif($flat_unit->{name} eq '"The Shrouded"'){
-            $flat_unit->{name} = 'Shrouded';
         }elsif($flat_unit->{name} =~ m/^Tikbalangs/){
             $flat_unit->{name} = 'Tikbalangs';
-        }elsif($flat_unit->{name} eq 'Kasym Beg (Lieutenant)'){
-            next;
+        }elsif($flat_unit->{name} eq 'Bit & Kiss!') {
+            $flat_unit->{name} = 'Bit';
         }
         $flat_unit->{name} =~ s/^Shasvastii //;
         $flat_unit->{name} =~ s/^Hassassin //;
@@ -642,54 +868,35 @@ for my $fname (glob("unit_data/*_units.json")){
 
         if(!exists $unit_data->{$unit->{army}}){
             $unit_data->{$unit->{army}} = [];
+            $unit_names->{$unit->{army}} = {};
         }
 
-        if(!$skip_list->{$new_unit->{name}}){
+        if(!$skip_base_profile_list->{$new_unit->{name}}){
             push @{$unit_data->{$unit->{army}}}, $new_unit;
+            if (exists $unit_names->{$unit->{army}}->{$new_unit->{name}}) {
+                die "Duplicate unit named $new_unit->{name}";
+            }
+            $unit_names->{$unit->{army}}->{$new_unit->{name}} = 1;
         }
 
         # Check for child units with special skills we care about
-        for my $specialist (@specialist_profiles){
-            my $ability = $new_unit->{$specialist->{key}};
-
-            for my $child (@{$unit->{childs}}){
-                next if $child->{_processed};
-                if(!$ability && ($ability = $specialist->{ability_func}($child))){
-                    my $child_unit = clone($new_unit);
-
-                    # It will get hacker again if it picks up a child profile with a hacking device
-                    delete $child_unit->{hacker};
-
-                    # stats replace if present, otherwise inherit
-                    $child->{spec} = [@{$flat_unit->{spec}}, @{$child->{spec}}];
-                    $child->{bsw} = [@{$flat_unit->{bsw}}, @{$child->{bsw}}];
-                    $child->{ccw} = [@{$flat_unit->{ccw}}, @{$child->{ccw}}];
-                    $child->{childs} = $flat_unit->{childs};
-                    parse_unit($child_unit, $child, $specialist->{ability_func});
-
-                    $child_unit->{name} = $new_unit->{name} . $specialist->{name_func}($ability);
-                    if($alternate_names->{$child_unit->{name}}){
-                        $child_unit->{name} = $alternate_names->{$child_unit->{name}};
-                    }
-
-                    push @{$unit_data->{$unit->{army}}}, $child_unit;
-                }
-            }
-        }
+        add_special_children($flat_unit, $new_unit);
 
         # Check for alternate profiles
         for(my $i = 1; $i < scalar @{$flat_unit->{profiles}}; $i++){
             my $alt = flatten_unit($unit, $i);
 
             next if $alt->{name} eq 'CrazyKoala';
-
-            warn "        Processing $alt->{name}\n";
+            next if $alt->{name} eq 'MadTrap';
+            next if $alt->{name} eq 'SymbioBug';
 
             my $alt_unit;
-            if(!$alt->{independent}){
+            if(!$alt->{no_inherit}){
                 $alt_unit = clone($new_unit);
                 # It will get hacker again if it picks up a child profile with a hacking device
+                # Really need to clean this up...
                 delete $alt_unit->{hacker};
+                delete $alt_unit->{fatality};
             }else{
                 # Independent models don't inherit from their controller
                 $alt_unit = {};
@@ -720,6 +927,9 @@ for my $fname (glob("unit_data/*_units.json")){
             if($unit_data->{$unit->{army}}[-1]{name} ne $alt_unit->{name}){
                 push @{$unit_data->{$unit->{army}}}, $alt_unit;
             }
+
+            # Check for child units with special skills we care about
+            add_special_children($alt, $alt_unit);
         }
     }
 }
@@ -736,7 +946,7 @@ open $file, '>', 'dual_weapons.dat' or die "Unable to open file";
 print $file $json->encode($dual_weapons);
 
 open $file, '>', 'dual_ccw.dat' or die "Unable to open file";
-print $file $json->encode([keys $dual_ccw]);
+print $file $json->encode([keys %$dual_ccw]);
 
 open $file, '>', 'poison_ccw.dat' or die "Unable to open file";
-print $file $json->encode([keys $poison_ccw]);
+print $file $json->encode([keys %$poison_ccw]);

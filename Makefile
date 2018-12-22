@@ -45,7 +45,7 @@ install: ${WWW_TARGETS} ${BIN_TARGETS}
 	cp inf-dice-n3 ${BINDIR}
 
 diff:
-	for i in ${WWW_TARGETS}; do diff -u ${WWWDIR} $$i; done
+	for i in ${WWW_TARGETS}; do diff -U 10 ${WWWDIR} $$i; done
 
 update_data:
 	cd unit_data && git pull

@@ -14,6 +14,10 @@
     "Total Control": true,
     // SWORD-1
     "Brain Blast": true,
+    // SWORD-2
+    "Redrum": true,
+    "Skullbuster": true,
+    "Trinity": true,
     // SHIELD-1
     "Exorcism": true,
     // SHIELD-2
@@ -23,4 +27,8 @@
     // UPGRADES
     "Sucker Punch": true,
     "Stop!": true,
+    "Icebreaker": true,
+    "Lightning": true,
+    "Maestro": true,
+    "Exile": true,
 }

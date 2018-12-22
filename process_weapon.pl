@@ -37,7 +37,7 @@ for my $fname (glob "unit_data/weapons.json"){
 
     WEAPON: for my $weapon (@$source_data){
         # Skip unimplemented weapons or other equipment
-        if($weapon->{name} =~ m/Koala|Charges|Discover|Electric Pulse|Hedgehog|Jammer|Sepsitor|Suppressive/){
+        if($weapon->{name} =~ m/Koala|Discover|Electric Pulse|Hedgehog|Jammer|Sepsitor|Suppressive/){
             next;
         }
 
@@ -165,13 +165,13 @@ for my $fname (glob "unit_data/weapons.json"){
 # Increase burst for dual weapons
 for my $name (keys %$dual_weapons){
     next if $name eq 'CrazyKoala';
+    next if $name eq 'MadTrap';
+    next if $name eq 'SymbioBug';
 
     my $base_name = $name;
     my $dual_name = $name . " (2)";
 
     while($name){
-        warn "Dualizing $name\n";
-
         my $new_weapon = clone($weapon_data->{$name});
 
         # B increase is only for non-CC weapons
