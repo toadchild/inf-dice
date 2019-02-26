@@ -1646,6 +1646,7 @@ sub gen_attack_args{
         $stat_name = uc($stat_name);
         my $them_full_auto = param("$them.full_auto") // 0;
         my $mod = 0;
+        my $fatality = param("$us.fatality") // 0;
 
         push @mod_strings, "Base $stat_name of $stat";
 
@@ -1707,6 +1708,24 @@ sub gen_attack_args{
         $stat = max($stat + $mod, 0);
         push @mod_strings, "Net $stat_name is $stat";
 
+        # Fatality
+        if($fatality >= 1){
+            if(!$code->{fixed_dam} && $stat_name eq 'BS'){
+                push @mod_strings, "Fatality grants +1 DAM";
+                map { $_ += 1 } @dam;
+            }else{
+                push @mod_strings, sprintf('Fatality DAM bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
+
+        if($fatality >= 2){
+            if($stat_name eq 'BS'){
+                push @mod_strings, "Weapon also crits on a 1";
+                $stat .= "!";
+            }else{
+                push @mod_strings, sprintf('Fatality crit bonus ignored by %s', param("$us.weapon") // "");
+            }
+        }
     }elsif($action eq 'cc'){
         # CC mods
         $type = 'ftf';
