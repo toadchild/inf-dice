@@ -515,6 +515,11 @@ sub has_surprise {
             return 1;
         }
 
+        # decot
+        if ($spec eq 'Decoy') {
+            return 1;
+        }
+
     }
 
     return 0;
@@ -858,12 +863,7 @@ for my $fname (glob("unit_data/*_units.json")){
         # Use the longer ISC names
         $flat_unit->{name} = $flat_unit->{isc};
 
-        # Only keep one kind of Caliban
-        if($flat_unit->{name} eq 'Shasvastii Caliban (Seed-Embryo)'){
-            $flat_unit->{name} = 'Caliban';
-        }elsif($flat_unit->{name} =~ m/Caliban/){
-            next;
-        }elsif($flat_unit->{name} =~ m/^Tikbalangs/){
+        if($flat_unit->{name} =~ m/^Tikbalangs/){
             $flat_unit->{name} = 'Tikbalangs';
         }elsif($flat_unit->{name} eq 'Bit & Kiss!') {
             $flat_unit->{name} = 'Bit';
