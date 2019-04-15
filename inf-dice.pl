@@ -157,10 +157,10 @@ my $ma_codes = {
 };
 
 my $guard_codes = {
-    1 => {attack => 0, enemy => -3, damage => 1, burst => 0},
-    2 => {attack => 3, enemy =>  0, damage => 1, burst => 0},
-    3 => {attack => 0, enemy => -3, damage => 2, burst => 0},
-    4 => {attack => 0, enemy =>  0, damage => 3, burst => 0},
+    1 => {attack => 0, enemy => -3, damage => 2, burst => 0},
+    2 => {attack => 3, enemy => -3, damage => 2, burst => 0},
+    3 => {attack => 0, enemy => -3, damage => 2, burst => 1},
+    4 => {attack => 3, enemy =>  0, damage => 3, burst => 1},
 };
 
 my $protheion_codes = {
