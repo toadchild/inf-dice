@@ -99,6 +99,7 @@ my $ammo_codes = {
     'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
     'Dep. Repeater' => {saves => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
     'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
+    'Pheromonic' => {saves => 1, save => 'bts'},
     'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
     'Plasma' => {saves => 2, save => ['arm', 'bts']},
@@ -2159,6 +2160,7 @@ sub gen_dodge_args{
     my ($us, $them, $change_face) = @_;
     my @mod_strings;
 
+    my $other_action = param("$them.action");
     my $dodge_unit = 0;
     my $unit_type = param("$us.type") // '';
     my $motorcycle = param("$us.motorcycle") // 0;
@@ -2169,51 +2171,86 @@ sub gen_dodge_args{
     }
 
     my $stat = param("$us.ph") // 0;
+    my $mod = 0;
     push @mod_strings, "Base PH of $stat";
 
     if($change_face){
         push @mod_strings, sprintf('Change facing grants %+d PH', $change_face);
-        $stat += $change_face;
+        $mod += $change_face;
     }
 
     if($dodge_unit){
         push @mod_strings, sprintf('Unit type grants %+d PH', $dodge_unit);
-        $stat += $dodge_unit;
+        $mod += $dodge_unit;
     }
 
     my $hyperdynamics = param("$us.hyperdynamics") // 0;
     if($hyperdynamics){
         push @mod_strings, sprintf('Hyperdynamics grants %+d PH', $hyperdynamics);
-        $stat += $hyperdynamics;
+        $mod += $hyperdynamics;
     }
 
     my $type = 'ftf';
 
-    if(param("$them.action") eq 'dodge' || param("$them.action") eq 'change_face'){
+    if($other_action eq 'dodge' || $other_action eq 'change_face'){
         # double-dodge is normal rolls
         $type = 'normal';
     }
 
-    if(param("$them.action") eq 'deploy' && !$change_face){
+    if($other_action eq 'deploy' && !$change_face){
         # -3 penalty to dodge mines, but is already included in change facing
-        $stat -= 3;
+        $mod -= 3;
         push @mod_strings, sprintf('Dodging a deployable grants -3 PH');
     }
 
     my $misc_mod = param("$us.misc_mod") // 0;
     if($misc_mod){
         push @mod_strings, sprintf('Additional modifier grants %+d PH', $misc_mod);
-        $stat += $misc_mod;
+        $mod += $misc_mod;
     }
 
     # surprise shot/attack mod
     my $surprise = get_surprise_mod($them);
     if($type eq 'ftf' && $surprise){
-        $stat += $surprise;
+        $mod += $surprise;
         push @mod_strings, sprintf('Surprise grants %d PH', $surprise);
     }
 
-    $stat = max($stat, 0);
+    # CC modifiers affect us if they are using a CC skill
+    if($other_action eq 'cc'){
+        my $them_ma = param("$them.ma") // 0;
+        my $them_guard = param("$them.guard") // 0;
+        my $them_protheion = check_protheion($them);
+
+        # Penalties from their CC skills
+        if($them_ma){
+            if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
+                push @mod_strings, sprintf('Opponent Martial Arts grants %+d PH', $ma_att);
+                $mod += $ma_att;
+            }
+        }
+        if($them_guard){
+            if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
+                push @mod_strings, sprintf('Opponent Guard grants %+d PH', $guard_att);
+                $mod += $guard_att;
+            }
+        }
+        if($them_protheion){
+            if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
+                push @mod_strings, sprintf('Opponent Protheion grants %+d PH', $protheion_att);
+                $mod += $protheion_att;
+            }
+        }
+    }
+
+    if($mod < -12){
+        push @mod_strings, "Modifier capped at -12";
+        $mod = -12;
+    }elsif($mod > 12){
+        push @mod_strings, "Modifier capped at 12";
+        $mod = 12;
+    }
+    $stat = max($stat + $mod, 0);
     push @mod_strings, "Net PH is $stat";
 
     return (
