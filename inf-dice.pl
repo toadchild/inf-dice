@@ -1755,19 +1755,6 @@ sub gen_attack_args{
             }
         }
 
-        # iKohl does not work on models with STR
-        my $ikohl = param("$them.ikohl") // 0;
-        my $w_type = param("$us.w_type") // 'W';
-        if($ikohl){
-            if($w_type eq 'STR'){
-                $ikohl = 0;
-                push @mod_strings, 'STR ignores i-Kohl';
-            }else{
-                push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
-                $mod += $ikohl;
-            }
-        }
-
         $b = 1;
 
         # Bonuses from our CC skills
@@ -1888,6 +1875,22 @@ sub gen_attack_args{
                 }else{
                     push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior A';
                 }
+            }
+        }
+
+        # I-Kohl applies for both CC and Dodge
+        my $ikohl = param("$them.ikohl") // 0;
+        if($ikohl && ($other_action eq 'cc' || $other_action eq 'dodge')){
+            # iKohl does not work on models with STR
+            my $w_type = param("$us.w_type") // 'W';
+            if($w_type eq 'STR'){
+                $ikohl = 0;
+                push @mod_strings, 'STR ignores i-Kohl';
+            }elsif(param("$us.nbw") == 1){
+                push @mod_strings, 'Opponent i-Kohl canceled by Natural Born Warrior A';
+            }else{
+                push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
+                $mod += $ikohl;
             }
         }
 
