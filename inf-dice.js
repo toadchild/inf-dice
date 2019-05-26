@@ -1338,10 +1338,10 @@ var ma_labels = [
 
 var guard_labels = [
     'None',
-    'Level 1 (-3 Opponent, +1 DAM)',
-    'Level 2 (+3 Attack, +1 DAM)',
-    'Level 3 (-3 Opponent, +2 DAM)',
-    'Level 4 (+3 DAM)',
+    'Level 1 (-3 Opponent, +2 DAM)',
+    'Level 2 (+3 Attack, -3 Opponent, +2 DAM)',
+    'Level 3 (-3 Opponent, +2 DAM, +1 Burst)',
+    'Level 4 (+3 Attack, +3 DAM, +1 Burst)',
 ];
 
 var protheion_labels = [
