@@ -1202,6 +1202,69 @@ sub check_protheion{
     return 0;
 }
 
+# Apply penalties from the opponent's CC skills
+sub apply_opponent_cc {
+    my ($us, $them, $stat_name, $mod_strings) = @_;
+    my $action = param("$us.action");
+    my $other_action = param("$them.action");
+    my $mod = 0;
+    my $us_nbw = param("$us.nbw") // 0;
+    if($other_action eq 'cc'){
+        my $them_ma = param("$them.ma") // 0;
+        my $them_guard = param("$them.guard") // 0;
+        my $them_protheion = check_protheion($them);
+
+        # Penalties from their CC skills
+        if($them_ma){
+            if($us_nbw != 1){
+                if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
+                    push @$mod_strings, sprintf('Opponent Martial Arts grants %+d %s', $ma_att, $stat_name);
+                    $mod += $ma_att;
+                }
+            }else{
+                push @$mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior A';
+            }
+        }
+        if($them_guard){
+            if($us_nbw != 1){
+                if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
+                    push @$mod_strings, sprintf('Opponent Guard grants %+d %s', $guard_att, $stat_name);
+                    $mod += $guard_att;
+                }
+            }else{
+                push @$mod_strings, 'Opponent Guard canceled by Natural Born Warrior A';
+            }
+        }
+        if($them_protheion){
+            if($us_nbw != 1){
+                if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
+                    push @$mod_strings, sprintf('Opponent Protheion grants %+d %s', $protheion_att, $stat_name);
+                    $mod += $protheion_att;
+                }
+            }else{
+                push @$mod_strings, 'Opponent Protheion canceled by Natural Born Warrior A';
+            }
+        }
+    }
+
+    # I-Kohl applies for both CC and Dodge if our skill is CC
+    my $ikohl = param("$them.ikohl") // 0;
+    if($ikohl && ($other_action eq 'cc' || ($action eq 'cc' && $other_action eq 'dodge'))){
+        # iKohl does not work on models with STR
+        my $w_type = param("$us.w_type") // 'W';
+        if($w_type eq 'STR'){
+            push @$mod_strings, 'Opponent i-Kohl negated by STR';
+        }elsif($us_nbw == 1){
+            push @$mod_strings, 'Opponent i-Kohl canceled by Natural Born Warrior A';
+        }else{
+            push @$mod_strings, sprintf('i-Kohl grants %+d %s', $ikohl, $stat_name);
+            $mod += $ikohl;
+        }
+    }
+
+    return $mod;
+}
+
 sub get_surprise_mod {
     my ($them) = @_;
     my $surprise = 0;
@@ -1500,43 +1563,7 @@ sub gen_attack_args{
         }
 
         # CC modifiers affect us if they are using a CC skill
-        if($other_action eq 'cc'){
-            my $them_ma = param("$them.ma") // 0;
-            my $them_guard = param("$them.guard") // 0;
-            my $them_protheion = check_protheion($them);
-
-            # Penalties from their CC skills
-            if($them_ma){
-                if(param("$us.nbw") != 1){
-                    if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
-                        push @mod_strings, sprintf('Opponent Martial Arts grants %+d %s', $ma_att, $stat_name);
-                        $mod += $ma_att;
-                    }
-                }else{
-                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior A';
-                }
-            }
-            if($them_guard){
-                if(param("$us.nbw") != 1){
-                    if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
-                        push @mod_strings, sprintf('Opponent Guard grants %+d %s', $guard_att, $stat_name);
-                        $mod += $guard_att;
-                    }
-                }else{
-                    push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior A';
-                }
-            }
-            if($them_protheion){
-                if(param("$us.nbw") != 1){
-                    if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
-                        push @mod_strings, sprintf('Opponent Protheion grants %+d %s', $protheion_att, $stat_name);
-                        $mod += $protheion_att;
-                    }
-                }else{
-                    push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior A';
-                }
-            }
-        }
+        $mod += apply_opponent_cc($us, $them, $stat_name, \@mod_strings);
 
         # Fatality
         if($fatality >= 1){
@@ -1844,55 +1871,8 @@ sub gen_attack_args{
             push @mod_strings, 'D-Charges grant -3 to CC';
         }
 
-        # Penalties from their MA skill
-        if($other_action eq 'cc'){
-            if($them_ma){
-                if(param("$us.nbw") != 1){
-                    if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
-                        push @mod_strings, sprintf('Opponent Martial Arts grants %+d CC', $ma_att);
-                        $mod += $ma_att;
-                    }
-                }else{
-                    push @mod_strings, 'Opponent Martial Arts canceled by Natural Born Warrior A';
-                }
-            }
-            if($them_guard){
-                if(param("$us.nbw") != 1){
-                    if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
-                        push @mod_strings, sprintf('Opponent Guard grants %+d CC', $guard_att);
-                        $mod += $guard_att;
-                    }
-                }else{
-                    push @mod_strings, 'Opponent Guard canceled by Natural Born Warrior A';
-                }
-            }
-            if($them_protheion){
-                if(param("$us.nbw") != 1){
-                    if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
-                        push @mod_strings, sprintf('Opponent Protheion grants %+d CC', $protheion_att);
-                        $mod += $protheion_att;
-                    }
-                }else{
-                    push @mod_strings, 'Opponent Protheion canceled by Natural Born Warrior A';
-                }
-            }
-        }
-
-        # I-Kohl applies for both CC and Dodge
-        my $ikohl = param("$them.ikohl") // 0;
-        if($ikohl && ($other_action eq 'cc' || $other_action eq 'dodge')){
-            # iKohl does not work on models with STR
-            my $w_type = param("$us.w_type") // 'W';
-            if($w_type eq 'STR'){
-                $ikohl = 0;
-                push @mod_strings, 'STR ignores i-Kohl';
-            }elsif(param("$us.nbw") == 1){
-                push @mod_strings, 'Opponent i-Kohl canceled by Natural Born Warrior A';
-            }else{
-                push @mod_strings, sprintf('i-Kohl grants %+d CC', $ikohl);
-                $mod += $ikohl;
-            }
-        }
+        # Penalties from their CC skills
+        $mod += apply_opponent_cc($us, $them, 'CC', \@mod_strings);
 
         # gang up bonus
         my $gang_up = param("$us.gang_up") // 0;
@@ -2051,6 +2031,11 @@ sub gen_hack_args{
     if($type eq 'ftf' && $surprise){
         $mod += $surprise;
         push @mod_strings, sprintf('Surprise grants %d WIP', $surprise);
+    }
+
+    if ($type eq 'ftf') {
+        # CC modifiers affect us if they are using a CC skill
+        $mod += apply_opponent_cc($us, $them, 'WIP', \@mod_strings);
     }
 
     if($mod < -12){
@@ -2220,31 +2205,7 @@ sub gen_dodge_args{
     }
 
     # CC modifiers affect us if they are using a CC skill
-    if($other_action eq 'cc'){
-        my $them_ma = param("$them.ma") // 0;
-        my $them_guard = param("$them.guard") // 0;
-        my $them_protheion = check_protheion($them);
-
-        # Penalties from their CC skills
-        if($them_ma){
-            if(my $ma_att = $ma_codes->{$them_ma}{enemy}){
-                push @mod_strings, sprintf('Opponent Martial Arts grants %+d PH', $ma_att);
-                $mod += $ma_att;
-            }
-        }
-        if($them_guard){
-            if(my $guard_att = $guard_codes->{$them_guard}{enemy}){
-                push @mod_strings, sprintf('Opponent Guard grants %+d PH', $guard_att);
-                $mod += $guard_att;
-            }
-        }
-        if($them_protheion){
-            if(my $protheion_att = $protheion_codes->{$them_protheion}{enemy}){
-                push @mod_strings, sprintf('Opponent Protheion grants %+d PH', $protheion_att);
-                $mod += $protheion_att;
-            }
-        }
-    }
+    $mod += apply_opponent_cc($us, $them, 'PH', \@mod_strings);
 
     if($mod < -12){
         push @mod_strings, "Modifier capped at -12";
