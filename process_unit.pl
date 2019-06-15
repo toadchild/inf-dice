@@ -856,7 +856,7 @@ for my $fname (glob("unit_data/*_units.json")){
         my $flat_unit = flatten_unit($unit);
 
         # Skip Spec-Ops
-        if($flat_unit->{bs} eq 'X'){
+        if($flat_unit->{type} eq 'SPEC-OPS'){
             next;
         }
 
