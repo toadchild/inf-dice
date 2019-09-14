@@ -338,6 +338,7 @@ my $factions = [
     'Nomads',
     'Non-Aligned Armies',
     'PanOceania',
+    "O-12",
     'Tohaa',
     'Yu Jing',
 ];
