@@ -1821,6 +1821,10 @@ sub gen_attack_args{
                         push @mod_strings, sprintf('Guard DAM bonus ignored by %s', param("$us.weapon") // "");
                     }
                 }
+                if(my $guard_b = $guard_codes->{$us_guard}{burst}){
+                    push @mod_strings, sprintf('Guard grants %+d B', $guard_b);
+                    $b += $guard_b;
+                }
             }else{
                 push @mod_strings, 'Guard canceled by Natural Born Warrior A';
             }
