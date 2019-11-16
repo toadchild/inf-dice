@@ -213,6 +213,13 @@ my $symbiont_armor_labels = {
     2 => 'Active',
 };
 
+my $lotech = [0, 2, 1];
+my $lotech_labels = {
+    0 => 'None',
+    1 => 'Battle Ravaged',
+    2 => 'Lo-Tech A',
+};
+
 my $operator = [0, 1, 2];
 my $operator_labels = {
     0 => 'None',
@@ -455,6 +462,13 @@ sub print_input_attack_section{
               -default => param("$player.symbiont") // '',
               -labels => $symbiont_armor_labels,
               -label => 'Symbiont Armor',
+          ),
+          "<br>",
+          span_popup_menu(-name => "$player.lotech",
+              -values => $lotech,
+              -default => param("$player.lotech") // '',
+              -labels => $lotech_labels,
+              -label => 'Lo-Tech',
           ),
           "<br>",
           span_popup_menu(-name => "$player.operator",
@@ -779,6 +793,7 @@ sub print_player_output{
     my $name = param("p$player.unit") // 'Model A';
     my $other_name = param("p$other.unit") // 'Model B';
     my $symbiont = param("p$other.symbiont") // 0;
+    my $lotech = param("p$other.lotech") // 0;
     my $operator_w = param("p$other.operator") // 0;
     my $remote_presence = param("p$other.remote_presence") // 0;
     my $action = param("p$player.action") // '';
@@ -808,12 +823,13 @@ sub print_player_output{
     my $unconscious = $wounds;
     my $dead = $wounds + 1;
     my $symb_disabled = -1;
+    my $battle_ravaged = -1;
     my $eject = -1;
     my $spawn = -1;
     my $unconscious_2 = -1;
 
     if($symbiont == 2){
-        $symb_disabled = $wounds;
+        $symb_disabled = $unconscious;
         $unconscious++;
         $dead++;
         if($code->{fatal_symbiont}){
@@ -821,15 +837,23 @@ sub print_player_output{
         }
     }
 
-    if($symbiont){
-        # Make Symbiont armor shock-immune.
-        $immunity = 'shock';
+    if($lotech == 2){
+        $battle_ravaged = $unconscious;
+        $unconscious++;
+        $dead++;
+    }
+
+    if ($symbiont || $lotech) {
+        # Multi-wound profile grants shock immunity
+        if (!$immunity) {
+            $immunity = 'shock';
+        }
     }
 
     if($operator_w){
+        $eject = $unconscious;
         $unconscious += $operator_w;
         $dead += $operator_w;
-        $eject = $wounds;
     }
 
     if($shasvastii){
@@ -839,14 +863,13 @@ sub print_player_output{
 
     if($nwi){
         $unconscious = -1;
-        if($w_type eq 'STR' && $remote_presence){
-            $dead++;
-        }
     }
 
-    if($unconscious != -1 && $w_type eq 'STR' && $remote_presence){
-        $unconscious_2 = $unconscious + 1;
+    if ($w_type eq 'STR' && $remote_presence){
         $dead++;
+        if($unconscious > 0) {
+            $unconscious_2 = $unconscious + 1;
+        }
     }
 
     if($fatal >= $wounds && !$immunities->{$immunity}{$ammo}){
@@ -883,6 +906,8 @@ sub print_player_output{
             $done = 1;
         }elsif($w == $symb_disabled){
             $label = ' (Symbiont Disabled)';
+        }elsif($w == $battle_ravaged){
+            $label = ' (Battle Ravaged)';
         }elsif($w == $eject){
             $label = ' (Operator Ejected)';
         }elsif($w == $unconscious){
@@ -936,7 +961,7 @@ sub print_player_output{
     }
 
     for(my $h = 0; $h < scalar @{$results->{cumul_hits}}; $h++){
-        if(defined $results->{cumul_hits}[$h]){
+        if(defined $formats[$h]){
             printf "<span class='p$player-hit-$h hit_chance'>%.2f%%</span> ", $results->{cumul_hits}[$h];
             printf "$formats[$h]<br>\n", $name, $h, $other_name, $labels[$h];
         }

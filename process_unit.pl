@@ -225,6 +225,17 @@ sub has_symbiont{
     return 0;
 }
 
+sub has_lotech{
+    my ($unit, $ravaged) = @_;
+    if($ravaged){
+        return 1;
+    }
+    if(has_spec($unit, 'Lo-Tech A')){
+        return 2;
+    }
+    return 0;
+}
+
 sub has_nwi{
     return has_spec(@_, 'No Wound Incapacitation');
 }
@@ -667,6 +678,8 @@ sub unit_sort{
 }
 
 sub parse_unit{
+    # $new_unit is either blank or a clone of the unit that's inherited from.
+    # $unit is the source JSON object being parsed.
     my ($new_unit, $unit, $code) = @_;
 
     # Seed Embryos do not inherit their parent profile's weapons
@@ -685,6 +698,12 @@ sub parse_unit{
     my $symbiont_inactive = 0;
     if(has_symbiont($new_unit)){
         $symbiont_inactive = 1;
+    }
+
+    # If the parent has lo-tech, this unit is battle ravaged
+    my $battle_ravaged = 0;
+    if(has_lotech($new_unit)){
+        $battle_ravaged = 1;
     }
 
     # Stats
@@ -754,6 +773,9 @@ sub parse_unit{
     }
     if($v = has_symbiont($new_unit, $symbiont_inactive)){
         $new_unit->{symbiont} = $v;
+    }
+    if($v = has_lotech($new_unit, $battle_ravaged)){
+        $new_unit->{lotech} = $v;
     }
     if($v = has_ad($new_unit)){
         $new_unit->{ad} = $v;

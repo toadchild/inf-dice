@@ -1072,6 +1072,7 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
         document.getElementsByName(player + ".msv")[0].value = unit["msv"] || 0;
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"] || 0;
+        document.getElementsByName(player + ".lotech")[0].value = unit["lotech"] || 0;
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
