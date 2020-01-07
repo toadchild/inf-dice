@@ -821,6 +821,12 @@ sub print_player_output{
     # pretty printing
     my $format = $code->{format} // '%s inflicts %d or more wounds on %s%s';
 
+    # Fire kills the entire symbiont immediately, but no extra damage
+    # to the underlying profile.
+    if($code->{fatal_symbiont}){
+        $wounds = 1;
+    }
+
     # thresholds or state changes
     my $unconscious = $wounds;
     my $dead = $wounds + 1;
@@ -834,9 +840,6 @@ sub print_player_output{
         $symb_disabled = $unconscious;
         $unconscious++;
         $dead++;
-        if($code->{fatal_symbiont}){
-            $fatal = $code->{fatal_symbiont};
-        }
     }
 
     if($lotech == 2){
