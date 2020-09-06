@@ -15,7 +15,7 @@
 #include <pthread.h>
 
 #define B_MAX  5
-#define SAVES_MAX  3
+#define SAVES_MAX  4
 #define SUCCESS_MAX (B_MAX * SAVES_MAX)
 #define STAT_MAX 40
 #define ROLL_MAX 20
@@ -309,30 +309,30 @@ static int64_t choose(int n, int k){
 }
 
 /*
- * hit_prob()
+ * success_prob()
  *
  * Uses binomial theorem to calculate the likelyhood that a certain number
  * of hits were successful.
  */
-static double hit_prob(int successes, int trials, double probability){
+static double success_prob(int successes, int trials, double probability){
     return choose(trials, successes) * pow(probability, successes) * pow(1 - probability, trials - successes);
 }
 
-static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int crits, int n, int successes, double prob, enum tag_mask_t mask){
-    if(n == p->num_saves){
-        assert(crits + successes <= SUCCESS_MAX);
-        p->success[crits + successes][mask] += prob * p->hit[hits][crits];
+static void hit_prob_multi_helper(struct player *p, int *saves, double hit_prob, int n, int successes, double prob, enum tag_mask_t mask){
+    if(n == p->num_saves + 1){
+        assert(successes <= SUCCESS_MAX);
+        p->success[successes][mask] += prob * hit_prob;
     }else{
         int i;
         double dam_prob = ((double)p->dam[n]) / ROLL_MAX;
         for(i = 0; i <= saves[n]; i++){
-            double new_prob = hit_prob(i, saves[n], dam_prob);
+            double new_prob = success_prob(i, saves[n], dam_prob);
             // If we scored a hit, add that save's tag to the mask.
             enum tag_mask_t new_mask = mask;
             if(i){
                 new_mask |= p->tag_mask[n];
             }
-            hit_prob_multi_helper(p, saves, hits, crits, n + 1, successes + i, prob * new_prob, new_mask);
+            hit_prob_multi_helper(p, saves, hit_prob, n + 1, successes + i, prob * new_prob, new_mask);
         }
     }
 }
@@ -343,13 +343,8 @@ static void hit_prob_multi_helper(struct player *p, int *saves, int hits, int cr
  * Recurses to find the probability that any combination of saves passed or
  * failed.
  */
-static void hit_prob_multi(struct player *p, int *saves, int hits, int crits){
-    // If there were crits, the damage is tagged with the first damage type.
-    enum tag_mask_t mask = TAG_MASK_NONE;
-    if(crits){
-        mask = p->tag_mask[0];
-    }
-    hit_prob_multi_helper(p, saves, hits, crits, 0, 0, 1.0, mask);
+static void hit_prob_multi(struct player *p, int *saves, double hit_prob){
+    hit_prob_multi_helper(p, saves, hit_prob, 0, 0, 1.0, TAG_MASK_NONE);
 }
 
 /*
@@ -370,7 +365,7 @@ static void fire_damage(struct player *p, int hits, int total_hits, int dam, dou
     }
 
     for(success = 0; success <= hits; success++){
-        double new_prob = hit_prob(success, hits, ((double)dam) / ROLL_MAX);
+        double new_prob = success_prob(success, hits, ((double)dam) / ROLL_MAX);
         int new_depth = depth - 1;
 
         fire_damage(p, success, total_hits + success, dam, prob * new_prob, new_depth);
@@ -389,36 +384,35 @@ static void calc_player_successes(struct player *p){
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
             if(p->hit[hits][crits] > 0){
-                int i;
+                // We scored this many hits and crits
+                // now we need to determine how likely it was we caused however many successes
+                // Gotta binomialize!
                 int saves[SAVES_MAX] = {};
-                for(i = 0; i < p->num_saves; i++){
-                    // We scored this many hits and crits
-                    // now we need to determine how likely it was we caused however many successes
-                    // Gotta binomialize!
-
-                    // crits always hit, so they are an offset into the success array
-                    // then we count up to the max number of hits.
-                    if(p->ammo == AMMO_FIRE){
-                        // Fire ammo
-                        // If you fail the save, you must roll again, ad infinitum.
+                if(p->ammo == AMMO_FIRE){
+                    // Fire ammo
+                    // If you fail the save, you must roll again, ad infinitum.
+                    int i;
+                    for(i = 0; i < p->num_saves; i++){
                         fire_damage(p, hits + crits, crits, p->dam[i], p->hit[hits][crits], SUCCESS_MAX);
-                    }else if(p->ammo == AMMO_NONE){
-                        // Non-lethal skill (Dodge, Smoke)
-                        // There is no saving throw. Number of successes still
-                        // matters for smoke.
-                        p->success[crits + hits][TAG_MASK_NONE] += p->hit[hits][crits];
-                    }else{
-                        // Normal - one save per regular hit
-                        // Additional saves for crits after the first die
-                        saves[i] += hits;
-                        if(i > 0){
-                            saves[i] += crits;
-                        }
                     }
-                }
+                }else if(p->ammo == AMMO_NONE){
+                    // Non-lethal skill (Dodge, Smoke)
+                    // There is no saving throw. Number of successes still
+                    // matters for smoke.
+                    p->success[crits + hits][TAG_MASK_NONE] += p->hit[hits][crits];
+                }else{
+                    // Most normal ammo types; roll p->num_saves saving throws per hit.
+                    int i;
+                    for(i = 0; i < p->num_saves; i++){
+                        saves[i] += hits + crits;
+                    }
+                    // Criticals inflict an extra save.
+                    // Copy stats from the first save.
+                    if (crits) {
+                        saves[p->num_saves] += crits;
+                    }
 
-                if(p->ammo == AMMO_NORMAL){
-                    hit_prob_multi(p, saves, hits, crits);
+                    hit_prob_multi(p, saves, p->hit[hits][crits]);
                 }
             }
         }
@@ -952,6 +946,12 @@ static void parse_dam(const char **argv, int argc, int *i, struct player *p){
             }
         }
     }
+
+    // Load an extra copy of the first values at the end of the list.
+    // This is used for crits.
+    p->dam[p->num_saves] = p->dam[0];
+    p->tag_mask[p->num_saves] = p->tag_mask[0];
+    p->tag_label[p->num_saves] = p->tag_label[0];
 }
 
 static void parse_args(int argc, const char *argv[], struct player *p1, struct player *p2){
