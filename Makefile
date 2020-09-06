@@ -49,3 +49,6 @@ diff:
 
 update_data:
 	cd unit_data && git pull
+
+test: inf-dice-n4
+	./test.pl
