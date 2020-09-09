@@ -139,6 +139,74 @@ $output = `./inf-dice-n4 12 1 2 2 NONE 2 NONE 12 1 3 10 NONE 10 NONE 10 NONE`;
 die if $output ne $expected;
 
 ###########################################################################
+# Test shoot vs. dodge
+###########################################################################
+
+$expected = <<EOF;
+P1 STAT 12 CRIT 12 CRIT_1 N BOOST  0 B 3 TEMPLATE 0 AMMO NORMAL DAM[0] 10 TAG[0] NONE
+P2 STAT 12 CRIT 12 CRIT_1 N BOOST  0 B 1 TEMPLATE 0 AMMO NONE DAM[0]  0 TAG[0] NONE
+
+Total Rolls: 160000
+Actual Rolls Made: 5915
+Savings: 96.30%
+
+P1 Hits:  0 Crits:  1 -  5.209% (8334)
+P1 Hits:  0 Crits:  2 -  0.409% (654)
+P1 Hits:  0 Crits:  3 -  0.012% (19)
+P1 Hits:  1 Crits:  0 - 26.029% (41646)
+P1 Hits:  1 Crits:  1 -  5.115% (8184)
+P1 Hits:  1 Crits:  2 -  0.268% (429)
+P1 Hits:  2 Crits:  0 - 22.564% (36102)
+P1 Hits:  2 Crits:  1 -  2.537% (4059)
+P1 Hits:  3 Crits:  0 -  8.546% (13673)
+
+No Hits:  7.240% 11584
+
+P2 Hits:  0 Crits:  1 -  4.287% (6859)
+P2 Hits:  1 Crits:  0 - 17.786% (28457)
+
+
+======================================================
+
+P1 Scores  6 Success(es):  0.000% NONE
+P1 Scores  6 Success(es):  0.000%
+P1 Scores  5 Success(es):  0.009% NONE
+P1 Scores  5 Success(es):  0.009%
+P1 Scores  4 Success(es):  0.229% NONE
+P1 Scores  4 Success(es):  0.229%
+P1 Scores  3 Success(es):  2.531% NONE
+P1 Scores  3 Success(es):  2.531%
+P1 Scores  2 Success(es): 13.257% NONE
+P1 Scores  2 Success(es): 13.257%
+P1 Scores  1 Success(es): 32.803% NONE
+P1 Scores  1 Success(es): 32.803%
+P1 Scores  6+ Successes:   0.000% NONE
+P1 Scores  5+ Successes:   0.010% NONE
+P1 Scores  4+ Successes:   0.238% NONE
+P1 Scores  3+ Successes:   2.770% NONE
+P1 Scores  2+ Successes:  16.027% NONE
+P1 Scores  1+ Successes:  48.830% NONE
+P1 Scores  6+ Successes:   0.000%
+P1 Scores  5+ Successes:   0.010%
+P1 Scores  4+ Successes:   0.238%
+P1 Scores  3+ Successes:   2.770%
+P1 Scores  2+ Successes:  16.027%
+P1 Scores  1+ Successes:  48.830%
+
+No Successes: 29.098%
+
+P2 Scores  1 Success(es): 22.073% NONE
+P2 Scores  1 Success(es): 22.073%
+P2 Scores  1+ Successes:  22.073% NONE
+P2 Scores  1+ Successes:  22.073%
+
+EOF
+
+$output = `./inf-dice-n4 12 3 1 10 NONE 12 1 - 0 NONE`;
+
+die if $output ne $expected;
+
+###########################################################################
 # Done!
 ###########################################################################
 
