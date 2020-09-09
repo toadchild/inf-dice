@@ -138,7 +138,7 @@ static int64_t print_player_hits(struct player *p, int p_num, int64_t num_rolls)
     for(hits = 0; hits <= B_MAX; hits++){
         for(crits = 0; crits <= B_MAX; crits++){
             if((hits > 0 || crits > 0) && p->hit[hits][crits] > 0){
-                printf("P%d Hits: %2d Crits: %2d - %6.2f%% (%lld)\n", p_num, hits, crits, 100.0 * p->hit[hits][crits] / num_rolls, p->hit[hits][crits]);
+                printf("P%d Hits: %2d Crits: %2d - %6.3f%% (%lld)\n", p_num, hits, crits, 100.0 * p->hit[hits][crits] / num_rolls, p->hit[hits][crits]);
                 n_rolls += p->hit[hits][crits];
             }
         }
@@ -185,15 +185,15 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
         int tag;
         for(tag = 0; tag < NUM_TAGS; tag++){
             double prob = tagged_prob[success][tag];
-            if(prob >= 0.005){
-                printf("P%d Scores %2d Success(es): %6.2f%% %s\n", p_num, success, prob, tag_labels[tag]);
+            if(prob){
+                printf("P%d Scores %2d Success(es): %6.3f%% %s\n", p_num, success, prob, tag_labels[tag]);
             }
         }
-        if(tagless_prob[success] >= 0.005){
-            printf("P%d Scores %2d Success(es): %6.2f%% %s\n", p_num, success, tagless_prob[success], TAG_LABEL_NONE);
+        if(tagless_prob[success]){
+            printf("P%d Scores %2d Success(es): %6.3f%% %s\n", p_num, success, tagless_prob[success], TAG_LABEL_NONE);
         }
-        if(untagged_prob[success] >= 0.005){
-            printf("P%d Scores %2d Success(es): %6.2f%%\n", p_num, success, untagged_prob[success]);
+        if(untagged_prob[success]){
+            printf("P%d Scores %2d Success(es): %6.3f%%\n", p_num, success, untagged_prob[success]);
         }
     }
 
@@ -201,7 +201,7 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
     for(success = SUCCESS_MAX; success > 0; success--){
         if(tagless_prob[success]){
             cumul_prob += tagless_prob[success];
-            printf("P%d Scores %2d+ Successes:  %6.2f%% %s\n", p_num, success, cumul_prob, TAG_LABEL_NONE);
+            printf("P%d Scores %2d+ Successes:  %6.3f%% %s\n", p_num, success, cumul_prob, TAG_LABEL_NONE);
         }
     }
     int tag;
@@ -210,7 +210,7 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
         for(success = SUCCESS_MAX; success > 0; success--){
             if(tagged_prob[success][tag]){
                 cumul_prob += tagged_prob[success][tag];
-                printf("P%d Scores %2d+ Successes:  %6.2f%% %s\n", p_num, success, cumul_prob, tag_labels[tag]);
+                printf("P%d Scores %2d+ Successes:  %6.3f%% %s\n", p_num, success, cumul_prob, tag_labels[tag]);
             }
         }
     }
@@ -218,7 +218,7 @@ double print_player_successes(struct player *p, int p_num, int64_t num_rolls){
     for(success = SUCCESS_MAX; success > 0; success--){
         cumul_prob += untagged_prob[success];
         if(cumul_prob){
-            printf("P%d Scores %2d+ Successes:  %6.2f%%\n", p_num, success, cumul_prob);
+            printf("P%d Scores %2d+ Successes:  %6.3f%%\n", p_num, success, cumul_prob);
         }
     }
     printf("\n");
@@ -250,7 +250,7 @@ static void print_tables(struct dice *d){
     n += d->p1.hit[0][0] + d->p2.hit[0][0];
 
     n_rolls += n;
-    printf("No Hits: %6.2f%% %lld\n", 100.0 * n / d->num_rolls, n);
+    printf("No Hits: %6.3f%% %lld\n", 100.0 * n / d->num_rolls, n);
     printf("\n");
 
     n_rolls += print_player_hits(&d->p2, 2, d->num_rolls);
@@ -263,7 +263,7 @@ static void print_tables(struct dice *d){
     n_success += print_player_successes(&d->p1, 1, d->num_rolls);
 
     n_failures = d->p1.success[0][TAG_MASK_NONE] + d->p2.success[0][TAG_MASK_NONE];
-    printf("No Successes: %6.2f%%\n", 100.0 * n_failures / d->num_rolls);
+    printf("No Successes: %6.3f%%\n", 100.0 * n_failures / d->num_rolls);
     printf("\n");
 
     n_success += print_player_successes(&d->p2, 2, d->num_rolls);
