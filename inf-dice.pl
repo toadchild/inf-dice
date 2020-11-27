@@ -19,7 +19,7 @@ Content-Type: text/html; charset=utf-8
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Infinity Dice Calculator (N3)</title>
+        <title>Infinity Dice Calculator (N4)</title>
         <link href="inf-dice.css" rel="stylesheet" type="text/css">
         <link href="hitbar.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="inf-dice.js"></script>
@@ -39,10 +39,10 @@ sub print_top{
     print <<EOF
     <div id="head" class="databox">
     <div class='content'>
-    <h1>Infinity Dice Calculator (N3)</h1>
+    <h1>Infinity Dice Calculator (N4)</h1>
 <p>
 The Infinity Dice Calculator is a statistical tool for the 3rd Edition of
-Infinity (N3).  It is a work in progress and may still have errors.
+Infinity (N4).  It is a work in progress and may still have errors.
 Please report any issues to <a href="mailto:infinity\@ghostlords.com">
 infinity\@ghostlords.com</a>. My other Infinity resources may be found
 <a href="http://infinity.ghostlords.com/">here</a>.
