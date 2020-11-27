@@ -207,6 +207,116 @@ $output = `./inf-dice-n4 12 3 1 10 NONE 12 1 - 0 NONE`;
 die if $output ne $expected;
 
 ###########################################################################
+# Test flame template
+###########################################################################
+
+$expected = <<EOF;
+P1 STAT 20 CRIT 21 CRIT_1 N BOOST  0 B 1 TEMPLATE 1 AMMO FIRE DAM[0] 12 TAG[0] NONE
+P2 STAT  0 CRIT  0 CRIT_1 N BOOST  0 B 1 TEMPLATE 0 AMMO NONE DAM[0]  0 TAG[0] NONE
+
+Total Rolls: 400
+Actual Rolls Made: 1
+Savings: 99.75%
+
+P1 Hits:  1 Crits:  0 - 100.000% (400)
+
+No Hits:  0.000% 0
+
+
+
+======================================================
+
+P1 Scores 20 Success(es):  0.004% NONE
+P1 Scores 20 Success(es):  0.004%
+P1 Scores 19 Success(es):  0.002% NONE
+P1 Scores 19 Success(es):  0.002%
+P1 Scores 18 Success(es):  0.004% NONE
+P1 Scores 18 Success(es):  0.004%
+P1 Scores 17 Success(es):  0.007% NONE
+P1 Scores 17 Success(es):  0.007%
+P1 Scores 16 Success(es):  0.011% NONE
+P1 Scores 16 Success(es):  0.011%
+P1 Scores 15 Success(es):  0.019% NONE
+P1 Scores 15 Success(es):  0.019%
+P1 Scores 14 Success(es):  0.031% NONE
+P1 Scores 14 Success(es):  0.031%
+P1 Scores 13 Success(es):  0.052% NONE
+P1 Scores 13 Success(es):  0.052%
+P1 Scores 12 Success(es):  0.087% NONE
+P1 Scores 12 Success(es):  0.087%
+P1 Scores 11 Success(es):  0.145% NONE
+P1 Scores 11 Success(es):  0.145%
+P1 Scores 10 Success(es):  0.242% NONE
+P1 Scores 10 Success(es):  0.242%
+P1 Scores  9 Success(es):  0.403% NONE
+P1 Scores  9 Success(es):  0.403%
+P1 Scores  8 Success(es):  0.672% NONE
+P1 Scores  8 Success(es):  0.672%
+P1 Scores  7 Success(es):  1.120% NONE
+P1 Scores  7 Success(es):  1.120%
+P1 Scores  6 Success(es):  1.866% NONE
+P1 Scores  6 Success(es):  1.866%
+P1 Scores  5 Success(es):  3.110% NONE
+P1 Scores  5 Success(es):  3.110%
+P1 Scores  4 Success(es):  5.184% NONE
+P1 Scores  4 Success(es):  5.184%
+P1 Scores  3 Success(es):  8.640% NONE
+P1 Scores  3 Success(es):  8.640%
+P1 Scores  2 Success(es): 14.400% NONE
+P1 Scores  2 Success(es): 14.400%
+P1 Scores  1 Success(es): 24.000% NONE
+P1 Scores  1 Success(es): 24.000%
+P1 Scores 20+ Successes:   0.004% NONE
+P1 Scores 19+ Successes:   0.006% NONE
+P1 Scores 18+ Successes:   0.010% NONE
+P1 Scores 17+ Successes:   0.017% NONE
+P1 Scores 16+ Successes:   0.028% NONE
+P1 Scores 15+ Successes:   0.047% NONE
+P1 Scores 14+ Successes:   0.078% NONE
+P1 Scores 13+ Successes:   0.131% NONE
+P1 Scores 12+ Successes:   0.218% NONE
+P1 Scores 11+ Successes:   0.363% NONE
+P1 Scores 10+ Successes:   0.605% NONE
+P1 Scores  9+ Successes:   1.008% NONE
+P1 Scores  8+ Successes:   1.680% NONE
+P1 Scores  7+ Successes:   2.799% NONE
+P1 Scores  6+ Successes:   4.666% NONE
+P1 Scores  5+ Successes:   7.776% NONE
+P1 Scores  4+ Successes:  12.960% NONE
+P1 Scores  3+ Successes:  21.600% NONE
+P1 Scores  2+ Successes:  36.000% NONE
+P1 Scores  1+ Successes:  60.000% NONE
+P1 Scores 20+ Successes:   0.004%
+P1 Scores 19+ Successes:   0.006%
+P1 Scores 18+ Successes:   0.010%
+P1 Scores 17+ Successes:   0.017%
+P1 Scores 16+ Successes:   0.028%
+P1 Scores 15+ Successes:   0.047%
+P1 Scores 14+ Successes:   0.078%
+P1 Scores 13+ Successes:   0.131%
+P1 Scores 12+ Successes:   0.218%
+P1 Scores 11+ Successes:   0.363%
+P1 Scores 10+ Successes:   0.605%
+P1 Scores  9+ Successes:   1.008%
+P1 Scores  8+ Successes:   1.680%
+P1 Scores  7+ Successes:   2.799%
+P1 Scores  6+ Successes:   4.666%
+P1 Scores  5+ Successes:   7.776%
+P1 Scores  4+ Successes:  12.960%
+P1 Scores  3+ Successes:  21.600%
+P1 Scores  2+ Successes:  36.000%
+P1 Scores  1+ Successes:  60.000%
+
+No Successes: 40.000%
+
+
+EOF
+
+$output = `./inf-dice-n4 T 1 F 12 NONE 0 1 - 0 NONE`;
+
+die if $output ne $expected;
+
+###########################################################################
 # Done!
 ###########################################################################
 
