@@ -318,10 +318,10 @@ static double success_prob(int successes, int trials, double probability){
     return choose(trials, successes) * pow(probability, successes) * pow(1 - probability, trials - successes);
 }
 
-static void hit_prob_multi_helper(struct player *p, int *saves, double hit_prob, int n, int successes, double prob, enum tag_mask_t mask){
+static void hit_prob_multi_helper(struct player *p, int *saves, int64_t hit_count, int n, int successes, double prob, enum tag_mask_t mask){
     if(n == p->num_saves + 1){
         assert(successes <= SUCCESS_MAX);
-        p->success[successes][mask] += prob * hit_prob;
+        p->success[successes][mask] += prob * hit_count;
     }else{
         int i;
         double dam_prob = ((double)p->dam[n]) / ROLL_MAX;
@@ -332,7 +332,7 @@ static void hit_prob_multi_helper(struct player *p, int *saves, double hit_prob,
             if(i){
                 new_mask |= p->tag_mask[n];
             }
-            hit_prob_multi_helper(p, saves, hit_prob, n + 1, successes + i, prob * new_prob, new_mask);
+            hit_prob_multi_helper(p, saves, hit_count, n + 1, successes + i, prob * new_prob, new_mask);
         }
     }
 }
@@ -343,33 +343,56 @@ static void hit_prob_multi_helper(struct player *p, int *saves, double hit_prob,
  * Recurses to find the probability that any combination of saves passed or
  * failed.
  */
-static void hit_prob_multi(struct player *p, int *saves, double hit_prob){
-    hit_prob_multi_helper(p, saves, hit_prob, 0, 0, 1.0, TAG_MASK_NONE);
+static void hit_prob_multi(struct player *p, int hits, int crits, int64_t hit_count){
+    int saves[SAVES_MAX] = {};
+
+    // Most normal ammo types; roll p->num_saves saving throws per hit.
+    int i;
+    for(i = 0; i < p->num_saves; i++){
+        saves[i] += hits + crits;
+    }
+    // Criticals inflict an extra save.
+    if (crits) {
+        saves[p->num_saves] += crits;
+    }
+    hit_prob_multi_helper(p, saves, hit_count, 0, 0, 1.0, TAG_MASK_NONE);
 }
 
 /*
- * fire_damage()
+ * hit_prob_cont_helper()
  *
- * Helper for calc_player_successes(). Recursively calculates how many successes
- * Fire ammo could have inflicted.
+ * Helper for calc_player_cont(). Recursively calculates how many successes
+ * continuous damage could have inflicted.
  */
 
-static void fire_damage(struct player *p, int hits, int total_hits, int dam, double prob, int depth){
-    int success;
+static void hit_prob_cont_helper(struct player *p, int hits, int crits, int successes, int64_t hit_count, double prob, int depth){
+    double dam_prob = ((double)p->dam[0]) / ROLL_MAX;
 
-    // record damage at bottom of stack or when we hit the cap
-    if(hits == 0 || total_hits >= SUCCESS_MAX || depth == 0){
-        // TODO: Don't ignore tags when dealing with fire damage.
-        p->success[MIN(total_hits, SUCCESS_MAX)][TAG_MASK_NONE] += prob;
+    // Record damage at bottom of stack or when we hit the cap.
+    if(hits == 0 || depth == 0 || successes >= SUCCESS_MAX){
+        // Add extra non-continuous saves from crits.
+        for (int c = 0; c <= crits; c++) {
+            double crit_prob = success_prob(c, crits, dam_prob);
+            // TODO: Don't ignore tags when dealing with fire damage.
+            p->success[MIN(successes + c, SUCCESS_MAX)][TAG_MASK_NONE] += prob * crit_prob * hit_count;
+        }
         return;
     }
 
-    for(success = 0; success <= hits; success++){
-        double new_prob = success_prob(success, hits, ((double)dam) / ROLL_MAX);
-        int new_depth = depth - 1;
-
-        fire_damage(p, success, total_hits + success, dam, prob * new_prob, new_depth);
+    for(int h = 0; h <= hits; h++){
+        double new_prob = success_prob(h, hits, dam_prob);
+        hit_prob_cont_helper(p, h, crits, successes + h, hit_count, prob * new_prob, depth - 1);
     }
+}
+
+/*
+ * hit_prob_cont()
+ *
+ * Recurses to find the probability that any combination of saves passed or
+ * failed, applying continuous damage.
+ */
+static void hit_prob_cont(struct player *p, int hits, int crits, int64_t hit_count){
+    hit_prob_cont_helper(p, hits + crits, crits, 0, hit_count, 1.0, SUCCESS_MAX);
 }
 
 /*
@@ -387,32 +410,17 @@ static void calc_player_successes(struct player *p){
                 // We scored this many hits and crits
                 // now we need to determine how likely it was we caused however many successes
                 // Gotta binomialize!
-                int saves[SAVES_MAX] = {};
                 if(p->ammo == AMMO_FIRE){
                     // Fire ammo
-                    // If you fail the save, you must roll again, ad infinitum.
-                    int i;
-                    for(i = 0; i < p->num_saves; i++){
-                        fire_damage(p, hits + crits, crits, p->dam[i], p->hit[hits][crits], SUCCESS_MAX);
-                    }
+                    // TODO: Limited to one save per hit scored.
+                    hit_prob_cont(p, hits, crits, p->hit[hits][crits]);
                 }else if(p->ammo == AMMO_NONE){
                     // Non-lethal skill (Dodge, Smoke)
                     // There is no saving throw. Number of successes still
                     // matters for smoke.
                     p->success[crits + hits][TAG_MASK_NONE] += p->hit[hits][crits];
                 }else{
-                    // Most normal ammo types; roll p->num_saves saving throws per hit.
-                    int i;
-                    for(i = 0; i < p->num_saves; i++){
-                        saves[i] += hits + crits;
-                    }
-                    // Criticals inflict an extra save.
-                    // Copy stats from the first save.
-                    if (crits) {
-                        saves[p->num_saves] += crits;
-                    }
-
-                    hit_prob_multi(p, saves, p->hit[hits][crits]);
+                    hit_prob_multi(p, hits, crits, p->hit[hits][crits]);
                 }
             }
         }
