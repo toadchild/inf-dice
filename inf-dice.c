@@ -30,7 +30,7 @@
 
 enum ammo_t{
     AMMO_NORMAL,
-    AMMO_FIRE,
+    AMMO_CONTINUOUS,
     AMMO_NONE,
 };
 
@@ -346,7 +346,7 @@ static void hit_prob_multi_helper(struct player *p, int *saves, int64_t hit_coun
 static void hit_prob_multi(struct player *p, int hits, int crits, int64_t hit_count){
     int saves[SAVES_MAX] = {};
 
-    // Most normal ammo types; roll p->num_saves saving throws per hit.
+    // Roll p->num_saves saving throws per hit.
     int i;
     for(i = 0; i < p->num_saves; i++){
         saves[i] += hits + crits;
@@ -365,23 +365,44 @@ static void hit_prob_multi(struct player *p, int hits, int crits, int64_t hit_co
  * continuous damage could have inflicted.
  */
 
-static void hit_prob_cont_helper(struct player *p, int hits, int crits, int successes, int64_t hit_count, double prob, int depth){
-    double dam_prob = ((double)p->dam[0]) / ROLL_MAX;
+static void hit_prob_cont_helper(struct player *p, int *saves, int successes, int n, int64_t hit_count, double prob, int depth, enum tag_mask_t mask){
+    double dam_prob = ((double)p->dam[n]) / ROLL_MAX;
 
-    // Record damage at bottom of stack or when we hit the cap.
-    if(hits == 0 || depth == 0 || successes >= SUCCESS_MAX){
+    // Record damage when we get to the extra save for crits.
+    if (n == p->num_saves) {
         // Add extra non-continuous saves from crits.
-        for (int c = 0; c <= crits; c++) {
-            double crit_prob = success_prob(c, crits, dam_prob);
-            // TODO: Don't ignore tags when dealing with fire damage.
-            p->success[MIN(successes + c, SUCCESS_MAX)][TAG_MASK_NONE] += prob * crit_prob * hit_count;
+        for (int c = 0; c <= saves[n]; c++) {
+            double crit_prob = success_prob(c, saves[n], dam_prob);
+
+            // If we scored a hit, add that save's tag to the mask.
+            enum tag_mask_t new_mask = mask;
+            if(c){
+                new_mask |= p->tag_mask[n];
+            }
+            p->success[MIN(successes + c, SUCCESS_MAX)][new_mask] += prob * crit_prob * hit_count;
         }
         return;
     }
 
-    for(int h = 0; h <= hits; h++){
-        double new_prob = success_prob(h, hits, dam_prob);
-        hit_prob_cont_helper(p, h, crits, successes + h, hit_count, prob * new_prob, depth - 1);
+    // Go to the next save category when we exhaust this one.
+    if(saves[n] == 0 || depth == 0 || successes >= SUCCESS_MAX){
+        hit_prob_cont_helper(p, saves, successes, n + 1, hit_count, prob, depth, mask);
+        return;
+    }
+
+    for(int h = 0; h <= saves[n]; h++){
+        int new_saves[SAVES_MAX] = {};
+        for (int i = 0; i <= p->num_saves; i++) {
+            new_saves[i] = saves[i];
+        }
+        new_saves[n] = h;
+        // If we scored a hit, add that save's tag to the mask.
+        enum tag_mask_t new_mask = mask;
+        if(h){
+            new_mask |= p->tag_mask[n];
+        }
+        double new_prob = success_prob(h, saves[n], dam_prob);
+        hit_prob_cont_helper(p, new_saves, successes + h, n, hit_count, prob * new_prob, depth - 1, new_mask);
     }
 }
 
@@ -392,7 +413,18 @@ static void hit_prob_cont_helper(struct player *p, int hits, int crits, int succ
  * failed, applying continuous damage.
  */
 static void hit_prob_cont(struct player *p, int hits, int crits, int64_t hit_count){
-    hit_prob_cont_helper(p, hits + crits, crits, 0, hit_count, 1.0, SUCCESS_MAX);
+    int saves[SAVES_MAX] = {};
+
+    // Roll p->num_saves saving throws per hit.
+    int i;
+    for(i = 0; i < p->num_saves; i++){
+        saves[i] += hits + crits;
+    }
+    // Criticals inflict an extra save.
+    if (crits) {
+        saves[p->num_saves] += crits;
+    }
+    hit_prob_cont_helper(p, saves, 0, 0, hit_count, 1.0, SUCCESS_MAX, TAG_MASK_NONE);
 }
 
 /*
@@ -410,9 +442,7 @@ static void calc_player_successes(struct player *p){
                 // We scored this many hits and crits
                 // now we need to determine how likely it was we caused however many successes
                 // Gotta binomialize!
-                if(p->ammo == AMMO_FIRE){
-                    // Fire ammo
-                    // TODO: Limited to one save per hit scored.
+                if(p->ammo == AMMO_CONTINUOUS){
                     hit_prob_cont(p, hits, crits, p->hit[hits][crits]);
                 }else if(p->ammo == AMMO_NONE){
                     // Non-lethal skill (Dodge, Smoke)
@@ -895,32 +925,31 @@ static void parse_dam(const char **argv, int argc, int *i, struct player *p){
     // Tn is tag
     int save;
 
-    char ammo = argv[(*i)++][0];
-    switch(ammo){
-        case '1':
-            p->ammo = AMMO_NORMAL;
-            p->num_saves = 1;
-            break;
-        case '2':
-            p->ammo = AMMO_NORMAL;
-            p->num_saves = 2;
-            break;
-        case '3':
-            p->ammo = AMMO_NORMAL;
-            p->num_saves = 3;
-            break;
-        case 'F':
-            p->ammo = AMMO_FIRE;
-            p->num_saves = 1;
-            break;
-        case '-':
-            p->ammo = AMMO_NONE;
-            p->num_saves = 1;
-            break;
-        default:
-            printf("ERROR: P%d AMMO type '%c' unknown.  Must be one of 1, 2, 3, F, -\n", p->player_num, ammo);
-            exit(1);
-            break;
+    const char *ammo = argv[(*i)++];
+    if (strcmp(ammo, "1") == 0) {
+        p->ammo = AMMO_NORMAL;
+        p->num_saves = 1;
+    } else if (strcmp(ammo, "2") == 0) {
+        p->ammo = AMMO_NORMAL;
+        p->num_saves = 2;
+    } else if (strcmp(ammo, "3") == 0) {
+        p->ammo = AMMO_NORMAL;
+        p->num_saves = 3;
+    } else if (strcmp(ammo, "1C") == 0) {
+        p->ammo = AMMO_CONTINUOUS;
+        p->num_saves = 1;
+    } else if (strcmp(ammo, "2C") == 0) {
+        p->ammo = AMMO_CONTINUOUS;
+        p->num_saves = 2;
+    } else if (strcmp(ammo, "3C") == 0) {
+        p->ammo = AMMO_CONTINUOUS;
+        p->num_saves = 3;
+    } else if (strcmp(ammo, "-") == 0) {
+        p->ammo = AMMO_NONE;
+        p->num_saves = 1;
+    } else {
+        printf("ERROR: P%d AMMO type '%s' unknown.  Must be one of 1, 2, 3, 1C, 2C, 3C, -\n", p->player_num, ammo);
+        exit(1);
     }
 
     if(*i + p->num_saves * 2 > argc){
