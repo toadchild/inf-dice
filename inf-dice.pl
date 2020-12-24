@@ -1321,12 +1321,6 @@ sub gen_attack_args{
     if($dam eq 'PH'){
         $dam = param("$us.ph") // 0;
         $ph_dam = 1;
-    }elsif($dam eq 'PH-1'){
-        $dam = (param("$us.ph") // 1) - 1;
-        $ph_dam = 1;
-    }elsif($dam eq 'PH-2'){
-        $dam = (param("$us.ph") // 2) - 2;
-        $ph_dam = 1;
     }
 
     # Total Immunity ignores most ammo types

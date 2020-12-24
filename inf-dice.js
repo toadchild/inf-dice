@@ -1267,7 +1267,7 @@ function action_hack_filter(unit){
     return unit["hacker"].length;
 }
 
-var damages = ["PH-2", "PH", 10, 11, 12, 13, 14, 15];
+var damages = ["PH", 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 var stats = ["BS", "PH", "WIP"];
 var w_types = ["W", "STR"];
 var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];
