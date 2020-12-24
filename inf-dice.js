@@ -973,11 +973,14 @@ function ch_mod(unit){
     return 0;
 }
 
-function full_stat_dropdown(player, stat, min, max, check_params){
+function full_stat_dropdown(player, stat, min, max, check_params, default_value){
     var list = document.getElementsByName(player + "." + stat)[0];
     var selected = list.value;
     if(check_params){
         selected = params[player + "." + stat];
+        if (selected == null && default_value != null) {
+            selected = default_value;
+        }
     }
 
     list.length = 0;
@@ -1095,10 +1098,10 @@ function set_unit(player, check_params){
         set_w_taken(player, check_params, 3);
 
         // stat block
-        full_stat_dropdown(player, "cc", 1, stat_max, check_params);
-        full_stat_dropdown(player, "bs", 1, stat_max, check_params);
-        full_stat_dropdown(player, "ph", 1, stat_max, check_params);
-        full_stat_dropdown(player, "wip", 1, stat_max, check_params);
+        full_stat_dropdown(player, "cc", 1, stat_max, check_params, 10);
+        full_stat_dropdown(player, "bs", 1, stat_max, check_params, 10);
+        full_stat_dropdown(player, "ph", 1, stat_max, check_params, 10);
+        full_stat_dropdown(player, "wip", 1, stat_max, check_params, 10);
         full_stat_dropdown(player, "arm", 0, arm_max, check_params);
         full_stat_dropdown(player, "w", 1, w_max, 1, check_params);
         full_stat_dropdown_list(player, "bts", bts_list, check_params);
