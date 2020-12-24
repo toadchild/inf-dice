@@ -86,7 +86,7 @@ my $ammo_codes = {
     DA => {saves => 2},
     'DA+Shock' => {saves => 2, tag => 'SHOCK'},
     EXP => {saves => 3},
-    Fire => {saves => 'F', fatal_symbiont => 9},
+    Fire => {saves => 'F'},
     Monofilament => {saves => 1, fixed_dam => 12, fatal => 9},
     K1 => {saves => 1, fixed_dam => 12},
     Viral => {saves => 2, save => 'bts', tag => 'SHOCK'},
@@ -208,18 +208,11 @@ my $immunities = {
     },
 };
 
-my $symbiont_armor = [0, 2, 1];
-my $symbiont_armor_labels = {
+my $transmutation_w = [0, 1, 2];
+my $transmutation_w_labels = {
     0 => 'None',
-    1 => 'Inactive',
-    2 => 'Active',
-};
-
-my $lotech = [0, 2, 1];
-my $lotech_labels = {
-    0 => 'None',
-    1 => 'Battle Ravaged',
-    2 => 'Lo-Tech A',
+    1 => '1 W',
+    2 => '2 W',
 };
 
 my $operator = [0, 1, 2];
@@ -459,18 +452,11 @@ sub print_input_attack_section{
               -label => 'Shasvastii Spawn-Embryo',
           ),
           "<br>",
-          span_popup_menu(-name => "$player.symbiont",
-              -values => $symbiont_armor,
-              -default => param("$player.symbiont") // '',
-              -labels => $symbiont_armor_labels,
-              -label => 'Symbiont Armor',
-          ),
-          "<br>",
-          span_popup_menu(-name => "$player.lotech",
-              -values => $lotech,
-              -default => param("$player.lotech") // '',
-              -labels => $lotech_labels,
-              -label => 'Lo-Tech',
+          span_popup_menu(-name => "$player.transmutation_w",
+              -values => $transmutation_w,
+              -default => param("$player.transmutation_w") // '',
+              -labels => $transmutation_w_labels,
+              -label => 'Transmutation (W)',
           ),
           "<br>",
           span_popup_menu(-name => "$player.operator",
@@ -794,8 +780,7 @@ sub print_player_output{
     my $w_type = param("p$other.w_type") // 'W';
     my $name = param("p$player.unit") // 'Model A';
     my $other_name = param("p$other.unit") // 'Model B';
-    my $symbiont = param("p$other.symbiont") // 0;
-    my $lotech = param("p$other.lotech") // 0;
+    my $transmutation_w = param("p$other.transmutation_w") // 0;
     my $operator_w = param("p$other.operator") // 0;
     my $remote_presence = param("p$other.remote_presence") // 0;
     my $action = param("p$player.action") // '';
@@ -821,38 +806,18 @@ sub print_player_output{
     # pretty printing
     my $format = $code->{format} // '%s inflicts %d or more wounds on %s%s';
 
-    # Fire kills the entire symbiont immediately, but no extra damage
-    # to the underlying profile.
-    if($code->{fatal_symbiont}){
-        $wounds = 1;
-    }
-
     # thresholds or state changes
     my $unconscious = $wounds;
     my $dead = $wounds + 1;
-    my $symb_disabled = -1;
-    my $battle_ravaged = -1;
+    my $transmute = -1;
     my $eject = -1;
     my $spawn = -1;
     my $unconscious_2 = -1;
 
-    if($symbiont == 2){
-        $symb_disabled = $unconscious;
-        $unconscious++;
-        $dead++;
-    }
-
-    if($lotech == 2){
-        $battle_ravaged = $unconscious;
-        $unconscious++;
-        $dead++;
-    }
-
-    if ($symbiont || $lotech) {
-        # Multi-wound profile grants shock immunity
-        if (!$immunity) {
-            $immunity = 'shock';
-        }
+    if($transmutation_w){
+        $transmute = $unconscious;
+        $unconscious += $transmutation_w;
+        $dead += $transmutation_w;
     }
 
     if($operator_w){
@@ -909,10 +874,8 @@ sub print_player_output{
         if($w >= $dead){
             $label = sprintf " (%s)", $code->{label} // 'Dead';
             $done = 1;
-        }elsif($w == $symb_disabled){
-            $label = ' (Symbiont Disabled)';
-        }elsif($w == $battle_ravaged){
-            $label = ' (Battle Ravaged)';
+        }elsif($w == $transmute){
+            $label = ' (Transmuted)';
         }elsif($w == $eject){
             $label = ' (Operator Ejected)';
         }elsif($w == $unconscious){
@@ -921,6 +884,8 @@ sub print_player_output{
             $label = ' (Unconscious 2)';
         }elsif($w == $spawn){
             $label = ' (Spawn Embryo)';
+        }elsif($transmutation_w && $w > $transmute){
+            $label = ' (Transmuted ' . ($wounds + $transmutation_w - $w) . ' W)';
         }elsif($operator_w && $w > $eject){
             $label = ' (Operator ' . ($wounds + $operator_w - $w) . ' W)';
         }else{

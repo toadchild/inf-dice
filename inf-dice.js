@@ -1072,7 +1072,6 @@ function set_unit(player, check_params){
         document.getElementsByName(player + ".ch")[0].value = ch_mod(unit);
         document.getElementsByName(player + ".msv")[0].value = unit["msv"] || 0;
         document.getElementsByName(player + ".symbiont")[0].value = unit["symbiont"] || 0;
-        document.getElementsByName(player + ".lotech")[0].value = unit["lotech"] || 0;
         document.getElementsByName(player + ".operator")[0].value = unit["operator"] || 0;
         document.getElementsByName(player + ".hacker")[0].value = unit["hacker"] || 0;
         document.getElementsByName(player + ".marksmanship")[0].value = unit["marksmanship"] || 0;
@@ -1271,7 +1270,7 @@ var w_types = ["W", "STR"];
 var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];
 var bts_list = [0, 3, 6, 9];
 var ranges = ["+6", "+3", "0", "-3", "-6"];
-var stat_max = 22;
+var stat_max = 29;
 var arm_max = 10;
 var w_max = 3;
 var master_action_list = [

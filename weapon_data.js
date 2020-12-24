@@ -1,2 +1,5 @@
 var weapon_data = {}
-var ammos = []
+var ammos = [
+  'Normal',
+  'AP',
+]
