@@ -36,7 +36,7 @@ enum ammo_t{
 
 static const char *ammo_labels[] = {
     "NORMAL",
-    "FIRE",
+    "CONTINUOUS",
     "NONE",
 };
 

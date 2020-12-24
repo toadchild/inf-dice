@@ -602,6 +602,10 @@ sub print_input_attack_section{
               -checked => defined(param("$player.template")),
               -value => 1,
               -label => 'Template'),
+          span_checkbox(-name => "$player.continuous",
+              -checked => defined(param("$player.continuous")),
+              -value => 1,
+              -label => 'Continuous'),
           "</div>";
 
     print "<div id='$player.sec_shoot'>
@@ -1381,6 +1385,11 @@ sub gen_attack_args{
         }
     }else{
         @tag = ($tag) x scalar @dam;
+    }
+
+    # Check if damage is continuous
+    if (param("$us.continuous")) {
+        $ammo .= 'C';
     }
 
     # Monofilament and K1 have fixed damage
