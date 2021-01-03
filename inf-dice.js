@@ -1103,8 +1103,8 @@ function set_unit(player, check_params){
         full_stat_dropdown(player, "ph", 1, stat_max, check_params, 10);
         full_stat_dropdown(player, "wip", 1, stat_max, check_params, 10);
         full_stat_dropdown(player, "arm", 0, arm_max, check_params);
+        full_stat_dropdown(player, "bts", 0, bts_max, check_params);
         full_stat_dropdown(player, "w", 1, w_max, 1, check_params);
-        full_stat_dropdown_list(player, "bts", bts_list, check_params);
         full_stat_dropdown_list(player, "w_type", w_types, check_params);
         full_stat_dropdown_list(player, "type", unit_types, check_params);
     }
@@ -1271,10 +1271,10 @@ var damages = ["PH", 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 var stats = ["BS", "PH", "WIP"];
 var w_types = ["W", "STR"];
 var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];
-var bts_list = [0, 3, 6, 9];
 var ranges = ["+6", "+3", "0", "-3", "-6"];
 var stat_max = 29;
 var arm_max = 10;
+var bts_max = 9;
 var w_max = 3;
 var master_action_list = [
     { 
