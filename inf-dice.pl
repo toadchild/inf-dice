@@ -178,17 +178,15 @@ my $nbw_codes = {
     2 => {attack => 3, enemy => 0, damage => 1, burst => 0},
 };
 
-my $immunity = ['', 'shock', 'bio', 'total'];
+my $immunity = ['', 'shock', 'total'];
 my $immunity_labels = {
     '' => 'None',
     'shock' => 'Shock',
-    'bio' => 'Bio',
     'total' => 'Total',
 };
 
 my $immunities = {
     shock => {Shock => 'arm', SHOCK => 'arm'},
-    bio => {Shock => 'arm', SHOCK => 'arm', Viral => 'bts'},
     total => {
         Shock => 'arm',
         SHOCK => 'arm',
@@ -467,6 +465,11 @@ sub print_input_attack_section{
           ),
           "<br>",
           "<h4>Special Skills and Equipment</h4>",
+          span_checkbox(-name => "$player.bioimmunity",
+              -value => 1,
+              -label => 'Bioimmunity',
+          ),
+          "<br>",
           span_popup_menu(-name => "$player.immunity",
               -values => $immunity,
               -default => param("$player.immunity") // '',
@@ -1329,22 +1332,22 @@ sub gen_attack_args{
         $save = $immunities->{$immunity}{$ammo_name};
         $ammo = 1;
         $tag = 'NONE';
-
-        # Bioimmunity choses the higher of ARM or BTS vs. Shock
-        if($immunity eq 'bio'){
-            if(lc($ammo_name) eq 'shock'){
-                my $arm = param("$them.arm") // 0;
-                my $bts = param("$them.bts") // 0;
-                if($bts > $arm){
-                    $save = 'bts';
-                }
-            }
-        }
     }else{
         $ap = $code->{ap} // 1;
         $save = $code->{save} // 'arm';
         $ammo = $code->{saves};
         $tag = $code->{tag} // 'NONE';
+    }
+
+    # Bioimmunity choses the higher of ARM or BTS
+    if(param("$them.bioimmunity")){
+        my $arm = param("$them.arm") // 0;
+        my $bts = param("$them.bts") // 0;
+        if($bts > $arm){
+            $save = 'bts';
+        } else {
+            $save = 'arm';
+        }
     }
 
     # convert dam into array
