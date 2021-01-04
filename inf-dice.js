@@ -741,7 +741,7 @@ function populate_weapons(player, check_params){
     if(action == "bs" || action == "cc" || action == "dtw" || action == "deploy" || action == "spec" || action == "supp"){
         weapon_list.options[weapon_list.options.length] = new Option("Custom Weapon");
 
-        if("Custom Weapon" == selected_weapon){
+        if("Custom Weapon" == selected_weapon || weapon_list.options.length == 2){
             weapon_list.options[weapon_list.options.length - 1].selected = true;
         }
     }
