@@ -76,7 +76,7 @@ function set_ammo(player, check_params){
 
     var dam_id = player + ".dam";
 
-    if(ammo == "Smoke" || ammo == "None"){
+    if(ammo == "Smoke" || ammo == "Eclipse" || ammo == "None"){
         disable_input(dam_id);
     }else{
         enable_input(dam_id);
@@ -527,6 +527,7 @@ function set_weapon(player, check_params){
     var stat_list = document.getElementsByName(player + ".stat")[0];
     var ammo_list = document.getElementsByName(player + ".ammo")[0];
     var dam_list = document.getElementsByName(player + ".dam")[0];
+    var save_list = document.getElementsByName(player + ".save")[0];
     var range_list = document.getElementsByName(player + ".range")[0];
     var weapon_name = document.getElementsByName(player + ".weapon")[0].value;
     var action = document.getElementsByName(player + ".action")[0].value;
@@ -542,6 +543,10 @@ function set_weapon(player, check_params){
     if(check_params){
         selected_damage = params[player + ".dam"];
     }
+    var selected_save = save_list.value;
+    if(check_params){
+        selected_save = params[player + ".save"];
+    }
     var selected_stat = stats.value;
     if(check_params){
         selected_stat = params[player + ".stat"];
@@ -554,13 +559,14 @@ function set_weapon(player, check_params){
     var my_ammo = ammos;
     var my_stat = stats;
     var my_dam = damages;
+    var my_save = saves;
     var my_range = ranges;
 
     if(weapon){
         my_ammo = weapon["ammo"];
         my_stat = [weapon["stat"]];
         my_dam = [weapon["dam"]];
-
+        my_save = [weapon["save"]];
         my_range = weapon["ranges"];
     }
 
@@ -607,6 +613,16 @@ function set_weapon(player, check_params){
 
         if(dam_list.options[i].value == selected_damage){
             dam_list.options[i].selected = true;
+        }
+    }
+
+    // Saving Throw
+    save_list.length = 0;
+    for(var i = 0; i < my_save.length; i++){
+        save_list.options[i] = new Option(my_save[i]);
+
+        if(save_list.options[i].value == selected_save){
+            save_list.options[i].selected = true;
         }
     }
 
@@ -1268,6 +1284,7 @@ function action_hack_filter(unit){
 }
 
 var damages = ["PH", 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+var saves = ["ARM", "BTS", "ARM+BTS"];
 var stats = ["BS", "PH", "WIP"];
 var w_types = ["W", "STR"];
 var unit_types = ["LI", "MI", "HI", "SK", "WB", "TAG", "REM"];

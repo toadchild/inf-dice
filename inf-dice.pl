@@ -74,40 +74,29 @@ my $tag_codes = {
 };
 
 my $ammo_codes = {
-    Normal => {saves => 1},
-    Shock => {saves => 1, tag => 'SHOCK'},
-    Swarm => {saves => 1, save => 'bts', tag => 'SHOCK'},
-    T2 => {saves => 1, dam => 2},
-    AP => {saves => 1, ap => 0.5},
+    # Basic ammo types
+    'N' => {saves => 1},
+    'AP' => {saves => 1, ap => 0.5},
+    'DA' => {saves => 2},
+    'Eclipse' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Eclipse', nonlethal => 1},
+    'E/M' => {saves => 1, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
+    'EXP' => {saves => 3},
+    'PARA' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'IMM-A', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'Shock' => {saves => 1, tag => 'SHOCK'},
+    'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
+    'Stun' => {saves => 2, fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'T2' => {saves => 1, dam => 2},
+
+    # Combined ammos
     'AP+DA' => {saves => 2, ap => 0.5},
     'AP+EXP' => {saves => 3, ap => 0.5},
-    'AP+T2' => {saves => 1, dam => 2, ap => 0.5},
     'AP+Shock' => {saves => 1, ap => 0.5, tag => 'SHOCK'},
-    DA => {saves => 2},
     'DA+Shock' => {saves => 2, tag => 'SHOCK'},
-    EXP => {saves => 3},
-    Fire => {saves => 'F'},
-    Monofilament => {saves => 1, fixed_dam => 12, fatal => 9},
-    K1 => {saves => 1, fixed_dam => 12},
-    Viral => {saves => 2, save => 'bts', tag => 'SHOCK'},
-    Nanotech => {saves => 1, save => 'bts'},
-    Flash => {saves => 1, save => 'bts', fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
-    Stun => {saves => 2, save => 'bts', fatal => 9, label => 'Stunned', format => '%s hits %3$s%4$s', nonlethal => 1},
-    'E/M' => {saves => 1, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
-    'E/M2' => {saves => 2, ap => 0.5, save => 'bts', nonlethal => 1, tag => 'EM'},
-    'Smoke' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Smoke', nonlethal => 1},
-    'Eclipse' => {saves => '-', cover => 0, no_lof => 1, dam => 0, format => '%s blocks %3$s with Eclipse', nonlethal => 1},
-    'Adhesive' => {saves => 1, alt_save => 'ph', alt_save_mod => -6, fatal => 9, label => 'Immobilized', format => '%s hits %3$s%4$s', nonlethal => 1},
+    'N+E/M' => {saves => 2, ap => 0.5, tag => 'EM'},
+
+    # Other weapons/skills
     'Dep. Repeater' => {saves => '-', dam => 0, not_attack => 1, format => '%s places a Deployable Repeater', nonlethal => 1},
-    'Breaker' => {saves => 1, save => 'bts', ap => 0.5},
-    'Pheromonic' => {saves => 1, save => 'bts'},
-    'DT' => {saves => 2, save => 'bts'},
     'FO' => {saves => '-', format => '%s targets %3$s for 1 Turn', fatal => 9},
-    'Plasma' => {saves => 2, save => ['arm', 'bts']},
-    'AP+E/M' => {saves => 2, ap => 0.5, save => ['bts', 'arm'], tag => ['EM', 'NONE']},
-    Striga => {saves => 1, save => 'bts', format => '%s inflicts %d or more wounds on %s%s - POWER UP (%2$d)'},
-    'N+E/M' => {saves => 2, ap => [0.5, 1], save => ['bts', 'arm'], tag => ['EM', 'NONE']},
-    'N+E/M2' => {saves => 3, ap => [0.5, 0.5, 1], save => ['bts', 'bts', 'arm'], tag => ['EM', 'EM', 'NONE']},
 };
 
 my $skill_codes = {
@@ -598,9 +587,13 @@ sub print_input_attack_section{
           span_popup_menu(-name => "$player.b",
               -label => "B",
           ),
+          span_popup_menu(-name => "$player.save",
+              -label => 'Save',
+          ),
           span_popup_menu(-name => "$player.dam",
               -label => 'DAM',
           ),
+          '<br>',
           span_checkbox(-name => "$player.template",
               -checked => defined(param("$player.template")),
               -value => 1,
@@ -1296,7 +1289,7 @@ sub get_surprise_mod {
 sub gen_attack_args{
     my ($us, $them) = @_;
     my ($link_bs, $link_b) = (0, 0);
-    my ($ap, $ammo, $cover, $ignore_cover, $save, $dam, $tag);
+    my ($cover, $ignore_cover);
     my @dam;
     my @arm = ();
     my @tag = ();
@@ -1318,62 +1311,52 @@ sub gen_attack_args{
     $code = $ammo_codes->{$ammo_name};
     $immunity = param("$them.immunity") // '';
 
-    $dam = param("$us.dam") // 0;
+    # Basic attributes of incoming attack
+    my $ap = $code->{ap} // 1;
+    my $ammo = $code->{saves} // 1;
+    my $dam = param("$us.dam") // 0;
+    my $tag = $code->{tag} // 'NONE';
+    my $save = param("$us.save") // 'ARM';
 
+    # Reformat saves as an array
+    my @save;
+    if ($save eq 'ARM+BTS') {
+        # ARM+BTS doubles the number of saves called for
+        @save = ('arm', 'bts') x $ammo;
+        $ammo *= 2;
+    } else {
+        @save = (lc($save)) x $ammo;
+    }
+
+    # Caluclate DAM if using PH value
     my $ph_dam = 0;
     if($dam eq 'PH'){
         $dam = param("$us.ph") // 0;
         $ph_dam = 1;
     }
 
-    # Total Immunity ignores most ammo types
-    if($immunities->{$immunity}{$ammo_name}){
-        $ap = 1;
-        $save = $immunities->{$immunity}{$ammo_name};
-        $ammo = 1;
-        $tag = 'NONE';
-    }else{
-        $ap = $code->{ap} // 1;
-        $save = $code->{save} // 'arm';
-        $ammo = $code->{saves};
-        $tag = $code->{tag} // 'NONE';
-    }
+    # Create damage array based on number of saves
+    @dam = ($dam) x $ammo;
 
     # Bioimmunity choses the higher of ARM or BTS
     if(param("$them.bioimmunity")){
         my $arm = param("$them.arm") // 0;
         my $bts = param("$them.bts") // 0;
-        if($bts > $arm){
-            $save = 'bts';
-        } else {
-            $save = 'arm';
+        my $best_save = 'arm';
+        if ($bts > $arm){
+            $best_save = 'bts';
         }
-    }
-
-    # convert dam into array
-    if($ammo eq '2'){
-        @dam = ($dam) x 2;;
-    }elsif($ammo eq '3'){
-        @dam = ($dam) x 3;
-    }else{
-        @dam = ($dam);
+        for (my $s = 0; $s < @save; $s++){
+            $save[$s] = $best_save;
+        }
     }
 
     # also convert arm to array
-    if(ref($save) eq 'ARRAY'){
-        for(my $s = 0; $s < @$save; $s++){
-            my $save_stat = $save->[$s];
-            my $save_ap;
-            if (ref($ap) eq 'ARRAY') {
-                $save_ap = $ap->[$s];
-            } else {
-                $save_ap = $ap;
-            }
-            push @arm, ceil(abs(param("$them.$save_stat") // 0) * $save_ap);
-        }
-    }else{
-        @arm = (ceil(abs(param("$them.$save") // 0) * $ap)) x scalar @dam;
+    for(my $s = 0; $s < @save; $s++){
+        my $save_stat = $save[$s];
+        push @arm, ceil(abs(param("$them.$save_stat") // 0) * $ap);
     }
+    push @mod_strings, "Processed arm values: @arm";
 
     # construct a tag array
     if(ref($tag) eq 'ARRAY'){
@@ -1475,18 +1458,8 @@ sub gen_attack_args{
         }
 
         if($marksmanship >= 1 && $stat_name eq 'BS' && !$code->{nonlethal}){
-            if($save eq 'bts'){
-                # Marksmanship L1 adds Shock; makes a second save if first is on BTS
-                $save = [('bts') x scalar @dam, 'arm'];
-                push @dam, $dam[0];
-                push @arm, ceil(abs(param("$them.arm") // 0));
-                push @tag, 'SHOCK';
-                $ammo++;
-                push @mod_strings, sprintf('Marksmanship L1 grants aditional ARM save at DAM %d', $dam[$#dam]);
-            }else{
-                for(my $i = 0; $i < scalar @tag; $i++){
-                    $tag[$i] = 'SHOCK';
-                }
+            for(my $i = 0; $i < scalar @tag; $i++){
+                $tag[$i] = 'SHOCK';
             }
         }
 

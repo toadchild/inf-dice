@@ -1,5 +1,16 @@
-var weapon_data = {}
+var weapon_data = {
+}
+
 var ammos = [
-  'Normal',
+  'N',
   'AP',
+  'DA',
+  'Eclipse',
+  'E/M',
+  'EXP',
+  'PARA',
+  'Shock',
+  'Smoke',
+  'Stun',
+  'T2'
 ]
