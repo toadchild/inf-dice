@@ -385,7 +385,7 @@ function set_action(player){
         disable_display(player + ".sec_hack");
         disable_display(other + ".sec_defense");
         enable_display(player + ".sec_other");
-    }else if(action.value == "dodge" || action.value == "change_face"){
+    }else if(action.value == "dodge"){
         // action
         disable_display(player + ".intuitive");
 
@@ -594,7 +594,7 @@ function set_weapon(player, check_params){
     stat_list.length = 0;
     if(action == "cc"){
         stat_list.options[0] = new Option("CC");
-    }else if(action == "dtw" || action == "deploy" || action == "dodge" || action == "change_face"){
+    }else if(action == "dtw" || action == "deploy" || action == "dodge"){
         stat_list.options[0] = new Option("--");
     }else{
         for(var i = 0; i < my_stat.length; i++){
@@ -1327,10 +1327,6 @@ var master_action_list = [
     { 
         "label": "Dodge",
         "value": "dodge",
-    },
-    { 
-        "label": "Change Facing",
-        "value": "change_face",
     },
     { 
         "label": "Reset",

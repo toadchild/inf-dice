@@ -101,7 +101,6 @@ my $ammo_codes = {
 
 my $skill_codes = {
     'dodge' => {title => 'Dodge', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
-    'change_face' => {title => 'Change Facing', no_lof => 1, dam => 0, format => '%s Dodges %3$s'},
     'reset' => {title => 'Reset', no_lof => 1, dam => 0, format => '%s Resets vs. %3$s'},
 };
 
@@ -1621,7 +1620,7 @@ sub gen_attack_args{
         }
 
         # templates are FTF against Dodge
-        if($other_action eq 'dodge' || $other_action eq 'change_face'){
+        if($other_action eq 'dodge'){
             $type = 'ftf';
         }
 
@@ -1635,7 +1634,7 @@ sub gen_attack_args{
         $b = 1;
 
         # templates are FTF against Dodge
-        if($other_action eq 'dodge' || $other_action eq 'change_face'){
+        if($other_action eq 'dodge'){
             $type = 'ftf';
         }
 
@@ -1967,7 +1966,7 @@ sub gen_hack_args{
     my $tag = $code->{effect}{tag} // 'NONE';
 
     # Dodge does not protect against hacking
-    if($other_action eq 'dodge' || $other_action eq 'change_face'){
+    if($other_action eq 'dodge'){
         $type = 'normal';
     }
 
@@ -2124,7 +2123,7 @@ sub gen_reset_args{
 }
 
 sub gen_dodge_args{
-    my ($us, $them, $change_face) = @_;
+    my ($us, $them) = @_;
     my @mod_strings;
 
     my $other_action = param("$them.action");
@@ -2135,11 +2134,6 @@ sub gen_dodge_args{
     my $stat = param("$us.ph") // 0;
     my $mod = 0;
     push @mod_strings, "Base PH of $stat";
-
-    if($change_face){
-        push @mod_strings, sprintf('Change facing grants %+d PH', $change_face);
-        $mod += $change_face;
-    }
 
     if($dodge_unit){
         push @mod_strings, sprintf('Unit type grants %+d PH', $dodge_unit);
@@ -2154,13 +2148,13 @@ sub gen_dodge_args{
 
     my $type = 'ftf';
 
-    if($other_action eq 'dodge' || $other_action eq 'change_face'){
+    if($other_action eq 'dodge'){
         # double-dodge is normal rolls
         $type = 'normal';
     }
 
-    if($other_action eq 'deploy' && !$change_face){
-        # -3 penalty to dodge mines, but is already included in change facing
+    if($other_action eq 'deploy'){
+        # -3 penalty to dodge mines
         $mod -= 3;
         push @mod_strings, sprintf('Dodging a deployable grants -3 PH');
     }
@@ -2226,8 +2220,6 @@ sub gen_args{
         return gen_reset_args($us, $them);
     }elsif($action eq 'dodge'){
         return gen_dodge_args($us, $them, 0);
-    }elsif($action eq 'change_face'){
-        return gen_dodge_args($us, $them, -3);
     }else{
         return gen_none_args();
     }
