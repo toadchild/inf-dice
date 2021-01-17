@@ -211,8 +211,8 @@ my $operator_labels = {
 my $ch = ['0', '-3', '-6'];
 my $ch_labels = {
     0 => 'None',
-    -3 => 'Mimetism/Camo (-3 Opponent BS)',
-    -6 => 'TO Camo/ODD (-6 Opponent BS)',
+    -3 => '-3',
+    -6 => '-6',
 };
 
 my $ikohl = ['0', '-3', '-6', '-9'];
@@ -489,7 +489,7 @@ sub print_input_attack_section{
               -values => $ch,
               -default => param("$player.ch") // '',
               -labels => $ch_labels,
-              -label => "Camo",
+              -label => "Mimetism",
           ),
           "<br>",
           span_popup_menu(-name => "$player.msv",
