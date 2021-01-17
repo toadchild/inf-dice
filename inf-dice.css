@@ -27,25 +27,23 @@
     border-radius: 6px;
     margin: 20px;
     padding: 1px;
-    background-color: #425a67;
+    background-color: #333333;
 
-    border-bottom-color: #13111d;
-    border-bottom-width: 4px;
-    border-bottom-style: solid;
+    box-shadow: #0003 0px 27px 24px 0px
 }
 
 .databox .content {
     margin: 20px;
 }
 
-.databox input {
-    background-color: #444444;
-    color: white;
-}
-
 .databox button {
-    background-color: #444444;
-    color: white;
+    background-color: #cccccc;
+    color: black;
+    border: none;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .inner-databox {
@@ -70,11 +68,11 @@
 }
 
 #p1.inner-databox {
-    background-color: #5e4c95;
+    background-color: rgb(255, 177, 41);
 }
 
 #p2.inner-databox {
-    background-color: #34b38a;
+    background-color: rgb(6, 164, 235);
 }
 
 #input {
@@ -109,7 +107,7 @@
 }
 
 body {
-    background-color: #181919;
+    background-color: #222222;
     color: white;
     font-family: sans-serif;
 }

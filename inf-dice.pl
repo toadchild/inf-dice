@@ -728,7 +728,7 @@ sub print_input_head{
     <div id="input" class="databox">
     <div class='content'>
     <h2>Model and Action Selection</h2>
-    <form method="get">
+    <form method="get" id="diceForm">
 EOF
 }
 
@@ -736,7 +736,7 @@ sub print_input_tail{
     print <<EOF
     <div id="submit">
     <div class='content'>
-        <input type="submit" value="Roll the Dice!">
+        <button onclick="document.getElementById("diceForm").submit()">Roll the Dice!</button>
     </div>
     </div>
     </form>

@@ -7,27 +7,23 @@ my $players = ['p1', 'p2'];
 my $colors = {
     p1 => {
         pure => {
-            r => 0x5e,
-            g => 0x4c,
-            b => 0x95,
+            r => 255,
+            g => 177,
+            b => 41,
         },
         text => 'black',
     },
     p2 => {
         pure => {
-            r => 0x34,
-            g => 0xb3,
-            b => 0x8a,
+            r => 6,
+            g => 164,
+            b => 235,
         },
         text => 'black',
     },
     miss => {
         color => '#000000',
         text => 'white',
-    },
-    splat => {
-        color => '#aa4040',
-        text => 'black',
     },
 };
 
@@ -68,11 +64,6 @@ print "    color: $colors->{miss}{text};\n";
 print "    background-color: $colors->{miss}{color};\n";
 print "}\n\n";
 
-print ".splat {\n";
-print "    color: $colors->{splat}{text};\n";
-print "    background-color: $colors->{splat}{color};\n";
-print "}\n\n";
-
 for my $p (@$players){
     my ($r, $g, $b);
     my ($final_r, $final_g, $final_b);
@@ -86,7 +77,7 @@ for my $p (@$players){
     $step_b = ($final_b - $b) / $steps;
 
     # solid backgrounds
-    for my $i (0 .. $steps){
+    for my $i (1 .. $steps + 1){
         print ".$p-hit-$i {\n";
         print "    color: $colors->{$p}{text};\n";
         printf "    background-color: #%02x%02x%02x;\n", $r, $g, $b;
