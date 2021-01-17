@@ -2131,11 +2131,6 @@ sub gen_dodge_args{
     my $dodge_unit = 0;
     my $unit_type = param("$us.type") // '';
     my $motorcycle = param("$us.motorcycle") // 0;
-    if($unit_type eq 'REM' || $motorcycle){
-        $dodge_unit = -3;
-    } elsif($unit_type eq 'TAG'){
-        $dodge_unit = -6;
-    }
 
     my $stat = param("$us.ph") // 0;
     my $mod = 0;

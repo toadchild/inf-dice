@@ -242,7 +242,6 @@ function set_action(player){
         enable_input(player + ".range");
         enable_input(player + ".link");
         enable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -250,6 +249,7 @@ function set_action(player){
 
         // defensive abilities
         enable_input(other + ".cover");
+        enable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         enable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -273,14 +273,14 @@ function set_action(player){
         enable_input(player + ".range");
         enable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
         disable_input(other + ".ikohl");
 
         // defensive abilities
-        enable_input(other + ".cover");
+        disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -304,7 +304,6 @@ function set_action(player){
         disable_input(player + ".range");
         enable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -312,6 +311,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -335,7 +335,6 @@ function set_action(player){
         disable_input(player + ".range");
         enable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -343,6 +342,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -366,7 +366,6 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         enable_input(player + ".gang_up");
@@ -374,6 +373,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -397,7 +397,6 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        enable_input(player + ".motorcycle");
 
         // cc modifiers
         enable_input(player + ".gang_up");
@@ -405,6 +404,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         disable_input(other + ".ch");
         enable_input(player + ".hyperdynamics");
@@ -428,7 +428,6 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -436,6 +435,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         enable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -459,7 +459,6 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -467,6 +466,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         enable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
@@ -490,7 +490,6 @@ function set_action(player){
         disable_input(player + ".range");
         disable_input(player + ".link");
         disable_input(player + ".viz");
-        disable_input(player + ".motorcycle");
 
         // cc modifiers
         disable_input(player + ".gang_up");
@@ -498,6 +497,7 @@ function set_action(player){
 
         // defensive abilities
         disable_input(other + ".cover");
+        disable_input(other + ".motorcycle");
         disable_input(other + ".firewall");
         disable_input(other + ".ch");
         disable_input(player + ".hyperdynamics");
