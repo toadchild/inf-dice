@@ -14,7 +14,8 @@
 #include <assert.h>
 #include <pthread.h>
 
-#define B_MAX  5
+#define B_MAX  6
+#define B_MAX_SUM 9
 #define SAVES_MAX  4
 #define SUCCESS_MAX (B_MAX * SAVES_MAX)
 #define STAT_MAX 40
@@ -1014,8 +1015,8 @@ static void parse_args(int argc, const char *argv[], struct player *p1, struct p
     }
 
     // Quick and dirty CPU limiter
-    if(p1->burst + p2->burst > 9){
-        printf("ERROR: Combined B value may not exceed 9\n");
+    if(p1->burst + p2->burst > B_MAX_SUM){
+        printf("ERROR: Combined B value may not exceed %d\n", B_MAX_SUM);
         exit(1);
     }
 

@@ -211,7 +211,7 @@ die if $output ne $expected;
 ###########################################################################
 
 $expected = <<EOF;
-P1 STAT 20 CRIT 21 CRIT_1 N BOOST  0 B 1 TEMPLATE 1 AMMO FIRE DAM[0] 12 TAG[0] NONE
+P1 STAT 20 CRIT 21 CRIT_1 N BOOST  0 B 1 TEMPLATE 1 AMMO CONTINUOUS DAM[0] 12 TAG[0] NONE
 P2 STAT  0 CRIT  0 CRIT_1 N BOOST  0 B 1 TEMPLATE 0 AMMO NONE DAM[0]  0 TAG[0] NONE
 
 Total Rolls: 400
@@ -226,8 +226,16 @@ No Hits:  0.000% 0
 
 ======================================================
 
-P1 Scores 20 Success(es):  0.004% NONE
-P1 Scores 20 Success(es):  0.004%
+P1 Scores 24 Success(es):  0.000% NONE
+P1 Scores 24 Success(es):  0.000%
+P1 Scores 23 Success(es):  0.000% NONE
+P1 Scores 23 Success(es):  0.000%
+P1 Scores 22 Success(es):  0.001% NONE
+P1 Scores 22 Success(es):  0.001%
+P1 Scores 21 Success(es):  0.001% NONE
+P1 Scores 21 Success(es):  0.001%
+P1 Scores 20 Success(es):  0.001% NONE
+P1 Scores 20 Success(es):  0.001%
 P1 Scores 19 Success(es):  0.002% NONE
 P1 Scores 19 Success(es):  0.002%
 P1 Scores 18 Success(es):  0.004% NONE
@@ -266,6 +274,10 @@ P1 Scores  2 Success(es): 14.400% NONE
 P1 Scores  2 Success(es): 14.400%
 P1 Scores  1 Success(es): 24.000% NONE
 P1 Scores  1 Success(es): 24.000%
+P1 Scores 24+ Successes:   0.000% NONE
+P1 Scores 23+ Successes:   0.001% NONE
+P1 Scores 22+ Successes:   0.001% NONE
+P1 Scores 21+ Successes:   0.002% NONE
 P1 Scores 20+ Successes:   0.004% NONE
 P1 Scores 19+ Successes:   0.006% NONE
 P1 Scores 18+ Successes:   0.010% NONE
@@ -286,6 +298,10 @@ P1 Scores  4+ Successes:  12.960% NONE
 P1 Scores  3+ Successes:  21.600% NONE
 P1 Scores  2+ Successes:  36.000% NONE
 P1 Scores  1+ Successes:  60.000% NONE
+P1 Scores 24+ Successes:   0.000%
+P1 Scores 23+ Successes:   0.001%
+P1 Scores 22+ Successes:   0.001%
+P1 Scores 21+ Successes:   0.002%
 P1 Scores 20+ Successes:   0.004%
 P1 Scores 19+ Successes:   0.006%
 P1 Scores 18+ Successes:   0.010%
@@ -321,7 +337,7 @@ die if $output ne $expected;
 ###########################################################################
 
 $expected = <<EOF;
-P1 STAT 12 CRIT 12 CRIT_1 N BOOST  0 B 2 TEMPLATE 0 AMMO FIRE DAM[0] 13 TAG[0] NONE
+P1 STAT 12 CRIT 12 CRIT_1 N BOOST  0 B 2 TEMPLATE 0 AMMO CONTINUOUS DAM[0] 13 TAG[0] NONE
 P2 STAT  5 CRIT  5 CRIT_1 N BOOST  0 B 1 TEMPLATE 0 AMMO NORMAL DAM[0]  8 TAG[0] NONE
 
 Total Rolls: 8000
@@ -342,8 +358,16 @@ P2 Hits:  1 Crits:  0 -  4.575% (366)
 
 ======================================================
 
-P1 Scores 20 Success(es):  0.057% NONE
-P1 Scores 20 Success(es):  0.057%
+P1 Scores 24 Success(es):  0.012% NONE
+P1 Scores 24 Success(es):  0.012%
+P1 Scores 23 Success(es):  0.006% NONE
+P1 Scores 23 Success(es):  0.006%
+P1 Scores 22 Success(es):  0.008% NONE
+P1 Scores 22 Success(es):  0.008%
+P1 Scores 21 Success(es):  0.013% NONE
+P1 Scores 21 Success(es):  0.013%
+P1 Scores 20 Success(es):  0.018% NONE
+P1 Scores 20 Success(es):  0.018%
 P1 Scores 19 Success(es):  0.027% NONE
 P1 Scores 19 Success(es):  0.027%
 P1 Scores 18 Success(es):  0.040% NONE
@@ -382,6 +406,10 @@ P1 Scores  2 Success(es): 11.902% NONE
 P1 Scores  2 Success(es): 11.902%
 P1 Scores  1 Success(es): 15.643% NONE
 P1 Scores  1 Success(es): 15.643%
+P1 Scores 24+ Successes:   0.012% NONE
+P1 Scores 23+ Successes:   0.017% NONE
+P1 Scores 22+ Successes:   0.026% NONE
+P1 Scores 21+ Successes:   0.038% NONE
 P1 Scores 20+ Successes:   0.057% NONE
 P1 Scores 19+ Successes:   0.084% NONE
 P1 Scores 18+ Successes:   0.124% NONE
@@ -402,6 +430,10 @@ P1 Scores  4+ Successes:  22.444% NONE
 P1 Scores  3+ Successes:  31.307% NONE
 P1 Scores  2+ Successes:  43.210% NONE
 P1 Scores  1+ Successes:  58.853% NONE
+P1 Scores 24+ Successes:   0.012%
+P1 Scores 23+ Successes:   0.017%
+P1 Scores 22+ Successes:   0.026%
+P1 Scores 21+ Successes:   0.038%
 P1 Scores 20+ Successes:   0.057%
 P1 Scores 19+ Successes:   0.084%
 P1 Scores 18+ Successes:   0.124%
@@ -445,7 +477,7 @@ die if $output ne $expected;
 ###########################################################################
 
 $expected = <<EOF;
-P1 STAT 10 CRIT 10 CRIT_1 N BOOST  0 B 2 TEMPLATE 0 AMMO FIRE DAM[0] 12 TAG[0] NONE DAM[1] 12 TAG[1] NONE
+P1 STAT 10 CRIT 10 CRIT_1 N BOOST  0 B 2 TEMPLATE 0 AMMO CONTINUOUS DAM[0] 12 TAG[0] NONE DAM[1] 12 TAG[1] NONE
 P2 STAT  0 CRIT  0 CRIT_1 N BOOST  0 B 1 TEMPLATE 0 AMMO NONE DAM[0]  0 TAG[0] NONE
 
 Total Rolls: 8000
@@ -464,10 +496,18 @@ No Hits: 25.000% 2000
 
 ======================================================
 
-P1 Scores 20 Success(es):  0.135% NONE
-P1 Scores 20 Success(es):  0.135%
-P1 Scores 19 Success(es):  0.091% NONE
-P1 Scores 19 Success(es):  0.091%
+P1 Scores 24 Success(es):  0.028% NONE
+P1 Scores 24 Success(es):  0.028%
+P1 Scores 23 Success(es):  0.018% NONE
+P1 Scores 23 Success(es):  0.018%
+P1 Scores 22 Success(es):  0.023% NONE
+P1 Scores 22 Success(es):  0.023%
+P1 Scores 21 Success(es):  0.034% NONE
+P1 Scores 21 Success(es):  0.034%
+P1 Scores 20 Success(es):  0.050% NONE
+P1 Scores 20 Success(es):  0.050%
+P1 Scores 19 Success(es):  0.073% NONE
+P1 Scores 19 Success(es):  0.073%
 P1 Scores 18 Success(es):  0.107% NONE
 P1 Scores 18 Success(es):  0.107%
 P1 Scores 17 Success(es):  0.155% NONE
@@ -504,7 +544,11 @@ P1 Scores  2 Success(es): 10.909% NONE
 P1 Scores  2 Success(es): 10.909%
 P1 Scores  1 Success(es): 10.933% NONE
 P1 Scores  1 Success(es): 10.933%
-P1 Scores 20+ Successes:   0.135% NONE
+P1 Scores 24+ Successes:   0.028% NONE
+P1 Scores 23+ Successes:   0.046% NONE
+P1 Scores 22+ Successes:   0.069% NONE
+P1 Scores 21+ Successes:   0.103% NONE
+P1 Scores 20+ Successes:   0.153% NONE
 P1 Scores 19+ Successes:   0.227% NONE
 P1 Scores 18+ Successes:   0.334% NONE
 P1 Scores 17+ Successes:   0.489% NONE
@@ -524,7 +568,11 @@ P1 Scores  4+ Successes:  35.348% NONE
 P1 Scores  3+ Successes:  45.072% NONE
 P1 Scores  2+ Successes:  55.981% NONE
 P1 Scores  1+ Successes:  66.914% NONE
-P1 Scores 20+ Successes:   0.135%
+P1 Scores 24+ Successes:   0.028%
+P1 Scores 23+ Successes:   0.046%
+P1 Scores 22+ Successes:   0.069%
+P1 Scores 21+ Successes:   0.103%
+P1 Scores 20+ Successes:   0.153%
 P1 Scores 19+ Successes:   0.227%
 P1 Scores 18+ Successes:   0.334%
 P1 Scores 17+ Successes:   0.489%
