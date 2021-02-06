@@ -41,7 +41,7 @@ sub print_top{
     <div class='content'>
     <h1>Infinity Dice Calculator (N4)</h1>
 <p>
-The Infinity Dice Calculator is a statistical tool for the 3rd Edition of
+The Infinity Dice Calculator is a statistical tool for the 4th Edition of
 Infinity (N4).  It is a work in progress and may still have errors.
 Please report any issues to <a href="mailto:infinity\@ghostlords.com">
 infinity\@ghostlords.com</a>. My other Infinity resources may be found
