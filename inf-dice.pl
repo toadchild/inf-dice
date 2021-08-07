@@ -1756,7 +1756,7 @@ sub gen_attack_args{
             }
         }
 
-        $b = 1;
+        $b = (param("$us.b") // 1);
 
         # Bonuses from our CC skills
         if($us_ma){
