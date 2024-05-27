@@ -15,7 +15,7 @@ clean:
 	rm -f ${GENERATED_WWW_TARGETS} ${BIN_TARGETS} inf-dice.o
 
 inf-dice-n4: inf-dice.o
-	${CC} ${CFLAGS} ${LDFLAGS} ${LDLIBS} $< -o $@
+	${CC} ${CFLAGS} $< ${LDFLAGS} ${LDLIBS} -o $@
 
 inf-dice.o: inf-dice.c
 
